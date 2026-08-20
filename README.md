@@ -43,7 +43,7 @@ The whole engine + all 5 characters ship as a single bundled file on jsDelivr. J
 </script>
 ```
 
-> Tip: pin a version with `@v0.8.0` instead of `@master` for reproducible builds.
+> Tip: pin a version with `@latest` instead of `@master` for reproducible builds.
 
 ### Option B — Local / modular (split files)
 
