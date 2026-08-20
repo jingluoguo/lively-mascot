@@ -165,7 +165,13 @@ function createRig(root, rigEl, config, handlers) {
     }, currentHopInterval[0] * 1000 + Math.random() * (currentHopInterval[1] - currentHopInterval[0]) * 1000);
   }
 
-  function fireClick() { if (handlers.onClick) handlers.onClick(); setHappy(true); setTimeout(function(){ setHappy(false); }, 950); }
+  function fireClick() {
+    if (handlers.onClick) handlers.onClick();
+    // Skip happy flash if a non-idle emotion is active (avoid face overlap)
+    if (currentEmotionId !== "02") return;
+    setHappy(true);
+    setTimeout(function(){ setHappy(false); }, 950);
+  }
 
   if (following) { raf = requestAnimationFrame(tick); window.addEventListener("pointermove", onPointerMove, { passive: true }); }
   scheduleBlink(); scheduleHop();
