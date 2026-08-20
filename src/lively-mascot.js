@@ -222,7 +222,7 @@
     return {
       el: root,
       type: character.id,
-      setTheme: function (p) { if(p.body)theme.body=p.body; if(p.outline)theme.outline=p.outline; applyTheme(); },
+      setTheme: function (p) { if (p.body) theme.body = p.body; if (p.outline) theme.outline = p.outline; applyTheme(); },
       setEmotion: function (emotionId) {
         root.className = root.className.replace(/is-emotion-\d+/g, "").trim();
         root.classList.add("is-emotion-" + emotionId);
@@ -276,6 +276,6 @@
     characters: characters,
     emotions: LivelyEmotions,
     emotionGroups: LivelyEmotionGroups,
-    version: "0.8.0"
+    version: "0.1.0"
   };
 });
