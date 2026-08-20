@@ -21,6 +21,34 @@
 
 ## 快速开始
 
+### 方式 A — 一行 CDN 引入（免下载、免构建）
+
+整个引擎 + 5 个角色已打包成单文件放在 jsDelivr 上，只需两个标签：
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jingluoguo/lively-mascot@master/dist/lively-mascot.min.css" />
+<script src="https://cdn.jsdelivr.net/gh/jingluoguo/lively-mascot@master/dist/lively-mascot.min.js"></script>
+
+<div id="slot"></div>
+<script>
+  // 嫩芽（植物系吉祥物）— 默认
+  var s = LivelyMascot.createMascot(document.getElementById('slot'), {
+    type: 'sprout', size: 180
+  });
+
+  // 切换表情（所有角色共用同一套 API）
+  s.setEmotion('10'); // 开心
+  s.setEmotion('20'); // 思考中
+  s.clearEmotion();   // 恢复待机
+</script>
+```
+
+> 提示：把 `@master` 换成 `@v0.8.0` 可锁定版本，保证构建可复现。
+
+### 方式 B — 本地 / 模块化（分文件）
+
+如果你更想自己托管源码文件（例如接入自己的构建工具链）：
+
 ```html
 <!-- 核心：引擎样式 + 表情数据 + SDK -->
 <link rel="stylesheet" href="src/lively-mascot.css" />
@@ -58,6 +86,123 @@
   s.clearEmotion();   // 恢复待机
 </script>
 ```
+
+### 方式 C — 在 React / Vue 中使用
+
+不论哪个框架，先通过 CDN（或本地 `/dist`）加载一次引擎脚本，它会注册全局变量 `LivelyMascot`：
+
+```html
+<!-- 放在入口 HTML，全局只需一次 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jingluoguo/lively-mascot@master/dist/lively-mascot.min.css" />
+<script src="https://cdn.jsdelivr.net/gh/jingluoguo/lively-mascot@master/dist/lively-mascot.min.js"></script>
+```
+
+**React（命令式 + ref，便于用代码切换表情）**
+
+```jsx
+import { useEffect, useRef } from "react";
+
+export function Mascot({ type = "sprout", size = 180 }) {
+  const host = useRef(null);
+  const inst = useRef(null);
+
+  // 仅在 type / size 变化时重建实例
+  useEffect(() => {
+    inst.current = LivelyMascot.createMascot(host.current, { type, size });
+    return () => inst.current && inst.current.destroy();
+  }, [type, size]);
+
+  return (
+    <div>
+      <div ref={host} />
+      <button onClick={() => inst.current.setEmotion("10")}>开心</button>
+      <button onClick={() => inst.current.setEmotion("20")}>思考</button>
+      <button onClick={() => inst.current.clearEmotion()}>待机</button>
+    </div>
+  );
+}
+```
+
+**Vue 3（`<script setup>`）**
+
+```vue
+<script setup>
+import { ref, onMounted, onBeforeUnmount, watch } from "vue";
+
+const props = defineProps({ type: { default: "sprout" }, size: { default: 180 } });
+const el = ref(null);
+let inst = null;
+
+const mount = () =>
+  (inst = LivelyMascot.createMascot(el.value, { type: props.type, size: props.size }));
+onMounted(mount);
+onBeforeUnmount(() => inst && inst.destroy());
+watch(() => [props.type, props.size], () => { inst && inst.destroy(); mount(); });
+
+const set = (id) => inst && inst.setEmotion(id);
+const reset = () => inst && inst.clearEmotion();
+</script>
+
+<template>
+  <div>
+    <div ref="el" />
+    <button @click="set('10')">开心</button>
+    <button @click="set('20')">思考</button>
+    <button @click="reset()">待机</button>
+  </div>
+</template>
+```
+
+> 小提示：若只要一个**静态**角色、不需要代码切表情，更省事的是先调用一次 `LivelyMascot.defineMascotElement()` 注册自定义标签，然后在模板里直接写标签即可（属性变化会自动重建）。
+
+**纯 HTML（无需任何框架）**
+
+```html
+<script>
+  LivelyMascot.defineMascotElement(); // 注册 <lively-mascot>，全局只需一次
+</script>
+
+<!-- 直接声明式使用，浏览器自动渲染并循环待机动画 -->
+<lively-mascot type="cat" color="#ffd66b" size="180"></lively-mascot>
+<lively-mascot type="ghost" color="#9be7ff" size="160"></lively-mascot>
+```
+
+**React**
+
+```jsx
+import { useEffect } from "react";
+
+export function Mascot() {
+  useEffect(() => { LivelyMascot.defineMascotElement(); }, []);
+  return <lively-mascot type="cat" color="#ffd66b" size="180" />;
+}
+```
+
+**Vue 3**
+
+```vue
+<script setup>
+import { onMounted } from "vue";
+onMounted(() => LivelyMascot.defineMascotElement());
+</script>
+
+<template>
+  <lively-mascot type="cat" color="#ffd66b" size="180" />
+</template>
+```
+
+> 注意：声明式标签只响应 `type` / `color` / `size` 三个属性，改其中之一即自动重建；它拿不到实例、无法直接调 `setEmotion`。需要代码驱动切换表情时，请改用上方的 `createMascot` 用法。
+
+## 从源码构建
+
+`dist/` 里的单文件是由 `scripts/build-dist.mjs`（基于 esbuild）生成的，它会把引擎与 5 个角色的源码按顺序拼接并压缩：
+
+```bash
+npm install        # 安装 esbuild（唯一的构建依赖）
+npm run build      # 等价于：node scripts/build-dist.mjs
+```
+
+执行后会重新生成 `dist/lively-mascot.min.js` 和 `dist/lively-mascot.min.css`。只要改动了 `src/` 下任何文件，重跑一次即可。`dist/` 目录已纳入 npm 发布范围（`package.json` 的 `files`），并通过 jsDelivr 的 `@master` / `@vX.Y.Z` 引用对外提供。
 
 ## API
 

@@ -18,7 +18,12 @@
     "jelly",
     "robot"
   ],
+  "scripts": {
+    "build": "node scripts/build-dist.mjs"
+  },
   "files": [
+    "dist/lively-mascot.min.js",
+    "dist/lively-mascot.min.css",
     "src/lively-mascot.js",
     "src/lively-mascot.css",
     "src/core/emotions.js",
@@ -38,5 +43,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/jingluoguo/lively-mascot"
+  },
+  "dependencies": {
+    "esbuild": "^0.28.2",
+    "terser": "^5.50.0"
   }
 }
