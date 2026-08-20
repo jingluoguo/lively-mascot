@@ -1,0 +1,303 @@
+/* ============================================================
+ * lively-mascot · 共享样式（零依赖、纯 CSS）
+ *
+ * 视觉语言与原项目自测页吉祥物一致：实色填充 + 2px 墨描边 +
+ * 硬边偏移阴影的贴纸 / 新粗野风。所有类名以 lively- 为前缀，
+ * 避免与宿主项目样式冲突。
+ *
+ * 主题色通过 CSS 变量注入（由 JS 以 inline style 设置，或自行覆盖）：
+ *   --lively-body    身体主色，默认 #48ff42
+ *   --lively-outline 描边 / 眼睛 / 阴影墨色，默认 #080808
+ *   --lively-accent  点缀色（腮红等），默认 #ff9fb6
+ *
+ * 结构（DOM）：
+ *   .lively-mascot (root, 光标跟随类挂在它身上)
+ *     .lively-mascot__rig (JS 按视线施加侧倾/平移)
+ *       .lively__leaf  -> 坐落在头顶正上方(茎根被圆头顶盖住),待机摇曳 / is-happy 转圈
+ *       .lively-body   -> 待机摇摆
+ *       .lively-face-wrap > svg > .lively-face (随视线微转) -> 眨眼
+ *     .lively__feet    -> 踏步 / is-happy 踢腿 / is-hopping 收起
+ * ============================================================ */
+
+.lively-mascot {
+  --lively-body: #48ff42;
+  --lively-outline: #080808;
+  --lively-accent: #ff9fb6;
+  position: relative;
+  display: inline-block;
+  width: 106px;
+  height: 106px;
+  container-type: inline-size;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* 骨架层：JS 按视线方向施加侧倾 / 平移（高频 inline transform） */
+.lively-mascot__rig {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+/* ---------- 身体：圆角贴纸块 + 硬边阴影，待机摇摆 ---------- */
+.lively-body {
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--lively-outline);
+  border-radius: 50% 50% 46% 49%;
+  background: var(--lively-body);
+  box-shadow: 5px 5px 0 var(--lively-outline);
+  transform-origin: 50% 92%;
+  animation: lively-sway 3.6s ease-in-out infinite;
+}
+
+/* 点击开心：身子果冻弹跳（覆盖摇摆） */
+.lively-mascot.is-happy .lively-body {
+  animation: lively-squish 0.6s cubic-bezier(.3, 1.6, .4, 1);
+}
+
+/* ---------- 脸：叠在身体上的 SVG 贴纸层 + 呼吸 ---------- */
+.lively-face-wrap {
+  position: absolute;
+  inset: 4px;
+}
+
+.lively-face-wrap svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-origin: 50% 50%;
+  animation: lively-breathe 3.8s ease-in-out infinite;
+}
+
+.lively-face {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.lively-face__eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 90ms ease-out;
+}
+
+.lively-face__eye.is-blinking {
+  transform: scaleY(0.08);
+}
+
+.lively-face__eye > ellipse {
+  fill: #fff;
+  stroke: var(--lively-outline);
+  stroke-width: 2.4;
+}
+
+.lively-face__pupil {
+  fill: var(--lively-outline);
+}
+
+.lively-face__shine {
+  fill: #fff;
+}
+
+.lively-face__blush {
+  fill: var(--lively-accent);
+  fill-opacity: 0.75;
+}
+
+.lively-face__mouth,
+.lively-face__happy {
+  fill: none;
+  stroke: var(--lively-outline);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+
+.lively-face__happy-mouth {
+  fill: var(--lively-outline);
+}
+
+.lively-face__happy,
+.lively-face__happy-mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-happy .lively-face__eye > ellipse,
+.lively-mascot.is-happy .lively-face__pupil,
+.lively-mascot.is-happy .lively-face__shine,
+.lively-mascot.is-happy .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-happy .lively-face__happy,
+.lively-mascot.is-happy .lively-face__happy-mouth {
+  visibility: visible;
+}
+
+/* ---------- 头顶嫩芽：独立 svg，手绘贴纸风 ----------
+   茎根落在身体顶部弧缘正上方，水平居中，像从头顶长出；
+   body 的实色会盖住茎底极少一截，自然衔接。 */
+.lively__leaf {
+  position: absolute;
+  top: -42px;
+  left: 50%;
+  width: 46px;
+  height: 50px;
+  margin-left: -23px;
+  transform-origin: 50% 100%;
+  animation: lively-leaf-sway 2.6s ease-in-out infinite;
+}
+
+.lively__leaf svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(3px 3px 0 var(--lively-outline));
+}
+
+.lively-sprout__stem {
+  fill: none;
+  stroke: var(--lively-outline);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.lively-sprout__leaf {
+  fill: var(--lively-body);
+  stroke: var(--lively-outline);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.lively-sprout__vein {
+  fill: none;
+  stroke: var(--lively-outline);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.lively-sprout__shine {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  opacity: 0.9;
+}
+
+/* 点击开心：叶子转一圈 */
+.lively-mascot.is-happy .lively__leaf {
+  animation: lively-leaf-spin 0.7s cubic-bezier(.3, 1.4, .4, 1);
+}
+
+/* ---------- 双脚：实心墨色小脚（SVG，与身体同贴纸语言），原地交替踏步。
+   尺寸用 cqw 相对容器宽度，任意 size 下都居中、贴合身体底 ---------- */
+.lively__feet {
+  position: absolute;
+  bottom: -7cqw;
+  left: 0;
+  width: 100%;
+}
+
+.lively__foot {
+  position: absolute;
+  bottom: 0;
+  width: 22cqw;
+  height: 16cqw;
+  transform-origin: 50% 0;
+  animation: lively-foot-tap 1.6s ease-in-out infinite;
+}
+
+.lively__foot svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+/* 相对容器宽的居中位置：两脚本对称收在身体底中部 */
+.lively__foot--l { left: 18cqw; }
+.lively__foot--r { left: 60cqw; animation-delay: 0.8s; }
+
+.lively-foot__body {
+  fill: var(--lively-outline);
+  stroke: var(--lively-outline);
+  stroke-width: 1;
+  filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.18));
+}
+
+.lively-foot__shine {
+  fill: #fff;
+  opacity: 0.85;
+}
+
+/* 点击开心：双脚踢出去 */
+.lively-mascot.is-happy .lively__foot--l {
+  animation: lively-foot-kick-l 0.6s cubic-bezier(.3, 1.5, .5, 1);
+}
+
+.lively-mascot.is-happy .lively__foot--r {
+  animation: lively-foot-kick-r 0.6s cubic-bezier(.3, 1.5, .5, 1);
+}
+
+/* 间歇小跳：整体蹦一下，脚顺势收起 */
+.lively-mascot.is-hopping .lively-mascot__rig {
+  animation: lively-hop 0.9s cubic-bezier(.3, .7, .4, 1);
+}
+
+/* ---------- 减少动效偏好：降级为静态 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .lively-body,
+  .lively__leaf,
+  .lively__foot,
+  .lively-face-wrap svg {
+    animation: none !important;
+  }
+}
+
+/* ---------- keyframes ---------- */
+@keyframes lively-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.035); }
+}
+
+@keyframes lively-squish {
+  0% { transform: scale(1, 1); }
+  30% { transform: scale(1.12, 0.86); }
+  60% { transform: scale(0.94, 1.08); }
+  100% { transform: scale(1, 1); }
+}
+
+@keyframes lively-sway {
+  0%, 100% { transform: rotate(6deg); }
+  50% { transform: rotate(10deg) translateY(-2px); }
+}
+
+@keyframes lively-hop {
+  0% { transform: translateY(0); }
+  18% { transform: translateY(3px) scale(1.07, 0.88); }
+  45% { transform: translateY(-13px) scale(0.95, 1.07); }
+  72% { transform: translateY(0) scale(1.05, 0.93); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes lively-leaf-sway {
+  0%, 100% { transform: rotate(8deg); }
+  50% { transform: rotate(20deg) translateY(-1px); }
+}
+
+@keyframes lively-leaf-spin {
+  0% { transform: rotate(8deg); }
+  100% { transform: rotate(368deg); }
+}
+
+@keyframes lively-foot-tap {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  30% { transform: rotate(-11deg) translateY(-2px); }
+  60% { transform: rotate(5deg) translateY(0); }
+}
+
+@keyframes lively-foot-kick-l {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  40% { transform: rotate(-26deg) translateY(-5px); }
+}
+
+@keyframes lively-foot-kick-r {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  40% { transform: rotate(26deg) translateY(-5px); }
+}
