@@ -1,0 +1,185 @@
+/* ============================================================
+ * lively-mascot · Cat Character Styles
+ *
+ * A round cat with triangular ears, a curved tail, and whiskers.
+ * ============================================================ */
+
+/* --- Body shape: more rounded than sprout --- */
+.lively-mascot--cat .lively-body {
+  border-radius: 50% 50% 48% 48%;
+}
+
+/* --- Ears: rounded cat ears on top (nested inside body so they
+       follow body bounce / squash / boot / wake animations) --- */
+.lively__ears {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  width: 76px;
+  height: 32px;
+  margin-left: -38px;
+  z-index: 3;
+  transform-origin: 50% 92%;
+}
+
+.lively__ears svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.lively__ear {
+  fill: var(--lively-body);
+  stroke: var(--lively-outline);
+  stroke-width: 2.4;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.lively__ear--inner {
+  fill: var(--lively-accent);
+  stroke: none;
+  opacity: 0.85;
+}
+
+/* Happy click: ears wiggle */
+.lively-mascot.is-happy .lively__ears {
+  animation: lively-cat-ear-wiggle 0.5s ease-in-out;
+}
+
+/* --- Tail: curved behind the body --- */
+.lively__tail {
+  position: absolute;
+  bottom: 8cqw;
+  right: -14cqw;
+  width: 30cqw;
+  height: 30cqw;
+  transform-origin: 0% 100%;
+  animation: lively-cat-tail-sway 2.4s ease-in-out infinite;
+  z-index: -1;
+}
+
+.lively__tail svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.lively-cat__tail-path {
+  fill: none;
+  stroke: var(--lively-body);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.lively-cat__tail-outline {
+  fill: none;
+  stroke: var(--lively-outline);
+  stroke-width: 7;
+  stroke-linecap: round;
+  opacity: 0.3;
+}
+
+.lively-cat__tail-tip {
+  fill: var(--lively-body);
+  stroke: var(--lively-outline);
+  stroke-width: 2;
+}
+
+/* Happy click: tail wags fast */
+.lively-mascot.is-happy .lively__tail {
+  animation: lively-cat-tail-wag 0.3s ease-in-out 3;
+}
+
+/* --- Whiskers: lines on the face --- */
+.lively-face__whisker {
+  fill: none;
+  stroke: var(--lively-outline);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  opacity: 0.5;
+}
+
+/* --- Nose: small triangle --- */
+.lively-face__cat-nose {
+  fill: var(--lively-accent);
+  stroke: var(--lively-outline);
+  stroke-width: 1;
+}
+
+/* --- Foot positioning for cat --- */
+.lively-mascot--cat .lively__foot--l { left: 20cqw; }
+.lively-mascot--cat .lively__foot--r { left: 58cqw; animation-delay: 0.8s; }
+
+/* Cat paw shape override */
+.lively-mascot--cat .lively-foot__body {
+  rx: 8;
+  ry: 5;
+}
+
+/* --- Cat-specific ear emotion animations --- */
+.lively-mascot.is-emotion-11 .lively__ears { animation: lively-cat-ear-perk 0.6s ease-in-out infinite; }
+.lively-mascot.is-emotion-13 .lively__ears { animation: lively-cat-ear-flatten 0.3s ease-in-out infinite; }
+.lively-mascot.is-emotion-37 .lively__ears { animation: lively-cat-ear-nervous 0.4s ease-in-out infinite; }
+.lively-mascot.is-emotion-00 .lively__ears { animation: lively-cat-ear-relax 4s ease-in-out infinite; }
+
+/* --- Cat-specific tail emotion animations --- */
+.lively-mascot.is-emotion-12 .lively__tail { animation: lively-cat-tail-droop 3s ease-in-out infinite; }
+.lively-mascot.is-emotion-13 .lively__tail { animation: lively-cat-tail-puff 0.5s ease-in-out infinite; }
+.lively-mascot.is-emotion-37 .lively__tail { animation: lively-cat-tail-tuck 0.6s ease-in-out infinite; }
+
+/* --- Cat ear keyframes --- */
+@keyframes lively-cat-ear-wiggle {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-4deg) translateY(-2px); }
+  75% { transform: rotate(4deg) translateY(-2px); }
+}
+
+@keyframes lively-cat-ear-perk {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50% { transform: translateY(-3px) scaleY(1.1); }
+}
+
+@keyframes lively-cat-ear-flatten {
+  0%, 100% { transform: scaleY(1) rotate(0); }
+  50% { transform: scaleY(0.6) rotate(-5deg); }
+}
+
+@keyframes lively-cat-ear-nervous {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}
+
+@keyframes lively-cat-ear-relax {
+  0%, 100% { transform: rotate(0) scaleY(1); }
+  50% { transform: rotate(2deg) scaleY(0.9); }
+}
+
+/* --- Cat tail keyframes --- */
+@keyframes lively-cat-tail-sway {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(10deg); }
+}
+
+@keyframes lively-cat-tail-wag {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(15deg); }
+}
+
+@keyframes lively-cat-tail-droop {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  50% { transform: rotate(-8deg) translateY(3px); }
+}
+
+@keyframes lively-cat-tail-puff {
+  0%, 100% { transform: rotate(-5deg) scaleY(1); }
+  50% { transform: rotate(10deg) scaleY(1.3); }
+}
+
+@keyframes lively-cat-tail-tuck {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-15deg) translateX(-4px); }
+}

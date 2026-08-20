@@ -28,7 +28,9 @@ function createRig(root, rigEl, config, handlers) {
   var currentEmotionId = "02"; // Default idle
   var bodyEl = null;
   var leafEl = null;
+  var leafUseLeafAnim = true;
   var feetEl = null;
+  var gazeEl = null;
 
   var api = {
     registerPupil: function (elm, spec) {
@@ -38,8 +40,13 @@ function createRig(root, rigEl, config, handlers) {
     registerEye: function (elm) { if (eyes.indexOf(elm) === -1) eyes.push(elm); },
     registerFace: function (elm) { face = elm; },
     registerBody: function (elm) { bodyEl = elm; },
-    registerLeaf: function (elm) { leafEl = elm; },
+    registerLeaf: function (elm, opts) {
+      leafEl = elm;
+      // sprout uses its emotion `leafAnim` data; cat drives ears via its own CSS.
+      leafUseLeafAnim = !(opts && opts.useLeafAnim === false);
+    },
     registerFeet: function (elm) { feetEl = elm; },
+    registerGazeWrap: function (elm) { gazeEl = elm; },
     setEmotionState: function (id) {
       currentEmotionId = String(id);
       applyEmotionBehavior(currentEmotionId);
@@ -55,7 +62,7 @@ function createRig(root, rigEl, config, handlers) {
   function clearEmotionBehavior() {
     if (bodyEl) { bodyEl.style.animation = ""; bodyEl.style.filter = ""; }
     rigEl.style.animation = "";
-    if (leafEl) { leafEl.style.animation = ""; }
+    if (leafEl && leafUseLeafAnim) { leafEl.style.animation = ""; }
     if (feetEl) {
       var footL = feetEl.querySelector(".lively__foot--l");
       var footR = feetEl.querySelector(".lively__foot--r");
@@ -72,8 +79,9 @@ function createRig(root, rigEl, config, handlers) {
       bodyEl.style.animation = def.bodyAnim || "";
       bodyEl.style.filter = def.bodyFilter || "";
     }
-    // Leaf
-    if (leafEl) {
+    // Leaf (top decoration). Only drive it from emotion data when the
+    // character opts in (sprout). Cat drives its ears via its own CSS rules.
+    if (leafEl && leafUseLeafAnim) {
       leafEl.style.animation = def.leafAnim || "";
     }
     // Feet
@@ -124,7 +132,7 @@ function createRig(root, rigEl, config, handlers) {
       p.el.setAttribute("transform", "translate(" + (curX * p.spec.maxX).toFixed(2) + " " + (curY * p.spec.maxY).toFixed(2) + ")");
     }
     if (face) face.setAttribute("transform", "rotate(" + (curX * 3).toFixed(2) + " 50 52)");
-    rigEl.style.transform = "rotate(" + (curX * 5).toFixed(2) + "deg) translate3d(" + (curX * 4).toFixed(1) + "px, " + (curY * 2.5).toFixed(1) + "px, 0)";
+    (gazeEl || rigEl).style.transform = "rotate(" + (curX * 5).toFixed(2) + "deg) translate3d(" + (curX * 4).toFixed(1) + "px, " + (curY * 2.5).toFixed(1) + "px, 0)";
     raf = requestAnimationFrame(tick);
   }
 

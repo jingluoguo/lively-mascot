@@ -6,10 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>lively-mascot · demo</title>
   <link rel="stylesheet" href="src/lively-mascot.css" />
+  <link rel="stylesheet" href="src/characters/sprout.css" />
+  <link rel="stylesheet" href="src/characters/cat.css" />
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -21,279 +21,90 @@
       min-height: 100vh;
     }
 
-    .page {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 56px 24px 88px;
+    .page { max-width: 860px; margin: 0 auto; padding: 56px 24px 88px; }
+    .hero { text-align: center; }
+    .hero h1 { margin: 0 0 10px; font-size: 42px; letter-spacing: -1.5px; }
+    .hero__dot { color: #48ff42; text-shadow: 2px 2px 0 #080808; -webkit-text-stroke: 1.5px #080808; font-size: 30px; vertical-align: 6px; }
+    .hero__tagline { margin: 0 auto 14px; max-width: 580px; font-size: 16px; line-height: 1.7; color: #555; }
+    .hero__hint { display: inline-block; margin: 0; padding: 6px 14px; border: 2px solid #080808; border-radius: 999px; background: #fff; box-shadow: 3px 3px 0 #080808; font-size: 13px; color: #333; }
+
+    /* ---- Stage: vertical stack ---- */
+    .stage {
+      max-width: 760px;
+      margin: 32px auto 40px;
     }
 
-    .hero {
-      text-align: center;
-    }
-
-    .hero h1 {
-      margin: 0 0 10px;
-      font-size: 42px;
-      letter-spacing: -1.5px;
-    }
-
-    .hero__dot {
-      color: #48ff42;
-      text-shadow: 2px 2px 0 #080808;
-      -webkit-text-stroke: 1.5px #080808;
-      font-size: 30px;
-      vertical-align: 6px;
-    }
-
-    .hero__tagline {
-      margin: 0 auto 14px;
-      max-width: 580px;
-      font-size: 16px;
-      line-height: 1.7;
-      color: #555;
-    }
-
-    .hero__hint {
-      display: inline-block;
-      margin: 0;
-      padding: 6px 14px;
-      border: 2px solid #080808;
-      border-radius: 999px;
-      background: #fff;
-      box-shadow: 3px 3px 0 #080808;
-      font-size: 13px;
-      color: #333;
-    }
-
+    /* Showcase: mascot preview */
     .showcase {
       display: flex;
       justify-content: center;
-      padding: 48px 0 36px;
+      align-items: center;
+      min-height: 220px;
     }
 
-    /* ---- Main Tabs ---- */
-    .tabs {
-      margin: 0 0 0;
+    /* ---- Character Selector ---- */
+    .char-bar {
+      display: flex; gap: 10px;
+      justify-content: center;
+      margin-top: 36px;
     }
-
-    .tabs__bar {
-      display: flex;
-      gap: 0;
+    .char-btn {
+      width: 84px;
+      padding: 9px 0;
       border: 2px solid #080808;
-      border-radius: 12px 12px 0 0;
+      border-radius: 12px;
       background: #fff;
       box-shadow: 3px 3px 0 #080808;
-      overflow: hidden;
-    }
-
-    .tabs__btn {
-      flex: 1;
-      padding: 12px 0;
-      border: none;
-      border-right: 1px solid #080808;
-      background: #f5f5f5;
-      font-size: 14px;
-      font-weight: 700;
-      color: #666;
-      cursor: pointer;
-      transition: background .15s, color .15s;
-    }
-
-    .tabs__btn:last-child {
-      border-right: none;
-    }
-
-    .tabs__btn:hover {
-      background: #eee;
-    }
-
-    .tabs__btn.is-active {
-      background: #fff;
-      color: #1d1d1f;
-    }
-
-    .tabs__panel {
-      display: none;
-      border: 2px solid #080808;
-      border-top: none;
-      border-radius: 0 0 12px 12px;
-      background: #fff;
-      box-shadow: 3px 3px 0 #080808;
-      padding: 20px;
-    }
-
-    .tabs__panel.is-active {
-      display: block;
-    }
-
-    /* ---- Sub Tabs (Emotion Groups) ---- */
-    .sub-tabs {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 16px;
-    }
-
-    .sub-tabs__btn {
-      padding: 6px 14px;
-      border: 2px solid #080808;
-      border-radius: 999px;
-      background: #fff;
-      font-size: 12px;
-      font-weight: 700;
-      color: #666;
+      font-size: 14px; font-weight: 700; color: #666;
       cursor: pointer;
       transition: all .15s;
     }
+    .char-btn:hover { background: #f0f0f0; transform: translate(-1px, -1px); }
+    .char-btn.is-active { background: #080808; color: #fff; transform: translate(1px, 1px); box-shadow: 1px 1px 0 #080808; }
 
-    .sub-tabs__btn:hover {
-      background: #f0f0f0;
-    }
+    /* ---- Main Tabs (below character switcher) ---- */
+    .tabs { margin: 36px auto 0; max-width: 760px; }
+    .tabs__bar { display: flex; gap: 0; border: 2px solid #080808; border-radius: 12px 12px 0 0; background: #fff; box-shadow: 3px 3px 0 #080808; overflow: hidden; }
+    .tabs__btn { flex: 1; padding: 12px 0; border: none; border-right: 1px solid #080808; background: #f5f5f5; font-size: 14px; font-weight: 700; color: #666; cursor: pointer; transition: background .15s, color .15s; }
+    .tabs__btn:last-child { border-right: none; }
+    .tabs__btn:hover { background: #eee; }
+    .tabs__btn.is-active { background: #fff; color: #1d1d1f; }
+    .tabs__panel { display: none; border: 2px solid #080808; border-top: none; border-radius: 0 0 12px 12px; background: #fff; box-shadow: 3px 3px 0 #080808; padding: 20px; }
+    .tabs__panel.is-active { display: block; }
 
-    .sub-tabs__btn.is-active {
-      background: #080808;
-      color: #fff;
-    }
-
-    .sub-panel {
-      display: none;
-    }
-
-    .sub-panel.is-active {
-      display: block;
-    }
+    /* ---- Sub Tabs ---- */
+    .sub-tabs { display: flex; gap: 6px; margin-bottom: 16px; }
+    .sub-tabs__btn { padding: 6px 14px; border: 2px solid #080808; border-radius: 999px; background: #fff; font-size: 12px; font-weight: 700; color: #666; cursor: pointer; transition: all .15s; }
+    .sub-tabs__btn:hover { background: #f0f0f0; }
+    .sub-tabs__btn.is-active { background: #080808; color: #fff; }
+    .sub-panel { display: none; }
+    .sub-panel.is-active { display: block; }
 
     /* ---- Palette Grid ---- */
-    .palette {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 10px;
-    }
-
-    .palette__item {
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      height: 72px;
-      padding: 8px 6px;
-      border-radius: 10px;
-      border: 2px solid rgba(8, 8, 8, .12);
-      background: #fafafa;
-      cursor: pointer;
-      transition: border-color .15s, box-shadow .15s, background .15s, transform .15s;
-    }
-
-    .palette__swatch {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      box-shadow: 2px 2px 0 rgba(0, 0, 0, .15);
-    }
-
-    .palette__item:hover {
-      border-color: rgba(8, 8, 8, .35);
-    }
-
-    .palette__item.is-active {
-      border-color: #080808;
-      background: #fff;
-      box-shadow: 3px 3px 0 #080808;
-      transform: translate(-1px, -1px);
-    }
-
-    .palette__item figcaption {
-      font-size: 13px;
-      color: #666;
-      text-align: center;
-      transition: color .15s, font-weight .15s;
-    }
-
-    .palette__item.is-active figcaption {
-      color: #1d1d1f;
-      font-weight: 900;
-    }
+    .palette { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+    .palette__item { margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; height: 72px; padding: 8px 6px; border-radius: 10px; border: 2px solid rgba(8, 8, 8, .12); background: #fafafa; cursor: pointer; transition: border-color .15s, box-shadow .15s, background .15s, transform .15s; }
+    .palette__swatch { width: 36px; height: 36px; border-radius: 50%; box-shadow: 2px 2px 0 rgba(0, 0, 0, .15); }
+    .palette__item:hover { border-color: rgba(8, 8, 8, .35); }
+    .palette__item.is-active { border-color: #080808; background: #fff; box-shadow: 3px 3px 0 #080808; transform: translate(-1px, -1px); }
+    .palette__item figcaption { font-size: 13px; color: #666; text-align: center; transition: color .15s, font-weight .15s; }
+    .palette__item.is-active figcaption { color: #1d1d1f; font-weight: 900; }
 
     /* ---- Emotion Grid ---- */
-    .emotion-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
+    .emotion-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .emotion-item { padding: 10px 8px; border-radius: 8px; border: 2px solid rgba(8, 8, 8, .1); background: #fafafa; cursor: pointer; text-align: center; transition: all .1s; }
+    .emotion-item:hover { background: #f0f0f0; transform: translateY(-2px); box-shadow: 2px 2px 0 rgba(0, 0, 0, .1); }
+    .emotion-item:active { transform: scale(0.93) translateY(1px); box-shadow: 1px 1px 0 rgba(0, 0, 0, .15); background: #e8e8e8; transition: transform .06s, box-shadow .06s, background .06s; }
+    .emotion-item.is-active { border-color: #080808; background: #fff; box-shadow: 3px 3px 0 #080808; transform: translate(-1px, -1px); }
+    .emotion-item.is-active .emotion-item__name { color: #080808; }
+    .emotion-item__name { font-size: 13px; font-weight: 700; color: #1d1d1f; }
+    .emotion-item__desc { font-size: 11px; color: #888; margin-top: 3px; }
 
-    .emotion-item {
-      padding: 10px 8px;
-      border-radius: 8px;
-      border: 2px solid rgba(8, 8, 8, .1);
-      background: #fafafa;
-      cursor: pointer;
-      text-align: center;
-      transition: all .1s;
-    }
-
-    .emotion-item:hover {
-      background: #f0f0f0;
-      transform: translateY(-2px);
-      box-shadow: 2px 2px 0 rgba(0, 0, 0, .1);
-    }
-
-    .emotion-item:active {
-      transform: scale(0.93) translateY(1px);
-      box-shadow: 1px 1px 0 rgba(0, 0, 0, .15);
-      background: #e8e8e8;
-      transition: transform .06s, box-shadow .06s, background .06s;
-    }
-
-    .emotion-item.is-active {
-      border-color: #080808;
-      background: #fff;
-      box-shadow: 3px 3px 0 #080808;
-      transform: translate(-1px, -1px);
-    }
-
-    .emotion-item.is-active .emotion-item__name {
-      color: #080808;
-    }
-
-    .emotion-item__name {
-      font-size: 13px;
-      font-weight: 700;
-      color: #1d1d1f;
-    }
-
-    .emotion-item__desc {
-      font-size: 11px;
-      color: #888;
-      margin-top: 3px;
-    }
-
-    .code {
-      border: 2px solid #080808;
-      border-radius: 14px;
-      background: #fff;
-      box-shadow: 5px 5px 0 #080808;
-      overflow: hidden;
-      margin-top: 28px;
-    }
-
-    .code pre {
-      margin: 0;
-      padding: 18px 22px;
-      overflow-x: auto;
-      font-size: 13px;
-      line-height: 1.7;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    }
+    .code { border: 2px solid #080808; border-radius: 14px; background: #fff; box-shadow: 5px 5px 0 #080808; overflow: hidden; margin-top: 28px; }
+    .code pre { margin: 0; padding: 18px 22px; overflow-x: auto; font-size: 13px; line-height: 1.7; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 
     @media (max-width: 720px) {
-      .palette {
-        grid-template-columns: repeat(3, 1fr);
-      }
-
-      .emotion-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
+      .palette { grid-template-columns: repeat(3, 1fr); }
+      .emotion-grid { grid-template-columns: repeat(3, 1fr); }
     }
   </style>
 </head>
@@ -302,45 +113,90 @@
   <main class="page">
     <header class="hero">
       <h1><span class="hero__dot">✦</span> lively-mascot</h1>
-      <p class="hero__tagline">通用电子宠物引擎：32 种状态表情 · 纯 SVG 驱动 · 零依赖 · 即插即用。</p>
+      <p class="hero__tagline">通用电子宠物引擎：40 种状态表情 · 多角色 · 纯 SVG 驱动 · 零依赖 · 即插即用。</p>
       <p class="hero__hint" id="hint">把光标移到吉祥物上 · 点击让它开心</p>
     </header>
 
-    <section class="showcase" id="showcase"></section>
+    <!-- Stage: vertical stack -->
+    <div class="stage">
+      <section class="showcase" id="showcase"></section>
+      <div class="char-bar" id="char-bar"></div>
 
-    <div class="tabs" id="tabs">
-      <div class="tabs__bar" id="tabs-bar"></div>
-      <div class="tabs__panel is-active" id="panel-color"></div>
-      <div class="tabs__panel" id="panel-emotion"></div>
+      <div class="tabs" id="tabs">
+        <div class="tabs__bar" id="tabs-bar"></div>
+        <div class="tabs__panel is-active" id="panel-color"></div>
+        <div class="tabs__panel" id="panel-emotion"></div>
+      </div>
     </div>
 
     <section class="code">
       <pre>// 任意容器内创建
-LivelyMascot.createMascot(document.querySelector('#showcase'), {
-  type: 'sprout', color: '#48ff42', size: 180,
+var mascot = LivelyMascot.createMascot(el, {
+  type: 'sprout',  // 或 'cat'
+  color: '#48ff42', size: 180,
   onClick: () => console.log('hi'),
 });
 
 // 切换表情
 mascot.setEmotion('10');  // Happy
-mascot.setEmotion('20');  // Thinking
-mascot.setEmotion('31');  // Error</pre>
+mascot.setEmotion('38');  // Eureka
+
+// 切换角色
+LivelyMascot.registerCharacter('myChar', renderFn, 'MyChar');
+mascot = LivelyMascot.createMascot(el, { type: 'myChar' });</pre>
     </section>
   </main>
 
   <script src="src/core/emotions.js"></script>
   <script src="src/core/rig.js"></script>
   <script src="src/lively-mascot.js"></script>
+  <script src="src/characters/sprout.js"></script>
+  <script src="src/characters/cat.js"></script>
   <script>
     var hint = document.getElementById('hint');
     function say(name) {
       hint.textContent = name + ' says: hello!（点击于 ' + new Date().toLocaleTimeString() + '）';
     }
 
-    // ---- 主展示 ----
-    var hero = LivelyMascot.createMascot(document.getElementById('showcase'), {
-      type: 'sprout', size: 180,
-      onClick: function () { say('Sprout'); },
+    // ---- Current mascot instance ----
+    var hero = null;
+    var currentCharType = 'sprout';
+
+    function createHero(type) {
+      // Destroy old
+      if (hero) hero.destroy();
+      var container = document.getElementById('showcase');
+      container.innerHTML = '';
+      hero = LivelyMascot.createMascot(container, {
+        type: type,
+        size: 180,
+        onClick: function () { say(type === 'cat' ? 'Meow!' : 'Sprout'); },
+      });
+      currentCharType = type;
+      // Re-apply active emotion if any
+      var activeEmotion = document.querySelector('.emotion-item.is-active');
+      if (activeEmotion) {
+        hero.setEmotion(activeEmotion.dataset.emotionId);
+      }
+    }
+
+    // ---- Character Bar ----
+    var charBar = document.getElementById('char-bar');
+    var charTypes = ['sprout', 'cat'];
+    var charNames = { sprout: '🌱 嫩芽', cat: '🐱 小猫' };
+    var charBtns = [];
+
+    charTypes.forEach(function (type) {
+      var btn = document.createElement('button');
+      btn.className = 'char-btn' + (type === 'sprout' ? ' is-active' : '');
+      btn.textContent = charNames[type];
+      btn.addEventListener('click', function () {
+        charBtns.forEach(function (b) { b.classList.remove('is-active'); });
+        btn.classList.add('is-active');
+        createHero(type);
+      });
+      charBar.appendChild(btn);
+      charBtns.push(btn);
     });
 
     // ---- Main Tabs ----
@@ -363,7 +219,7 @@ mascot.setEmotion('31');  // Error</pre>
       tabBtns.push(btn);
     });
 
-    // ---- 颜色面板 ----
+    // ---- Color Panel ----
     var palettes = [
       { name: '薄荷绿', color: '#48ff42', outline: '#080808' },
       { name: '天空蓝', color: '#6ec7ff', outline: '#0b1e3a' },
@@ -398,14 +254,12 @@ mascot.setEmotion('31');  // Error</pre>
     });
     palettePanel.appendChild(paletteGrid);
 
-    // ---- 表情面板 (Sub Tabs) ----
+    // ---- Emotion Panel (Sub Tabs) ----
     var emotionPanel = document.getElementById('panel-emotion');
     var groups = LivelyMascot.emotionGroups;
     var emotions = LivelyMascot.emotions;
     var groupKeys = Object.keys(groups);
-    var currentGroup = groupKeys[0];
 
-    // Sub-tabs bar
     var subBar = document.createElement('div');
     subBar.className = 'sub-tabs';
     var subBtns = [];
@@ -456,6 +310,9 @@ mascot.setEmotion('31');  // Error</pre>
 
     emotionPanel.appendChild(subBar);
     subPanels.forEach(function (p) { emotionPanel.appendChild(p); });
+
+    // ---- Init ----
+    createHero('sprout');
   </script>
 </body>
 
