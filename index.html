@@ -223,10 +223,10 @@
           lifecycle: '生命周期', reaction: '情绪反应', work: '工作状态'
         },
         clickName: function (type) {
-          return type === 'cat' ? 'Meow!' : 'Sprout';
+          return type === 'cat' ? '喵！' : '嫩芽';
         },
-        sayGreeting: function (name) {
-          return name + ' says: hello!（点击于 ' + new Date().toLocaleTimeString() + '）';
+        sayGreeting: function (name, time) {
+          return name + ' 说：你好！（点击于 ' + (time || new Date()).toLocaleTimeString() + '）';
         },
         sayEmotion: function (name) {
           return '表情：' + name;
@@ -248,8 +248,8 @@
         clickName: function (type) {
           return type === 'cat' ? 'Meow!' : 'Sprout';
         },
-        sayGreeting: function (name) {
-          return name + ' says: hello! (clicked at ' + new Date().toLocaleTimeString() + ')';
+        sayGreeting: function (name, time) {
+          return name + ' says: hello! (clicked at ' + (time || new Date()).toLocaleTimeString() + ')';
         },
         sayEmotion: function (name) {
           return 'Emotion: ' + name;
@@ -262,7 +262,8 @@
 
     // ---- Hint helper ----
     var hint = document.getElementById('hint');
-    function say(text) { hint.textContent = text; }
+    var lastMessage = null; // { build: function() {...} } so it re-renders on language switch
+    function say(build) { lastMessage = build; hint.textContent = build(); }
 
     // ---- Current mascot instance ----
     var hero = null;
@@ -276,7 +277,7 @@
       hero = LivelyMascot.createMascot(container, {
         type: type,
         size: 180,
-        onClick: function () { say(T().sayGreeting(T().clickName(type))); },
+        onClick: function () { say(function () { return T().sayGreeting(T().clickName(type), new Date()); }); },
       });
       currentCharType = type;
       if (currentTheme) {
@@ -410,7 +411,7 @@
           hero.setEmotion(e.id);
           emotionPanel.querySelectorAll('.emotion-item.is-active').forEach(function (a) { a.classList.remove('is-active'); });
           item.classList.add('is-active');
-          say(T().sayEmotion(e.name));
+          say(function () { return T().sayEmotion(currentLang === 'zh' ? ZH_NAME[e.id] : e.name); });
         });
         grid.appendChild(item);
       });
@@ -432,10 +433,12 @@
         b.classList.toggle('is-active', b.dataset.lang === currentLang);
       });
 
-      // Hero hint (keep last greeting if already shown)
-      if (!hint.textContent || hint.dataset.dirty !== '1') {
+      // Hero hint: re-render a shown dynamic message in the new language,
+      // otherwise fall back to the default hint
+      if (lastMessage) {
+        hint.textContent = lastMessage();
+      } else {
         hint.textContent = t.hint;
-        hint.dataset.dirty = '0';
       }
 
       // Character bar
@@ -500,9 +503,6 @@
     groupOrder.forEach(function (key, i) {
       subCaptions.push(subBtns[i]);
     });
-
-    // Override say() so the hint marks itself dirty and refreshes on language change
-    say = function (text) { hint.dataset.dirty = '1'; hint.textContent = text; };
 
     // ---- Language toggle wiring ----
     var toggleButtons = Array.prototype.slice.call(document.querySelectorAll('.lang-switch__btn'));
