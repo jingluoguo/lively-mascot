@@ -1,7 +1,7 @@
 {
   "name": "lively-mascot",
-  "version": "0.1.0",
-  "description": "Animated mascots for chatbots, desktop pets & web widgets — they blink, breathe, follow your cursor, and express emotions. Drop in with a single script tag, no build needed.",
+  "version": "0.4.0",
+  "description": "Universal Animated Mascot Engine: 40 Emotions · Pure SVG · Zero Dependencies · Data-Driven · Drop-in.",
   "license": "MIT",
   "keywords": [
     "mascot",
@@ -9,14 +9,15 @@
     "avatar",
     "chatbot",
     "desktop-pet",
-    "floating-widget",
-    "emotion",
+    "emotion-engine",
     "web-component",
-    "no-build"
+    "no-build",
+    "svg-animation"
   ],
   "files": [
     "src/lively-mascot.js",
     "src/lively-mascot.css",
+    "src/core/emotions.js",
     "README.zh-CN.md"
   ],
   "repository": {

@@ -2,127 +2,118 @@
 
 [English](README.md) · **简体中文**
 
-> 动画吉祥物，适用于聊天机器人、桌面宠物与网页小部件——它们会眨眼、呼吸、跟随你的光标，还会表达情绪。
+> 电子宠物引擎：40 种状态表情 · 纯 SVG 驱动 · 零依赖 · 纯数据配置 · 即插即用。
 
-把一只吉祥物放进任何页面，它就会活过来：眨眼、呼吸、摇摆、跺脚、没人注意时还会蹦跶一下——眼睛始终追着你的光标。点它一下，它会开心起来。**无需构建、无需 npm install。**一个 `<script>` 标签搞定。
+一套为聊天机器人、桌面宠物、网页插件及 AI 助手打造的表情系统。通过 `setEmotion(id)` 即可切换对应表情，每个表情自带独立的身体、叶子、脚部动画和面部表情。
+
+**[在线预览](https://jingluoguo.github.io/lively-mascot/)**
 
 ## 特性
 
-- **零依赖、免构建** —— 单个 `lively-mascot.js`。`file://`、CDN 或任何打包器都直接可用。
-- **随处可用** —— 纯 JS 核心 + 可选的 `<lively-mascot>` 自定义元素。可直接用于原生 HTML、Vue、Svelte、Angular、WordPress、Electron 或 Tauri。
-- **开箱即活** —— 呼吸、眨眼、摇摆、跺脚、嫩芽晃动、随机小跳，以及点击开心的反馈。全部动画由 CSS keyframes + 极简 rAF 引擎驱动。
-- **感知光标** —— 眼睛（以及整个身体）会平滑追踪指针。
-- **可换主题** —— `color` / `outline` / `accent` 换色；样式基于 CSS 变量。
-- **一行换角色** —— 当前有 `type: "sprout"`，更多角色在路上。
+- **40 种状态表情**：覆盖生命周期（睡眠/待机）、情绪反应（开心/生气）、工作状态（思考/搜索）与扩展状态（无聊/紧张/灵光一现/等待）。
+- **全要素联动**：每个表情控制眼睛、嘴巴、腮红、身体、叶子、脚部 6 大部位的独立动画。
+- **配置驱动**：每个表情都是纯数据组合（动画 + 滤镜 + 行为参数），支持运行时注册新表情。
+- **零依赖、零构建**：原生 JS，无框架依赖，一个 `<script>` 标签即可引入。
+- **即插即用**：支持 Web Component `<lively-mascot>` 和函数式 API `createMascot`。
+- **视线跟随**：眼睛平滑跟随指针；表情激活时自动暂停跟随，结束后平滑恢复。
+- **主题化**：支持多实例主题切换（`setTheme`），所有样式基于 CSS 变量。
 
-## 用法
-
-### 方式 A — script 标签（任意静态页）
-
-把 `src/lively-mascot.js` 和 `src/lively-mascot.css` 放到 HTML 同目录，然后：
+## 快速开始
 
 ```html
-<link rel="stylesheet" href="lively-mascot.css" />
+<link rel="stylesheet" href="src/lively-mascot.css" />
 <div id="slot"></div>
-<script src="lively-mascot.js"></script>
+<script src="src/core/emotions.js"></script>
+<script src="src/lively-mascot.js"></script>
 <script>
-  LivelyMascot.createMascot(document.querySelector("#slot"), {
-    type: "sprout",
-    color: "#48ff42",
-    size: 120,
-    onClick: () => console.log("hi!"),
+  var m = LivelyMascot.createMascot(document.getElementById('slot'), {
+    type: 'sprout', size: 180
   });
+
+  // 切换表情
+  m.setEmotion('10'); // 开心
+  m.setEmotion('20'); // 思考中
+  m.clearEmotion();   // 恢复待机
 </script>
-```
-
-直接用浏览器打开文件即可，不需要起服务器。
-
-### 方式 B — Web Component（无需写 JS 接线）
-
-```html
-<script src="lively-mascot.js"></script>
-<script>
-  LivelyMascot.defineMascotElement("lively-mascot");
-</script>
-
-<!-- 之后在任意位置： -->
-<lively-mascot type="sprout" color="#6ec7ff" size="96"></lively-mascot>
-```
-
-`<lively-mascot>` 支持属性：`type`、`color`、`outline`、`accent`、`size`、`follow-cursor`（`"false"` 关闭）、`hop-interval`（`"6,13"` 秒，或 `""` 关闭）。点击时派发 `mascot-click` 事件，或在 JS 里设置 `el.onMascotClick = ...`。
-
-### 方式 C — 通过 CDN
-
-```html
-<link rel="stylesheet" href="https://unpkg.com/lively-mascot@0.1.0/src/lively-mascot.css" />
-<script src="https://unpkg.com/lively-mascot@0.1.0/src/lively-mascot.js"></script>
 ```
 
 ## API
 
 ### `createMascot(target, options)`
 
-| 选项 | 类型 | 默认值 | 说明 |
-| --- | --- | --- | --- |
-| `type` | `string` | `"sprout"` | 角色 ID。 |
-| `color` | `string` | `#48ff42` | 身体颜色（CSS 变量 `--lively-body`）。 |
-| `outline` | `string` | `#080808` | 描边 / 眼睛 / 阴影墨色（CSS 变量 `--lively-outline`）。 |
-| `accent` | `string` | `#ff9fb6` | 强调色，如腮红（CSS 变量 `--lively-accent`）。 |
-| `size` | `number` | `106` | 容器尺寸（px）。 |
-| `followCursor` | `boolean` | `true` | 眼睛 / 身体是否跟随指针。 |
-| `hopInterval` | `[number, number] \| null` | `[6, 13]` | 随机小跳间隔（秒）；`null` 禁用。 |
-| `onClick` | `() => void` | — | 点击回调（同时播放开心动画）。 |
+| 选项           | 类型      | 默认值     | 描述             |
+| -------------- | --------- | ---------- | ---------------- |
+| `type`         | `string`  | `"sprout"` | 角色 ID          |
+| `color`        | `string`  | —          | 身体颜色         |
+| `outline`      | `string`  | —          | 描边/眼睛颜色    |
+| `accent`       | `string`  | —          | 点缀色（腮红等） |
+| `size`         | `number`  | `106`      | 容器尺寸 px      |
+| `followCursor` | `boolean` | `true`     | 是否跟随光标     |
 
-**返回值**：`{ el, type, setTheme(partial), setFollowCursor(bool), setHopInterval(interval), click(), destroy() }`。
+**返回实例**：`{ el, type, setTheme, setEmotion(id), clearEmotion(), destroy() }`
+
+### 表情行为
+
+每个表情可配置以下行为：
+
+| 字段         | 说明                                |
+| ------------ | ----------------------------------- |
+| `bodyAnim`   | 身体 CSS 动画                       |
+| `bodyFilter` | 身体滤镜（如变暗、变灰）            |
+| `leafAnim`   | 叶子 CSS 动画                       |
+| `footAnim`   | 脚部 CSS 动画                       |
+| `blink`      | `false` 禁用眨眼，`"fast"` 快速眨眼 |
+| `gaze`       | `false` 暂停视线跟随                |
+
+### 表情 ID 映射
+
+| 分组         | ID    | 表情                                                                                                                         |
+| :----------- | :---- | :--------------------------------------------------------------------------------------------------------------------------- |
+| **生命周期** | 00-09 | Sleep · Wake · Idle · Breathe · Ready · Pause · Refresh · LowBattery · Offline · Boot                                        |
+| **情绪反应** | 10-19 | Happy · Excited · Sad · Angry · Surprised · Shy · Love · Confused · Cool · Smug                                              |
+| **工作状态** | 20-31 | Thinking · Listening · Talking · Searching · Reading · Writing · Coding · Designing · Loading · Processing · Success · Error |
+| **扩展状态** | 32-39 | Grateful · Retrying · Cancelled · Crying · Bored · Nervous · Eureka · Waiting                                                |
+
+## 扩展指南
+
+### 注册新角色
 
 ```js
-const m = LivelyMascot.createMascot(document.body, { type: "sprout", size: 140 });
-m.setTheme({ color: "#ff9fb6" }); // 运行时换色
-m.setFollowCursor(false);         // 停止跟随光标
-m.click();                         // 触发开心反馈
-m.destroy();                       // 从 DOM 移除并释放监听 / 定时器
-```
-
-### `registerCharacter(id, render, name?, viewBox?)`
-
-不动核心即可新增角色。`render(rig, hostSvg)` 负责把 SVG 画进宿主，并通过 `rig.registerPupil / registerEye / registerFace` 标记动点。
-
-```js
-function renderCat(rig, host) {
-  // ...把 <svg class="lively-character"> 画进 host...
+function renderMyChar(rig, rigEl) {
+  // 绘制 SVG 并注册动点
   rig.registerEye(eyeEl);
-  rig.registerPupil(pupilEl, { maxX: 7, maxY: 5 });
+  rig.registerPupil(pupilEl, { maxX: 8, maxY: 6 });
+  rig.registerLeaf(leafEl);
+  rig.registerFeet(feetEl);
 }
-LivelyMascot.registerCharacter("cat", renderCat, "Cat");
-// 然后：createMascot(el, { type: "cat" })
+LivelyMascot.registerCharacter('myChar', renderMyChar, 'My Char');
 ```
 
-### `defineMascotElement(tag?)`
+### 注册新表情
 
-注册 `<lively-mascot>` 自定义元素（默认标签 `lively-mascot`）。可重复调用。
+```js
+LivelyMascot.emotions['50'] = {
+  id: '50', name: 'Custom', group: 'custom', desc: '自定义',
+  bodyAnim: 'my-custom-anim 1s ease-in-out',
+  leafAnim: 'my-leaf-anim 1s ease-in-out',
+  footAnim: 'my-foot-anim 1s ease-in-out',
+};
+```
 
-## 自定义角色
+## 项目结构
 
-角色是一个渲染器：把吉祥物的 DOM 构建进 `rigEl`，并通过 `rig` API 注册动点：
-
-- **身体** `<div class="lively-body">` —— 圆角贴纸块（描边 + 偏移阴影），自动获得摇摆 + 果冻弹跳。
-- **嫩芽** 任意带 `lively__leaf` 类的元素；用 CSS 设置待机摇曳，`.is-happy` 时转一圈。
-- **眼睛** `<g class="lively-face__eye">` —— 用 `rig.registerEye` 注册 → 自动眨眼。
-- **瞳孔** 每只眼睛内的 `<g>`，用 `clipPath` 裁剪溢出 —— 用 `rig.registerPupil(el, { maxX, maxY })` 注册 → 自动视线跟随。
-- **脸** `<g class="lively-face">` —— 用 `rig.registerFace` 注册 → 随视线轻微歪头（可选，通常用 `.lively-face-wrap` 叠在身体上）。
-- **脚** `<div class="lively__feet">` 内两个 `◡` 字符 —— 用 `.lively__foot--l/--r` 设置踏步 / 踢腿 / 收起。
-
-主题色必须通过 CSS 变量 `--lively-body`、`--lively-outline`、`--lively-accent` 引用——绝不要硬编码。完整示例见 `src/lively-mascot.js` → `renderSprout`。
-
-## 演示
-
-直接用浏览器打开 `index.html`（无需服务器），即可同时看到函数式 API 与 Web Component 的演示。
-
-## 路线图
-
-- [ ] 更多内置角色（cat、star、blob……）
-- [ ] `mood` 状态 —— `happy` / `thinking` / `sleepy`
-- [ ] 悬浮助手包装（`position: fixed` 外层）
+```
+lively-mascot/
+├── index.html              # 演示站点：Hero + 颜色/表情 Tab 面板
+├── src/
+│   ├── core/
+│   │   ├── emotions.js     # 表情定义（纯数据）
+│   │   └── rig.js          # 动画引擎
+│   ├── lively-mascot.js    # 核心 SDK
+│   └── lively-mascot.css   # 动画样式
+├── package.json
+└── README.md
+```
 
 ## 许可证
 

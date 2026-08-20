@@ -1,117 +1,462 @@
 <!doctype html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>lively-mascot · demo</title>
-    <link rel="stylesheet" href="src/lively-mascot.css" />
-    <style>
-      * { box-sizing: border-box; }
-      body {
-        margin: 0;
-        font-family: ui-sans-serif, system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
-        background:
-          radial-gradient(circle at 20% 10%, #f4fff1 0, transparent 45%),
-          radial-gradient(circle at 85% 30%, #fff8e9 0, transparent 40%), #fdfdfb;
-        color: #1d1d1f; min-height: 100vh;
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lively-mascot · demo</title>
+  <link rel="stylesheet" href="src/lively-mascot.css" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background:
+        radial-gradient(circle at 20% 10%, #f4fff1 0, transparent 45%),
+        radial-gradient(circle at 85% 30%, #fff8e9 0, transparent 40%), #fdfdfb;
+      color: #1d1d1f;
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 56px 24px 88px;
+    }
+
+    .hero {
+      text-align: center;
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: 42px;
+      letter-spacing: -1.5px;
+    }
+
+    .hero__dot {
+      color: #48ff42;
+      text-shadow: 2px 2px 0 #080808;
+      -webkit-text-stroke: 1.5px #080808;
+      font-size: 30px;
+      vertical-align: 6px;
+    }
+
+    .hero__tagline {
+      margin: 0 auto 14px;
+      max-width: 580px;
+      font-size: 16px;
+      line-height: 1.7;
+      color: #555;
+    }
+
+    .hero__hint {
+      display: inline-block;
+      margin: 0;
+      padding: 6px 14px;
+      border: 2px solid #080808;
+      border-radius: 999px;
+      background: #fff;
+      box-shadow: 3px 3px 0 #080808;
+      font-size: 13px;
+      color: #333;
+    }
+
+    .showcase {
+      display: flex;
+      justify-content: center;
+      padding: 48px 0 36px;
+    }
+
+    /* ---- Main Tabs ---- */
+    .tabs {
+      margin: 0 0 0;
+    }
+
+    .tabs__bar {
+      display: flex;
+      gap: 0;
+      border: 2px solid #080808;
+      border-radius: 12px 12px 0 0;
+      background: #fff;
+      box-shadow: 3px 3px 0 #080808;
+      overflow: hidden;
+    }
+
+    .tabs__btn {
+      flex: 1;
+      padding: 12px 0;
+      border: none;
+      border-right: 1px solid #080808;
+      background: #f5f5f5;
+      font-size: 14px;
+      font-weight: 700;
+      color: #666;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+
+    .tabs__btn:last-child {
+      border-right: none;
+    }
+
+    .tabs__btn:hover {
+      background: #eee;
+    }
+
+    .tabs__btn.is-active {
+      background: #fff;
+      color: #1d1d1f;
+    }
+
+    .tabs__panel {
+      display: none;
+      border: 2px solid #080808;
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+      background: #fff;
+      box-shadow: 3px 3px 0 #080808;
+      padding: 20px;
+    }
+
+    .tabs__panel.is-active {
+      display: block;
+    }
+
+    /* ---- Sub Tabs (Emotion Groups) ---- */
+    .sub-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .sub-tabs__btn {
+      padding: 6px 14px;
+      border: 2px solid #080808;
+      border-radius: 999px;
+      background: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      color: #666;
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .sub-tabs__btn:hover {
+      background: #f0f0f0;
+    }
+
+    .sub-tabs__btn.is-active {
+      background: #080808;
+      color: #fff;
+    }
+
+    .sub-panel {
+      display: none;
+    }
+
+    .sub-panel.is-active {
+      display: block;
+    }
+
+    /* ---- Palette Grid ---- */
+    .palette {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+    }
+
+    .palette__item {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 72px;
+      padding: 8px 6px;
+      border-radius: 10px;
+      border: 2px solid rgba(8, 8, 8, .12);
+      background: #fafafa;
+      cursor: pointer;
+      transition: border-color .15s, box-shadow .15s, background .15s, transform .15s;
+    }
+
+    .palette__swatch {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      box-shadow: 2px 2px 0 rgba(0, 0, 0, .15);
+    }
+
+    .palette__item:hover {
+      border-color: rgba(8, 8, 8, .35);
+    }
+
+    .palette__item.is-active {
+      border-color: #080808;
+      background: #fff;
+      box-shadow: 3px 3px 0 #080808;
+      transform: translate(-1px, -1px);
+    }
+
+    .palette__item figcaption {
+      font-size: 13px;
+      color: #666;
+      text-align: center;
+      transition: color .15s, font-weight .15s;
+    }
+
+    .palette__item.is-active figcaption {
+      color: #1d1d1f;
+      font-weight: 900;
+    }
+
+    /* ---- Emotion Grid ---- */
+    .emotion-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .emotion-item {
+      padding: 10px 8px;
+      border-radius: 8px;
+      border: 2px solid rgba(8, 8, 8, .1);
+      background: #fafafa;
+      cursor: pointer;
+      text-align: center;
+      transition: all .1s;
+    }
+
+    .emotion-item:hover {
+      background: #f0f0f0;
+      transform: translateY(-2px);
+      box-shadow: 2px 2px 0 rgba(0, 0, 0, .1);
+    }
+
+    .emotion-item:active {
+      transform: scale(0.93) translateY(1px);
+      box-shadow: 1px 1px 0 rgba(0, 0, 0, .15);
+      background: #e8e8e8;
+      transition: transform .06s, box-shadow .06s, background .06s;
+    }
+
+    .emotion-item.is-active {
+      border-color: #080808;
+      background: #fff;
+      box-shadow: 3px 3px 0 #080808;
+      transform: translate(-1px, -1px);
+    }
+
+    .emotion-item.is-active .emotion-item__name {
+      color: #080808;
+    }
+
+    .emotion-item__name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1d1d1f;
+    }
+
+    .emotion-item__desc {
+      font-size: 11px;
+      color: #888;
+      margin-top: 3px;
+    }
+
+    .code {
+      border: 2px solid #080808;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 5px 5px 0 #080808;
+      overflow: hidden;
+      margin-top: 28px;
+    }
+
+    .code pre {
+      margin: 0;
+      padding: 18px 22px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.7;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    @media (max-width: 720px) {
+      .palette {
+        grid-template-columns: repeat(3, 1fr);
       }
-      .page { max-width: 860px; margin: 0 auto; padding: 56px 24px 88px; }
-      .hero { text-align: center; }
-      .hero h1 { margin: 0 0 10px; font-size: 42px; letter-spacing: -1.5px; }
-      .hero__dot { color: #48ff42; text-shadow: 2px 2px 0 #080808; -webkit-text-stroke: 1.5px #080808; font-size: 30px; vertical-align: 6px; }
-      .hero__tagline { margin: 0 auto 14px; max-width: 580px; font-size: 16px; line-height: 1.7; color: #555; }
-      .hero__hint { display: inline-block; margin: 0; padding: 6px 14px; border: 2px solid #080808; border-radius: 999px; background: #fff; box-shadow: 3px 3px 0 #080808; font-size: 13px; color: #333; }
-      .showcase { display: flex; justify-content: center; padding: 48px 0 36px; }
-      .palette { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin: 28px 0 44px; }
-      .palette__item { margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; height: 86px; padding: 4px 6px; border-radius: 12px; border: 2px solid rgba(8,8,8,.12); background: #fff; cursor: pointer; transition: border-color .15s, box-shadow .15s, background .15s, transform .15s; }
-      .palette__item:hover { border-color: rgba(8,8,8,.35); }
-      .palette__item.is-active { border-color: #080808; background: #fff; box-shadow: 3px 3px 0 #080808; transform: translate(-1px,-1px); }
-      .palette__item figcaption { font-size: 13px; color: #666; text-align: center; transition: color .15s, font-weight .15s; }
-      .palette__item.is-active figcaption { color: #1d1d1f; font-weight: 900; }
-      .code { border: 2px solid #080808; border-radius: 14px; background: #fff; box-shadow: 5px 5px 0 #080808; overflow: hidden; }
-      .code pre { margin: 0; padding: 18px 22px; overflow-x: auto; font-size: 13px; line-height: 1.7; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-      @media (max-width: 720px) { .palette { grid-template-columns: repeat(3, 1fr); } }
-    </style>
-  </head>
-  <body>
-    <main class="page">
-      <header class="hero">
-        <h1><span class="hero__dot">✦</span> lively-mascot</h1>
-        <p class="hero__tagline">会眨眼、呼吸、跟随光标的动画吉祥物 · 拖进去就用，一个 script 标签搞定。</p>
-        <p class="hero__hint" id="hint">把光标移到吉祥物上 · 点击让它开心</p>
-      </header>
 
-      <!-- 方式 A：函数式 API -->
-      <section class="showcase" id="showcase"></section>
+      .emotion-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  </style>
+</head>
 
-      <!-- 方式 B：Web Component（自定义元素） -->
-      <section class="palette" id="palette"></section>
+<body>
+  <main class="page">
+    <header class="hero">
+      <h1><span class="hero__dot">✦</span> lively-mascot</h1>
+      <p class="hero__tagline">通用电子宠物引擎：32 种状态表情 · 纯 SVG 驱动 · 零依赖 · 即插即用。</p>
+      <p class="hero__hint" id="hint">把光标移到吉祥物上 · 点击让它开心</p>
+    </header>
 
-      <section class="code">
-<pre>// 方式 A：任意容器内创建
+    <section class="showcase" id="showcase"></section>
+
+    <div class="tabs" id="tabs">
+      <div class="tabs__bar" id="tabs-bar"></div>
+      <div class="tabs__panel is-active" id="panel-color"></div>
+      <div class="tabs__panel" id="panel-emotion"></div>
+    </div>
+
+    <section class="code">
+      <pre>// 任意容器内创建
 LivelyMascot.createMascot(document.querySelector('#showcase'), {
   type: 'sprout', color: '#48ff42', size: 180,
   onClick: () => console.log('hi'),
 });
 
-// 方式 B：Web Component（先 define 一次）
-LivelyMascot.defineMascotElement('lively-mascot');
-// 之后任何静态 HTML 里： &lt;lively-mascot type="sprout" color="#6ec7ff"&gt;&lt;/lively-mascot&gt;</pre>
-      </section>
-    </main>
+// 切换表情
+mascot.setEmotion('10');  // Happy
+mascot.setEmotion('20');  // Thinking
+mascot.setEmotion('31');  // Error</pre>
+    </section>
+  </main>
 
-    <script src="src/lively-mascot.js"></script>
-    <script>
-      var hint = document.getElementById('hint');
-      function say(name) {
-        hint.textContent = name + ' says: hello!（点击于 ' + new Date().toLocaleTimeString() + '）';
-      }
+  <script src="src/core/emotions.js"></script>
+  <script src="src/core/rig.js"></script>
+  <script src="src/lively-mascot.js"></script>
+  <script>
+    var hint = document.getElementById('hint');
+    function say(name) {
+      hint.textContent = name + ' says: hello!（点击于 ' + new Date().toLocaleTimeString() + '）';
+    }
 
-      // 方式 A：主展示（点击调色板项时切换它的配色）
-      var hero = LivelyMascot.createMascot(document.getElementById('showcase'), {
-        type: 'sprout', size: 180,
-        onClick: function () { say('Sprout'); },
+    // ---- 主展示 ----
+    var hero = LivelyMascot.createMascot(document.getElementById('showcase'), {
+      type: 'sprout', size: 180,
+      onClick: function () { say('Sprout'); },
+    });
+
+    // ---- Main Tabs ----
+    var tabsBar = document.getElementById('tabs-bar');
+    var panels = document.querySelectorAll('.tabs__panel');
+    var tabNames = ['颜色', '表情'];
+    var tabBtns = [];
+
+    tabNames.forEach(function (name, i) {
+      var btn = document.createElement('button');
+      btn.className = 'tabs__btn' + (i === 0 ? ' is-active' : '');
+      btn.textContent = name;
+      btn.addEventListener('click', function () {
+        tabBtns.forEach(function (b) { b.classList.remove('is-active'); });
+        btn.classList.add('is-active');
+        panels.forEach(function (p) { p.classList.remove('is-active'); });
+        panels[i].classList.add('is-active');
       });
+      tabsBar.appendChild(btn);
+      tabBtns.push(btn);
+    });
 
-      // 方式 B：注册自定义元素后注入若干个
-      LivelyMascot.defineMascotElement('lively-mascot');
-      var palettes = [
-        { name: 'Mint', color: '#48ff42', outline: '#080808' },
-        { name: 'Sky', color: '#6ec7ff', outline: '#0b1e3a' },
-        { name: 'Peach', color: '#ffb37a', outline: '#5c2a12' },
-        { name: 'Lavender', color: '#c9a6ff', outline: '#2e1a4d' },
-        { name: 'Rose', color: '#ff9fb6', outline: '#5c1f33' },
-        { name: 'Lemon', color: '#ffe066', outline: '#4d3d00' },
-      ];
-      var palette = document.getElementById('palette');
-      var activeFig = null;
-      palettes.forEach(function (p) {
-        var fig = document.createElement('figure');
-        fig.className = 'palette__item';
-        var caption = document.createElement('figcaption');
-        caption.textContent = p.name;
-        var wc = document.createElement('lively-mascot');
-        wc.setAttribute('type', 'sprout');
-        wc.setAttribute('color', p.color);
-        wc.setAttribute('outline', p.outline);
-        wc.setAttribute('size', '64');
-        wc.onMascotClick = function () { say(p.name); };
-        fig.appendChild(wc);
-        fig.appendChild(caption);
-        // 点击整张卡片：把主展示切换到该配色并高亮
-        fig.addEventListener('click', function () {
-          hero.setTheme({ body: p.color, outline: p.outline });
-          if (activeFig) activeFig.classList.remove('is-active');
-          fig.classList.add('is-active');
-          activeFig = fig;
+    // ---- 颜色面板 ----
+    var palettes = [
+      { name: '薄荷绿', color: '#48ff42', outline: '#080808' },
+      { name: '天空蓝', color: '#6ec7ff', outline: '#0b1e3a' },
+      { name: '蜜桃橙', color: '#ffb37a', outline: '#5c2a12' },
+      { name: '薰衣草紫', color: '#c9a6ff', outline: '#2e1a4d' },
+      { name: '玫瑰粉', color: '#ff9fb6', outline: '#5c1f33' },
+      { name: '柠檬黄', color: '#ffe066', outline: '#4d3d00' },
+    ];
+    var palettePanel = document.getElementById('panel-color');
+    var paletteGrid = document.createElement('div');
+    paletteGrid.className = 'palette';
+    var activeSwatch = null;
+
+    palettes.forEach(function (p) {
+      var fig = document.createElement('figure');
+      fig.className = 'palette__item';
+      var swatch = document.createElement('span');
+      swatch.className = 'palette__swatch';
+      swatch.style.background = p.color;
+      swatch.style.border = '2px solid ' + p.outline;
+      var caption = document.createElement('figcaption');
+      caption.textContent = p.name;
+      fig.appendChild(swatch);
+      fig.appendChild(caption);
+      fig.addEventListener('click', function () {
+        hero.setTheme({ body: p.color, outline: p.outline });
+        if (activeSwatch) activeSwatch.classList.remove('is-active');
+        fig.classList.add('is-active');
+        activeSwatch = fig;
+      });
+      paletteGrid.appendChild(fig);
+    });
+    palettePanel.appendChild(paletteGrid);
+
+    // ---- 表情面板 (Sub Tabs) ----
+    var emotionPanel = document.getElementById('panel-emotion');
+    var groups = LivelyMascot.emotionGroups;
+    var emotions = LivelyMascot.emotions;
+    var groupKeys = Object.keys(groups);
+    var currentGroup = groupKeys[0];
+
+    // Sub-tabs bar
+    var subBar = document.createElement('div');
+    subBar.className = 'sub-tabs';
+    var subBtns = [];
+    var subPanels = [];
+
+    groupKeys.forEach(function (key, i) {
+      var g = groups[key];
+      var count = Object.values(emotions).filter(function (e) { return e.group === key; }).length;
+
+      var btn = document.createElement('button');
+      btn.className = 'sub-tabs__btn' + (i === 0 ? ' is-active' : '');
+      btn.textContent = g.name + ' (' + count + ')';
+      btn.addEventListener('click', function () {
+        subBtns.forEach(function (b) { b.classList.remove('is-active'); });
+        btn.classList.add('is-active');
+        subPanels.forEach(function (p) { p.classList.remove('is-active'); });
+        subPanels[i].classList.add('is-active');
+      });
+      subBar.appendChild(btn);
+      subBtns.push(btn);
+
+      var panel = document.createElement('div');
+      panel.className = 'sub-panel' + (i === 0 ? ' is-active' : '');
+      var grid = document.createElement('div');
+      grid.className = 'emotion-grid';
+
+      Object.values(emotions).filter(function (e) { return e.group === key; }).forEach(function (e) {
+        var item = document.createElement('div');
+        item.className = 'emotion-item';
+        if (e.id === '02') item.classList.add('is-active');
+        item.dataset.emotionId = e.id;
+        item.innerHTML =
+          '<div class="emotion-item__name">' + e.name + '</div>' +
+          '<div class="emotion-item__desc">' + e.desc + '</div>';
+        item.title = e.id + ' - ' + e.name + ': ' + e.desc;
+        item.addEventListener('click', function () {
+          hero.setEmotion(e.id);
+          emotionPanel.querySelectorAll('.emotion-item.is-active').forEach(function (a) { a.classList.remove('is-active'); });
+          item.classList.add('is-active');
+          say('Emotion: ' + e.name);
         });
-        palette.appendChild(fig);
+        grid.appendChild(item);
       });
-      // 默认 Mint 即主展示初始配色，标记为高亮
-      if (palette.firstElementChild) {
-        palette.firstElementChild.classList.add('is-active');
-        activeFig = palette.firstElementChild;
-      }
-    </script>
-  </body>
+
+      panel.appendChild(grid);
+      subPanels.push(panel);
+    });
+
+    emotionPanel.appendChild(subBar);
+    subPanels.forEach(function (p) { emotionPanel.appendChild(p); });
+  </script>
+</body>
+
 </html>
