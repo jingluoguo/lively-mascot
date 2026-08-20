@@ -31,6 +31,39 @@
     .hero__tagline { margin: 0 auto 14px; max-width: 580px; font-size: 16px; line-height: 1.7; color: #555; }
     .hero__hint { display: inline-block; margin: 0; padding: 6px 14px; border: 2px solid #080808; border-radius: 999px; background: #fff; box-shadow: 3px 3px 0 #080808; font-size: 13px; color: #333; }
 
+    /* ---- Language Toggle (matches neo-brutalist theme) ---- */
+    .lang-switch {
+      position: absolute;
+      top: 22px;
+      right: 22px;
+      display: inline-flex;
+      gap: 0;
+      padding: 3px;
+      border: 2px solid #080808;
+      border-radius: 999px;
+      background: #fff;
+      box-shadow: 3px 3px 0 #080808;
+      cursor: pointer;
+      user-select: none;
+    }
+    .lang-switch__btn {
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .5px;
+      color: #666;
+      padding: 5px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .lang-switch__btn.is-active {
+      background: #080808;
+      color: #fff;
+    }
+
     /* ---- Stage: vertical stack ---- */
     .stage {
       max-width: 760px;
@@ -108,16 +141,22 @@
     @media (max-width: 720px) {
       .palette { grid-template-columns: repeat(3, 1fr); }
       .emotion-grid { grid-template-columns: repeat(3, 1fr); }
+      .lang-switch { top: 14px; right: 14px; }
     }
   </style>
 </head>
 
 <body>
   <main class="page">
+    <div class="lang-switch" id="lang-switch">
+      <button type="button" class="lang-switch__btn is-active" data-lang="zh">中文</button>
+      <button type="button" class="lang-switch__btn" data-lang="en">EN</button>
+    </div>
+
     <header class="hero">
       <h1><span class="hero__dot">✦</span> lively-mascot</h1>
-      <p class="hero__tagline">通用电子宠物引擎：40 种状态表情 · 多角色 · 纯 SVG 驱动 · 零依赖 · 即插即用。</p>
-      <p class="hero__hint" id="hint">把光标移到吉祥物上 · 点击让它开心</p>
+      <p class="hero__tagline" id="tagline"></p>
+      <p class="hero__hint" id="hint"></p>
     </header>
 
     <!-- Stage: vertical stack -->
@@ -159,27 +198,77 @@ mascot = LivelyMascot.createMascot(el, { type: 'myChar' });</pre>
   <script src="src/characters/ghost.js"></script>
   <script src="src/characters/jelly.js"></script>
   <script>
+    // ============================================================
+    // i18n dictionary
+    // ============================================================
+    var I18N = {
+      zh: {
+        tagline: '通用电子宠物引擎：40 种状态表情 · 多角色 · 纯 SVG 驱动 · 零依赖 · 即插即用。',
+        hint: '把光标移到吉祥物上 · 点击让它开心',
+        charNames: {
+          sprout: '🌱 嫩芽', cat: '🐱 小猫', robot: '🤖 机器人',
+          ghost: '👻 幽灵', jelly: '🟢 果冻'
+        },
+        tabs: ['颜色', '表情'],
+        palette: ['薄荷绿', '天空蓝', '蜜桃橙', '薰衣草紫', '玫瑰粉', '柠檬黄'],
+        groupNames: {
+          lifecycle: '生命周期', reaction: '情绪反应', work: '工作状态'
+        },
+        clickName: function (type) {
+          return type === 'cat' ? 'Meow!' : 'Sprout';
+        },
+        sayGreeting: function (name) {
+          return name + ' says: hello!（点击于 ' + new Date().toLocaleTimeString() + '）';
+        },
+        sayEmotion: function (name) {
+          return '表情：' + name;
+        }
+      },
+      en: {
+        tagline: 'Universal e-pet engine: 40 status emotions · multi-character · pure SVG · zero deps · drop-in.',
+        hint: 'Hover the mascot · click to make it happy',
+        charNames: {
+          sprout: '🌱 Sprout', cat: '🐱 Cat', robot: '🤖 Robot',
+          ghost: '👻 Ghost', jelly: '🟢 Jelly'
+        },
+        tabs: ['Color', 'Emotion'],
+        palette: ['Mint', 'Sky Blue', 'Peach', 'Lavender', 'Rose', 'Lemon'],
+        groupNames: {
+          lifecycle: 'Lifecycle', reaction: 'Reactions', work: 'Work states'
+        },
+        clickName: function (type) {
+          return type === 'cat' ? 'Meow!' : 'Sprout';
+        },
+        sayGreeting: function (name) {
+          return name + ' says: hello! (clicked at ' + new Date().toLocaleTimeString() + ')';
+        },
+        sayEmotion: function (name) {
+          return 'Emotion: ' + name;
+        }
+      }
+    };
+    var currentLang = 'zh';
+    function T() { return I18N[currentLang]; }
+    document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+
+    // ---- Hint helper ----
     var hint = document.getElementById('hint');
-    function say(name) {
-      hint.textContent = name + ' says: hello!（点击于 ' + new Date().toLocaleTimeString() + '）';
-    }
+    function say(text) { hint.textContent = text; }
 
     // ---- Current mascot instance ----
     var hero = null;
     var currentCharType = 'sprout';
 
     function createHero(type) {
-      // Destroy old
       if (hero) hero.destroy();
       var container = document.getElementById('showcase');
       container.innerHTML = '';
       hero = LivelyMascot.createMascot(container, {
         type: type,
         size: 180,
-        onClick: function () { say(type === 'cat' ? 'Meow!' : 'Sprout'); },
+        onClick: function () { say(T().sayGreeting(T().clickName(type))); },
       });
       currentCharType = type;
-      // Re-apply active emotion if any
       var activeEmotion = document.querySelector('.emotion-item.is-active');
       if (activeEmotion) {
         hero.setEmotion(activeEmotion.dataset.emotionId);
@@ -189,16 +278,12 @@ mascot = LivelyMascot.createMascot(el, { type: 'myChar' });</pre>
     // ---- Character Bar ----
     var charBar = document.getElementById('char-bar');
     var charTypes = ['sprout', 'cat', 'robot', 'ghost', 'jelly'];
-    var charNames = {
-      sprout: '🌱 嫩芽', cat: '🐱 小猫', robot: '🤖 机器人',
-      ghost: '👻 幽灵', jelly: '🟢 果冻'
-    };
     var charBtns = [];
 
     charTypes.forEach(function (type) {
       var btn = document.createElement('button');
       btn.className = 'char-btn' + (type === 'sprout' ? ' is-active' : '');
-      btn.textContent = charNames[type];
+      btn.dataset.type = type;
       btn.addEventListener('click', function () {
         charBtns.forEach(function (b) { b.classList.remove('is-active'); });
         btn.classList.add('is-active');
@@ -211,35 +296,36 @@ mascot = LivelyMascot.createMascot(el, { type: 'myChar' });</pre>
     // ---- Main Tabs ----
     var tabsBar = document.getElementById('tabs-bar');
     var panels = document.querySelectorAll('.tabs__panel');
-    var tabNames = ['颜色', '表情'];
     var tabBtns = [];
 
-    tabNames.forEach(function (name, i) {
-      var btn = document.createElement('button');
-      btn.className = 'tabs__btn' + (i === 0 ? ' is-active' : '');
-      btn.textContent = name;
-      btn.addEventListener('click', function () {
-        tabBtns.forEach(function (b) { b.classList.remove('is-active'); });
-        btn.classList.add('is-active');
-        panels.forEach(function (p) { p.classList.remove('is-active'); });
-        panels[i].classList.add('is-active');
-      });
-      tabsBar.appendChild(btn);
-      tabBtns.push(btn);
-    });
+    for (var i = 0; i < T().tabs.length; i++) {
+      (function (i) {
+        var btn = document.createElement('button');
+        btn.className = 'tabs__btn' + (i === 0 ? ' is-active' : '');
+        btn.addEventListener('click', function () {
+          tabBtns.forEach(function (b) { b.classList.remove('is-active'); });
+          btn.classList.add('is-active');
+          panels.forEach(function (p) { p.classList.remove('is-active'); });
+          panels[i].classList.add('is-active');
+        });
+        tabsBar.appendChild(btn);
+        tabBtns.push(btn);
+      })(i);
+    }
 
     // ---- Color Panel ----
     var palettes = [
-      { name: '薄荷绿', color: '#48ff42', outline: '#080808' },
-      { name: '天空蓝', color: '#6ec7ff', outline: '#0b1e3a' },
-      { name: '蜜桃橙', color: '#ffb37a', outline: '#5c2a12' },
-      { name: '薰衣草紫', color: '#c9a6ff', outline: '#2e1a4d' },
-      { name: '玫瑰粉', color: '#ff9fb6', outline: '#5c1f33' },
-      { name: '柠檬黄', color: '#ffe066', outline: '#4d3d00' },
+      { name: '薄荷绿', en: 'Mint', color: '#48ff42', outline: '#080808' },
+      { name: '天空蓝', en: 'Sky Blue', color: '#6ec7ff', outline: '#0b1e3a' },
+      { name: '蜜桃橙', en: 'Peach', color: '#ffb37a', outline: '#5c2a12' },
+      { name: '薰衣草紫', en: 'Lavender', color: '#c9a6ff', outline: '#2e1a4d' },
+      { name: '玫瑰粉', en: 'Rose', color: '#ff9fb6', outline: '#5c1f33' },
+      { name: '柠檬黄', en: 'Lemon', color: '#ffe066', outline: '#4d3d00' },
     ];
     var palettePanel = document.getElementById('panel-color');
     var paletteGrid = document.createElement('div');
     paletteGrid.className = 'palette';
+    var paletteCaptions = [];
     var activeSwatch = null;
 
     palettes.forEach(function (p) {
@@ -250,7 +336,6 @@ mascot = LivelyMascot.createMascot(el, { type: 'myChar' });</pre>
       swatch.style.background = p.color;
       swatch.style.border = '2px solid ' + p.outline;
       var caption = document.createElement('figcaption');
-      caption.textContent = p.name;
       fig.appendChild(swatch);
       fig.appendChild(caption);
       fig.addEventListener('click', function () {
@@ -260,6 +345,7 @@ mascot = LivelyMascot.createMascot(el, { type: 'myChar' });</pre>
         activeSwatch = fig;
       });
       paletteGrid.appendChild(fig);
+      paletteCaptions.push(caption);
     });
     palettePanel.appendChild(paletteGrid);
 
@@ -268,19 +354,19 @@ mascot = LivelyMascot.createMascot(el, { type: 'myChar' });</pre>
     var groups = LivelyMascot.emotionGroups;
     var emotions = LivelyMascot.emotions;
     var groupKeys = Object.keys(groups);
+    var groupOrder = groupKeys.slice().sort(function (a, b) {
+      return groups[a].order - groups[b].order;
+    });
 
     var subBar = document.createElement('div');
     subBar.className = 'sub-tabs';
     var subBtns = [];
     var subPanels = [];
+    var subCaptions = [];
 
-    groupKeys.forEach(function (key, i) {
-      var g = groups[key];
-      var count = Object.values(emotions).filter(function (e) { return e.group === key; }).length;
-
+    groupOrder.forEach(function (key, i) {
       var btn = document.createElement('button');
       btn.className = 'sub-tabs__btn' + (i === 0 ? ' is-active' : '');
-      btn.textContent = g.name + ' (' + count + ')';
       btn.addEventListener('click', function () {
         subBtns.forEach(function (b) { b.classList.remove('is-active'); });
         btn.classList.add('is-active');
@@ -300,15 +386,17 @@ mascot = LivelyMascot.createMascot(el, { type: 'myChar' });</pre>
         item.className = 'emotion-item';
         if (e.id === '02') item.classList.add('is-active');
         item.dataset.emotionId = e.id;
-        item.innerHTML =
-          '<div class="emotion-item__name">' + e.name + '</div>' +
-          '<div class="emotion-item__desc">' + e.desc + '</div>';
-        item.title = e.id + ' - ' + e.name + ': ' + e.desc;
+        var nameEl = document.createElement('div');
+        nameEl.className = 'emotion-item__name';
+        var descEl = document.createElement('div');
+        descEl.className = 'emotion-item__desc';
+        item.appendChild(nameEl);
+        item.appendChild(descEl);
         item.addEventListener('click', function () {
           hero.setEmotion(e.id);
           emotionPanel.querySelectorAll('.emotion-item.is-active').forEach(function (a) { a.classList.remove('is-active'); });
           item.classList.add('is-active');
-          say('Emotion: ' + e.name);
+          say(T().sayEmotion(e.name));
         });
         grid.appendChild(item);
       });
@@ -320,8 +408,100 @@ mascot = LivelyMascot.createMascot(el, { type: 'myChar' });</pre>
     emotionPanel.appendChild(subBar);
     subPanels.forEach(function (p) { emotionPanel.appendChild(p); });
 
+    // ---- Apply / refresh all text for the current language ----
+    function applyLanguage() {
+      var t = T();
+      document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+      document.getElementById('tagline').textContent = t.tagline;
+      toggleButtons.forEach(function (b) {
+        b.classList.toggle('is-active', b.dataset.lang === currentLang);
+      });
+
+      // Hero hint (keep last greeting if already shown)
+      if (!hint.textContent || hint.dataset.dirty !== '1') {
+        hint.textContent = t.hint;
+        hint.dataset.dirty = '0';
+      }
+
+      // Character bar
+      charBtns.forEach(function (btn) {
+        btn.textContent = t.charNames[btn.dataset.type];
+      });
+
+      // Main tabs
+      tabBtns.forEach(function (btn, i) { btn.textContent = t.tabs[i]; });
+
+      // Palette captions
+      paletteCaptions.forEach(function (cap, i) {
+        cap.textContent = currentLang === 'zh' ? palettes[i].name : palettes[i].en;
+      });
+
+      // Emotion sub-tab captions
+      subCaptions.forEach(function (cap, i) {
+        var key = groupOrder[i];
+        cap.textContent = t.groupNames[key] + ' (' + subCounts[i] + ')';
+      });
+
+      // Emotion item names + descriptions
+      document.querySelectorAll('.emotion-item').forEach(function (item) {
+        var e = emotions[item.dataset.emotionId];
+        item.querySelector('.emotion-item__name').textContent = currentLang === 'zh' ? ZH_NAME[e.id] : e.name;
+        var enDesc = EN_DESC[e.id];
+        var desc = currentLang === 'zh' ? e.desc : enDesc;
+        item.querySelector('.emotion-item__desc').textContent = desc;
+        item.title = e.id + ' - ' + (currentLang === 'zh' ? ZH_NAME[e.id] : e.name) + ': ' + desc;
+      });
+    }
+
+    // English descriptions for emotions (zh desc already lives in emotions.js)
+    var EN_DESC = {
+      "00": "Deep sleep", "01": "Just woke", "02": "Idle", "03": "Calm breathing",
+      "04": "Standing by", "05": "Paused", "06": "Refreshing", "07": "Low battery",
+      "08": "Offline", "09": "Booting",
+      "10": "Happy", "11": "Excited", "12": "Sad", "13": "Angry", "14": "Surprised",
+      "15": "Shy", "16": "In love", "17": "Confused", "18": "Cool", "19": "Smug",
+      "20": "Thinking", "21": "Listening", "22": "Talking", "23": "Searching",
+      "24": "Reading", "25": "Writing", "26": "Coding", "27": "Designing",
+      "28": "Loading", "29": "Processing", "30": "Success", "31": "Error",
+      "32": "Grateful", "33": "Retrying", "34": "Cancelled", "35": "Crying",
+      "36": "Bored", "37": "Nervous", "38": "Eureka", "39": "Waiting"
+    };
+    // Chinese names for emotions (zh desc already lives in emotions.js)
+    var ZH_NAME = {
+      "00": "睡眠", "01": "醒来", "02": "待机", "03": "呼吸", "04": "待命",
+      "05": "暂停", "06": "刷新", "07": "低电量", "08": "离线", "09": "启动",
+      "10": "开心", "11": "兴奋", "12": "难过", "13": "生气", "14": "惊讶",
+      "15": "害羞", "16": "心动", "17": "困惑", "18": "耍酷", "19": "得意",
+      "20": "思考", "21": "倾听", "22": "说话", "23": "搜索", "24": "阅读",
+      "25": "写作", "26": "编程", "27": "设计", "28": "加载", "29": "处理",
+      "30": "成功", "31": "错误", "32": "感谢", "33": "重试", "34": "取消",
+      "35": "哭泣", "36": "无聊", "37": "紧张", "38": "顿悟", "39": "等待"
+    };
+
+    // Cache sub-tab counts (stable across languages)
+    var subCounts = groupOrder.map(function (key) {
+      return Object.values(emotions).filter(function (e) { return e.group === key; }).length;
+    });
+    groupOrder.forEach(function (key, i) {
+      subCaptions.push(subBtns[i]);
+    });
+
+    // Override say() so the hint marks itself dirty and refreshes on language change
+    say = function (text) { hint.dataset.dirty = '1'; hint.textContent = text; };
+
+    // ---- Language toggle wiring ----
+    var toggleButtons = Array.prototype.slice.call(document.querySelectorAll('.lang-switch__btn'));
+    toggleButtons.forEach(function (b) {
+      b.addEventListener('click', function () {
+        if (currentLang === b.dataset.lang) return;
+        currentLang = b.dataset.lang;
+        applyLanguage();
+      });
+    });
+
     // ---- Init ----
     createHero('sprout');
+    applyLanguage();
   </script>
 </body>
 
