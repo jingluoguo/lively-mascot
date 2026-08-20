@@ -10,6 +10,11 @@ An expression system for chatbots, desktop pets, web widgets, and AI assistants.
 
 ## Features
 
+<p align="center">
+  <img src="src/doc/en/e1.png" width="370" alt="lively-mascot demo 1" />
+  <img src="src/doc/en/e2.png" width="370" alt="lively-mascot demo 2" />
+</p>
+
 - **40 Status Emotions**: Covers lifecycle (sleep/idle), emotional reactions (happy/angry), work states (thinking/searching), and extended states (bored/nervous/eureka/waiting).
 - **Multi-Character**: Ships with five bundled characters — **Sprout** (plant-styled), **Cat** (pet-styled), **Robot** (tech blocky head + antenna), **Ghost** (domed floating translucent with a 3-lobe wavy hem), and **Jelly** (bouncy blob). Swappable via `type` option with zero engine-level changes.
 - **Full-Element Control**: Each emotion controls eyes, mouth, blush, body, accessories (leaf/ears/tail), and limbs — independent animation channels per character anatomy.
