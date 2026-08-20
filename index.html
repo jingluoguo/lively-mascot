@@ -8,6 +8,9 @@
   <link rel="stylesheet" href="src/lively-mascot.css" />
   <link rel="stylesheet" href="src/characters/sprout.css" />
   <link rel="stylesheet" href="src/characters/cat.css" />
+  <link rel="stylesheet" href="src/characters/robot.css" />
+  <link rel="stylesheet" href="src/characters/ghost.css" />
+  <link rel="stylesheet" href="src/characters/jelly.css" />
   <style>
     * { box-sizing: border-box; }
 
@@ -152,6 +155,9 @@ mascot = LivelyMascot.createMascot(el, { type: 'myChar' });</pre>
   <script src="src/lively-mascot.js"></script>
   <script src="src/characters/sprout.js"></script>
   <script src="src/characters/cat.js"></script>
+  <script src="src/characters/robot.js"></script>
+  <script src="src/characters/ghost.js"></script>
+  <script src="src/characters/jelly.js"></script>
   <script>
     var hint = document.getElementById('hint');
     function say(name) {
@@ -182,8 +188,11 @@ mascot = LivelyMascot.createMascot(el, { type: 'myChar' });</pre>
 
     // ---- Character Bar ----
     var charBar = document.getElementById('char-bar');
-    var charTypes = ['sprout', 'cat'];
-    var charNames = { sprout: '🌱 嫩芽', cat: '🐱 小猫' };
+    var charTypes = ['sprout', 'cat', 'robot', 'ghost', 'jelly'];
+    var charNames = {
+      sprout: '🌱 嫩芽', cat: '🐱 小猫', robot: '🤖 机器人',
+      ghost: '👻 幽灵', jelly: '🟢 果冻'
+    };
     var charBtns = [];
 
     charTypes.forEach(function (type) {

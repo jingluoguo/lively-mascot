@@ -1,0 +1,54 @@
+/* ============================================================
+ * lively-mascot · Jelly Character
+ * Pure jelly blob: no leaf, no feet. Q-bouncy squash-stretch.
+ * ============================================================ */
+
+.lively-mascot--jelly {
+  overflow: visible;
+}
+
+/* --- Body (translucent jelly) --- */
+.lively-mascot--jelly .lively-body {
+  border-radius: 46% 46% 48% 48% / 52% 52% 50% 50%;
+  background:
+    radial-gradient(ellipse at 38% 30%, rgba(255,255,255,0.55), rgba(255,255,255,0) 45%),
+    color-mix(in srgb, var(--lively-body) 68%, white);
+  border-color: var(--lively-outline);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.10), inset 0 -8px 14px rgba(0,0,0,0.06);
+  /* jiggly idle squash */
+  animation: lively-jelly-idle 2.8s ease-in-out infinite;
+}
+.lively-mascot--jelly.is-happy .lively-body {
+  animation: lively-jelly-idle 2.8s ease-in-out infinite, lively-squish 0.6s cubic-bezier(.3,1.6,.4,1);
+}
+
+@keyframes lively-jelly-idle {
+  0%, 100% { transform: scale(1, 1); border-radius: 46% 46% 48% 48% / 52% 52% 50% 50%; }
+  25% { transform: scale(1.06, 0.94); border-radius: 44% 44% 50% 50% / 50% 50% 52% 52%; }
+  50% { transform: scale(0.95, 1.06); border-radius: 50% 50% 44% 44% / 54% 54% 46% 46%; }
+  75% { transform: scale(1.03, 0.97); border-radius: 44% 44% 50% 50% / 50% 50% 52% 52%; }
+}
+
+/* jelly never hops (no feet) */
+.lively-mascot--jelly.is-hopping .lively-mascot__rig { animation: none; }
+
+/* a couple of emotion-driven jelly reactions on top of face changes */
+.lively-mascot--jelly.is-emotion-10 .lively-body,
+.lively-mascot--jelly.is-emotion-30 .lively-body,
+.lively-mascot--jelly.is-emotion-38 .lively-body {
+  animation: lively-jelly-bounce 0.7s cubic-bezier(.3,1.5,.5,1);
+}
+.lively-mascot--jelly.is-emotion-12 .lively-body,
+.lively-mascot--jelly.is-emotion-35 .lively-body {
+  animation: lively-jelly-sad 3s ease-in-out infinite;
+}
+@keyframes lively-jelly-bounce {
+  0% { transform: scale(1,1); }
+  30% { transform: translateY(-10px) scale(1.08, 0.9); }
+  60% { transform: translateY(0) scale(0.94, 1.08); }
+  100% { transform: scale(1,1); }
+}
+@keyframes lively-jelly-sad {
+  0%, 100% { transform: scale(1, 1) translateY(2px); }
+  50% { transform: scale(1.04, 0.96) translateY(4px); }
+}

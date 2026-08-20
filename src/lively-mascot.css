@@ -525,8 +525,10 @@
   .lively-body,
   .lively__leaf,
   .lively__ears,
+  .lively__antenna,
   .lively__tail,
   .lively__foot,
+  .lively__ghost-hem,
   .lively-face-wrap svg {
     animation: none !important;
   }

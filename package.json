@@ -1,7 +1,7 @@
 {
   "name": "lively-mascot",
-  "version": "0.7.0",
-  "description": "Universal Animated Mascot Engine: 40 Emotions · Multi-Character · Pure SVG · Zero Dependencies · Data-Driven · Drop-in.",
+  "version": "0.8.0",
+  "description": "Universal Animated Mascot Engine: 40 Emotions · 5 Characters · Pure SVG · Zero Dependencies · Data-Driven · Drop-in.",
   "license": "MIT",
   "keywords": [
     "mascot",
@@ -13,7 +13,10 @@
     "web-component",
     "no-build",
     "svg-animation",
-    "multi-character"
+    "multi-character",
+    "ghost",
+    "jelly",
+    "robot"
   ],
   "files": [
     "src/lively-mascot.js",
@@ -24,6 +27,12 @@
     "src/characters/sprout.css",
     "src/characters/cat.js",
     "src/characters/cat.css",
+    "src/characters/robot.js",
+    "src/characters/robot.css",
+    "src/characters/ghost.js",
+    "src/characters/ghost.css",
+    "src/characters/jelly.js",
+    "src/characters/jelly.css",
     "README.zh-CN.md"
   ],
   "repository": {

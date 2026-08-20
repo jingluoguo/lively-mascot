@@ -1,0 +1,76 @@
+/* ============================================================
+ * lively-mascot · Robot Character
+ * Square head + antenna (tech / mechanical vibe)
+ * ============================================================ */
+
+/* --- Body (square head) --- */
+.lively-mascot--robot .lively-body {
+  border-radius: 26%;
+  background:
+    linear-gradient(150deg, rgba(255,255,255,0.28), rgba(255,255,255,0) 55%),
+    var(--lively-body);
+  box-shadow: 5px 5px 0 var(--lively-outline), inset 0 0 0 4px rgba(255,255,255,0.12);
+}
+
+/* subtle screen seam so it reads as a robot face panel */
+.lively-mascot--robot .lively-face-wrap {
+  border-radius: 18%;
+  box-shadow: inset 0 0 0 3px rgba(0,0,0,0.10), inset 0 6px 14px rgba(0,0,0,0.12);
+  background: rgba(0,0,0,0.06);
+}
+.lively-mascot--robot .lively-face-wrap svg {
+  filter: drop-shadow(0 0 2px rgba(0,0,0,0.08));
+}
+
+/* --- Antenna (leaf channel, CSS-driven) --- */
+.lively__antenna {
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  width: 40px;
+  height: 36px;
+  margin-left: -20px;
+  z-index: 3;
+  transform-origin: 50% 100%;
+  animation: lively-robot-antenna 2.6s ease-in-out infinite;
+}
+.lively__antenna svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.lively-robot__antenna-stalk {
+  fill: none;
+  stroke: var(--lively-outline);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.lively-robot__antenna-ball {
+  fill: var(--lively-accent);
+  stroke: var(--lively-outline);
+  stroke-width: 2;
+  animation: lively-robot-blink 1.8s ease-in-out infinite;
+}
+@keyframes lively-robot-antenna {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+@keyframes lively-robot-blink {
+  0%, 100% { fill: var(--lively-accent); }
+  50% { fill: #fff; }
+}
+
+/* --- Feet (mechanical blocks) --- */
+.lively__feet--robot .lively__foot svg { overflow: visible; }
+.lively-robot__foot {
+  fill: var(--lively-outline);
+  stroke: var(--lively-outline);
+  stroke-width: 1;
+}
+.lively-robot__foot-line { fill: rgba(255,255,255,0.5); }
+
+/* Antenna emotion reactions (top decoration reacts to state) */
+.lively-mascot.is-emotion-13 .lively__antenna { animation: lively-robot-antenna-fast 0.3s ease-in-out infinite; }
+.lively-mascot.is-emotion-13 .lively-robot__antenna-ball { fill: #ff6b6b; }
+.lively-mascot.is-emotion-31 .lively-robot__antenna-ball { fill: #ff6b6b; }
+.lively-mascot.is-emotion-38 .lively-robot__antenna-ball { fill: #ffd23f; }
+@keyframes lively-robot-antenna-fast {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(-14deg); }
+}
