@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="src/characters/ghost.css" />
   <link rel="stylesheet" href="src/characters/jelly.css" />
   <style>
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
 
     body {
       margin: 0;
@@ -135,8 +135,26 @@
     .emotion-item__name { font-size: 13px; font-weight: 700; color: #1d1d1f; }
     .emotion-item__desc { font-size: 11px; color: #888; margin-top: 3px; }
 
-    .code { border: 2px solid #080808; border-radius: 14px; background: #fff; box-shadow: 5px 5px 0 #080808; overflow: hidden; margin-top: 28px; }
-    .code pre { margin: 0; padding: 18px 22px; overflow-x: auto; font-size: 13px; line-height: 1.7; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    /* ---- Footer: GitHub repo link (theme-matched) ---- */
+    .footer { text-align: center; margin-top: 36px; }
+    .footer__link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border: 2px solid #080808;
+      border-radius: 999px;
+      background: #fff;
+      box-shadow: 3px 3px 0 #080808;
+      font-size: 14px;
+      font-weight: 700;
+      color: #1d1d1f;
+      text-decoration: none;
+      transition: all .15s;
+    }
+    .footer__link:hover { background: #f0f0f0; transform: translate(-1px, -1px); box-shadow: 4px 4px 0 #080808; }
+    .footer__link:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 #080808; }
+    .footer__icon { color: #48ff42; text-shadow: 1px 1px 0 #080808; -webkit-text-stroke: 1px #080808; font-size: 16px; }
 
     @media (max-width: 720px) {
       .palette { grid-template-columns: repeat(3, 1fr); }
@@ -171,22 +189,11 @@
       </div>
     </div>
 
-    <section class="code">
-      <pre>// 任意容器内创建
-var mascot = LivelyMascot.createMascot(el, {
-  type: 'sprout',  // 或 'cat'
-  color: '#48ff42', size: 180,
-  onClick: () => console.log('hi'),
-});
-
-// 切换表情
-mascot.setEmotion('10');  // Happy
-mascot.setEmotion('38');  // Eureka
-
-// 切换角色
-LivelyMascot.registerCharacter('myChar', renderFn, 'MyChar');
-mascot = LivelyMascot.createMascot(el, { type: 'myChar' });</pre>
-    </section>
+    <footer class="footer">
+      <a class="footer__link" id="repo-link" href="https://github.com/jingluoguo/lively-mascot" target="_blank" rel="noopener">
+        <span class="footer__icon">★</span><span id="repo-label"></span>
+      </a>
+    </footer>
   </main>
 
   <script src="src/core/emotions.js"></script>
@@ -205,6 +212,7 @@ mascot = LivelyMascot.createMascot(el, { type: 'myChar' });</pre>
       zh: {
         tagline: '通用电子宠物引擎：40 种状态表情 · 多角色 · 纯 SVG 驱动 · 零依赖 · 即插即用。',
         hint: '把光标移到吉祥物上 · 点击让它开心',
+        repoLabel: '在 GitHub 上查看源码',
         charNames: {
           sprout: '🌱 嫩芽', cat: '🐱 小猫', robot: '🤖 机器人',
           ghost: '👻 幽灵', jelly: '🟢 果冻'
@@ -227,6 +235,7 @@ mascot = LivelyMascot.createMascot(el, { type: 'myChar' });</pre>
       en: {
         tagline: 'Universal e-pet engine: 40 status emotions · multi-character · pure SVG · zero deps · drop-in.',
         hint: 'Hover the mascot · click to make it happy',
+        repoLabel: 'View source on GitHub',
         charNames: {
           sprout: '🌱 Sprout', cat: '🐱 Cat', robot: '🤖 Robot',
           ghost: '👻 Ghost', jelly: '🟢 Jelly'
@@ -258,6 +267,7 @@ mascot = LivelyMascot.createMascot(el, { type: 'myChar' });</pre>
     // ---- Current mascot instance ----
     var hero = null;
     var currentCharType = 'sprout';
+    var currentTheme = null;
 
     function createHero(type) {
       if (hero) hero.destroy();
@@ -269,6 +279,9 @@ mascot = LivelyMascot.createMascot(el, { type: 'myChar' });</pre>
         onClick: function () { say(T().sayGreeting(T().clickName(type))); },
       });
       currentCharType = type;
+      if (currentTheme) {
+        hero.setTheme(currentTheme);
+      }
       var activeEmotion = document.querySelector('.emotion-item.is-active');
       if (activeEmotion) {
         hero.setEmotion(activeEmotion.dataset.emotionId);
@@ -339,7 +352,8 @@ mascot = LivelyMascot.createMascot(el, { type: 'myChar' });</pre>
       fig.appendChild(swatch);
       fig.appendChild(caption);
       fig.addEventListener('click', function () {
-        hero.setTheme({ body: p.color, outline: p.outline });
+        currentTheme = { body: p.color, outline: p.outline };
+        hero.setTheme(currentTheme);
         if (activeSwatch) activeSwatch.classList.remove('is-active');
         fig.classList.add('is-active');
         activeSwatch = fig;
@@ -413,6 +427,7 @@ mascot = LivelyMascot.createMascot(el, { type: 'myChar' });</pre>
       var t = T();
       document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
       document.getElementById('tagline').textContent = t.tagline;
+      document.getElementById('repo-label').textContent = t.repoLabel;
       toggleButtons.forEach(function (b) {
         b.classList.toggle('is-active', b.dataset.lang === currentLang);
       });
