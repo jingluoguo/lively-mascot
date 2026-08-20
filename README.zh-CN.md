@@ -30,7 +30,7 @@
 <script src="https://cdn.jsdelivr.net/gh/jingluoguo/lively-mascot@master/dist/lively-mascot.min.js"></script>
 
 <div id="slot"></div>
-<script>
+<script> 
   // 嫩芽（植物系吉祥物）— 默认
   var s = LivelyMascot.createMascot(document.getElementById('slot'), {
     type: 'sprout', size: 180
