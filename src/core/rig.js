@@ -99,11 +99,13 @@ function createRig(root, rigEl, config, handlers) {
       if (footL) footL.style.animation = def.footAnim || "";
       if (footR) footR.style.animation = def.footAnim || "";
     }
-    // Refresh: rotate entire rig instead of just body
-    if (id === "06") {
+    // Refresh (06) + Loading (28): drive the entire rig (whole mascot
+    // bounces / rotates with feet attached) instead of just the body.
+    if (id === "06" || id === "28") {
       if (bodyEl) bodyEl.style.animation = "";
       rigEl.style.animation = def.bodyAnim || "";
     } else {
+      // Everything else: keep the rig stationary so overlays line up.
       rigEl.style.animation = "";
     }
   }

@@ -132,8 +132,10 @@ var LivelyEmotions = {
           leafAnim: "lively-leaf-designing 2.5s ease-in-out infinite" },
   "28": { id: "28", name: "Loading",    group: "work", desc: "加载中",
           gaze: false,
-          bodyAnim: "lively-loading-pulse 1.8s ease-in-out infinite",
-          leafAnim: "lively-leaf-spin-slow 1.6s linear infinite",
+          // Loading state is communicated by the rotated ring (CSS).
+          // Disable the base body sway so the ring stays concentric; the
+          // whole rig bounces instead to make the live mascot feel alive.
+          bodyAnim: "lively-loading-bounce 0.9s ease-in-out infinite",
           footAnim: "lively-foot-rest 3s ease-in-out infinite" },
   "29": { id: "29", name: "Processing", group: "work", desc: "处理中",
           bodyAnim: "lively-processing 1.5s ease-in-out infinite",

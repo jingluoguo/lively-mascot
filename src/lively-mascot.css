@@ -38,8 +38,60 @@
   cursor: default;
   pointer-events: none;
 }
+
 .lively-mascot--static * {
   animation: none !important;
+}
+
+/* --- Loading ring overlay (28) — shared by all characters ---
+   A bold, clearly-visible spinner for the live mascot; hidden in static
+   thumbnails so the emotion gallery stays purely iconic. */
+.lively__loading-overlay {
+  display: none;
+}
+
+.lively-mascot.is-emotion-28 .lively__loading-overlay {
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50%;
+  height: 50%;
+  transform: translate(-50%, -50%);
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 2.5px solid color-mix(in srgb, var(--lively-outline) 22%, transparent);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.lively-mascot.is-emotion-28 .lively__loading-overlay::before {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  box-sizing: border-box;
+  border: 4px solid transparent;
+  border-top-color: var(--lively-outline);
+  border-right-color: var(--lively-outline);
+  border-radius: inherit;
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--lively-outline) 35%, transparent));
+  animation: lively-loading-orbit 1s linear infinite;
+}
+
+/* Static thumbnails (emotion gallery) keep the same loading ring but frozen */
+.lively-mascot--static.is-emotion-28 .lively__loading-overlay {
+  display: block;
+  width: 44%;
+  height: 44%;
+  border-width: 2px;
+}
+
+.lively-mascot--static.is-emotion-28 .lively__loading-overlay::before {
+  animation: none;
+  inset: -4px;
+  border-width: 3px;
+  /* freeze the arc at about 2 o'clock so it still reads as "loading" */
+  transform: rotate(45deg);
 }
 
 /* Rig layer: outer posture layer (hop / refresh rotation) */
@@ -66,7 +118,7 @@
   border: 2px solid var(--lively-outline);
   border-radius: 50%;
   background: var(--lively-body);
-  box-shadow: 5px 5px 0 var(--lively-outline);
+  box-shadow: 3px 3px 0 color-mix(in srgb, var(--lively-outline) 70%, transparent);
   transform-origin: 50% 92%;
   /* Default idle posture: body + nested face + ears sway together */
   animation: lively-sway 3.6s ease-in-out infinite;
@@ -109,14 +161,19 @@
   transform: scaleY(0.08);
 }
 
-.lively-face__eye > ellipse {
+.lively-face__eye>ellipse {
   fill: #fff;
   stroke: var(--lively-outline);
   stroke-width: 2.4;
 }
 
-.lively-face__pupil { fill: var(--lively-outline); }
-.lively-face__shine { fill: #fff; }
+.lively-face__pupil {
+  fill: var(--lively-outline);
+}
+
+.lively-face__shine {
+  fill: #fff;
+}
 
 /* --- Blush --- */
 .lively-face__blush {
@@ -133,18 +190,26 @@
   stroke-linecap: round;
 }
 
-.lively-face__happy-mouth { fill: var(--lively-outline); }
+.lively-face__happy-mouth {
+  fill: var(--lively-outline);
+}
 
 .lively-face__happy,
-.lively-face__happy-mouth { visibility: hidden; }
+.lively-face__happy-mouth {
+  visibility: hidden;
+}
 
-.lively-mascot.is-happy .lively-face__eye > ellipse,
+.lively-mascot.is-happy .lively-face__eye>ellipse,
 .lively-mascot.is-happy .lively-face__pupil,
 .lively-mascot.is-happy .lively-face__shine,
-.lively-mascot.is-happy .lively-face__mouth { visibility: hidden; }
+.lively-mascot.is-happy .lively-face__mouth {
+  visibility: hidden;
+}
 
 .lively-mascot.is-happy .lively-face__happy,
-.lively-mascot.is-happy .lively-face__happy-mouth { visibility: visible; }
+.lively-mascot.is-happy .lively-face__happy-mouth {
+  visibility: visible;
+}
 
 /* --- Alt face elements: hidden by default --- */
 .lively-face__sad-mouth,
@@ -153,7 +218,9 @@
 .lively-face__sleep-eye,
 .lively-face__angry-brow,
 .lively-face__x-eye,
-.lively-face__heart-eye { visibility: hidden; }
+.lively-face__heart-eye {
+  visibility: hidden;
+}
 
 .lively-face__sad-mouth,
 .lively-face__flat-mouth {
@@ -162,29 +229,34 @@
   stroke-width: 2.6;
   stroke-linecap: round;
 }
+
 .lively-face__open-mouth {
   fill: var(--lively-outline);
   stroke: var(--lively-outline);
   stroke-width: 1.5;
 }
+
 .lively-face__sleep-eye {
   fill: none;
   stroke: var(--lively-outline);
   stroke-width: 2.4;
   stroke-linecap: round;
 }
+
 .lively-face__angry-brow {
   fill: none;
   stroke: var(--lively-outline);
   stroke-width: 2.8;
   stroke-linecap: round;
 }
+
 .lively-face__x-eye line {
   fill: none;
   stroke: var(--lively-outline);
   stroke-width: 2.6;
   stroke-linecap: round;
 }
+
 .lively-face__heart-eye {
   fill: var(--lively-accent);
   stroke: var(--lively-outline);
@@ -196,150 +268,368 @@
  * ============================================================ */
 
 /* 00 Sleep */
-.lively-mascot.is-emotion-00 .lively-face__eye > ellipse,
+.lively-mascot.is-emotion-00 .lively-face__eye>ellipse,
 .lively-mascot.is-emotion-00 .lively-face__pupil,
 .lively-mascot.is-emotion-00 .lively-face__shine,
-.lively-mascot.is-emotion-00 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-00 .lively-face__sleep-eye { visibility: visible; }
-.lively-mascot.is-emotion-00 .lively-face__flat-mouth { visibility: visible; }
-.lively-mascot.is-emotion-00 .lively-face__blush { fill-opacity: 0.3; }
+.lively-mascot.is-emotion-00 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-00 .lively-face__sleep-eye {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-00 .lively-face__flat-mouth {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-00 .lively-face__blush {
+  fill-opacity: 0.3;
+}
 
 /* 01 Wake */
-.lively-mascot.is-emotion-01 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-01 .lively-face__open-mouth { visibility: visible; rx: 3; ry: 4; }
+.lively-mascot.is-emotion-01 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-01 .lively-face__open-mouth {
+  visibility: visible;
+  rx: 3;
+  ry: 4;
+}
 
 /* 02 Idle: default face */
 
 /* 03 Breathe: default face */
 
 /* 04 Ready */
-.lively-mascot.is-emotion-04 .lively-face__eye > ellipse { ry: 13; }
+.lively-mascot.is-emotion-04 .lively-face__eye>ellipse {
+  ry: 13;
+}
 
 /* 05 Pause */
-.lively-mascot.is-emotion-05 .lively-face__eye > ellipse { ry: 5; }
+.lively-mascot.is-emotion-05 .lively-face__eye>ellipse {
+  ry: 5;
+}
+
 .lively-mascot.is-emotion-05 .lively-face__pupil,
-.lively-mascot.is-emotion-05 .lively-face__shine { visibility: hidden; }
-.lively-mascot.is-emotion-05 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-05 .lively-face__flat-mouth { visibility: visible; }
+.lively-mascot.is-emotion-05 .lively-face__shine {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-05 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-05 .lively-face__flat-mouth {
+  visibility: visible;
+}
 
 /* 06 Refresh: normal face */
 
 /* 07 LowBattery */
-.lively-mascot.is-emotion-07 .lively-face__eye { transform: translateY(2px) scaleY(0.8); }
-.lively-mascot.is-emotion-07 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-07 .lively-face__sad-mouth { visibility: visible; }
-.lively-mascot.is-emotion-07 .lively-face__blush { fill-opacity: 0.3; }
+.lively-mascot.is-emotion-07 .lively-face__eye {
+  transform: translateY(2px) scaleY(0.8);
+}
+
+.lively-mascot.is-emotion-07 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-07 .lively-face__sad-mouth {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-07 .lively-face__blush {
+  fill-opacity: 0.3;
+}
 
 /* 08 Offline */
-.lively-mascot.is-emotion-08 .lively-face__eye > ellipse,
+.lively-mascot.is-emotion-08 .lively-face__eye>ellipse,
 .lively-mascot.is-emotion-08 .lively-face__pupil,
 .lively-mascot.is-emotion-08 .lively-face__shine,
-.lively-mascot.is-emotion-08 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-08 .lively-face__x-eye { visibility: visible; }
-.lively-mascot.is-emotion-08 .lively-face__flat-mouth { visibility: visible; }
-.lively-mascot.is-emotion-08 .lively-face__blush { fill-opacity: 0; }
+.lively-mascot.is-emotion-08 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-08 .lively-face__x-eye {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-08 .lively-face__flat-mouth {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-08 .lively-face__blush {
+  fill-opacity: 0;
+}
 
 /* 09 Boot */
-.lively-mascot.is-emotion-09 .lively-face__eye > ellipse { ry: 13; rx: 11; }
-.lively-mascot.is-emotion-09 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-09 .lively-face__open-mouth { visibility: visible; }
+.lively-mascot.is-emotion-09 .lively-face__eye>ellipse {
+  ry: 13;
+  rx: 11;
+}
+
+.lively-mascot.is-emotion-09 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-09 .lively-face__open-mouth {
+  visibility: visible;
+}
 
 /* 10 Happy */
-.lively-mascot.is-emotion-10 .lively-face__eye > ellipse,
+.lively-mascot.is-emotion-10 .lively-face__eye>ellipse,
 .lively-mascot.is-emotion-10 .lively-face__pupil,
 .lively-mascot.is-emotion-10 .lively-face__shine,
-.lively-mascot.is-emotion-10 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-10 .lively-face__happy { visibility: visible; }
-.lively-mascot.is-emotion-10 .lively-face__happy-mouth { visibility: visible; }
-.lively-mascot.is-emotion-10 .lively-face__blush { fill-opacity: 1; }
+.lively-mascot.is-emotion-10 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-10 .lively-face__happy {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-10 .lively-face__happy-mouth {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-10 .lively-face__blush {
+  fill-opacity: 1;
+}
 
 /* 11 Excited */
-.lively-mascot.is-emotion-11 .lively-face__eye > ellipse,
+.lively-mascot.is-emotion-11 .lively-face__eye>ellipse,
 .lively-mascot.is-emotion-11 .lively-face__pupil,
 .lively-mascot.is-emotion-11 .lively-face__shine,
-.lively-mascot.is-emotion-11 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-11 .lively-face__happy { visibility: visible; }
-.lively-mascot.is-emotion-11 .lively-face__happy-mouth { visibility: visible; }
-.lively-mascot.is-emotion-11 .lively-face__blush { fill-opacity: 1; rx: 9; }
+.lively-mascot.is-emotion-11 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-11 .lively-face__happy {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-11 .lively-face__happy-mouth {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-11 .lively-face__blush {
+  fill-opacity: 1;
+  rx: 9;
+}
 
 /* 12 Sad */
-.lively-mascot.is-emotion-12 .lively-face__eye { transform: translateY(2px) scaleY(0.85); }
-.lively-mascot.is-emotion-12 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-12 .lively-face__sad-mouth { visibility: visible; }
-.lively-mascot.is-emotion-12 .lively-face__blush { fill-opacity: 0.3; }
+.lively-mascot.is-emotion-12 .lively-face__eye {
+  transform: translateY(2px) scaleY(0.85);
+}
+
+.lively-mascot.is-emotion-12 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-12 .lively-face__sad-mouth {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-12 .lively-face__blush {
+  fill-opacity: 0.3;
+}
 
 /* 13 Angry */
-.lively-mascot.is-emotion-13 .lively-face__eye > ellipse { ry: 9; }
-.lively-mascot.is-emotion-13 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-13 .lively-face__sad-mouth { visibility: visible; }
-.lively-mascot.is-emotion-13 .lively-face__angry-brow { visibility: visible; }
-.lively-mascot.is-emotion-13 .lively-face__blush { fill: #ff6b6b; fill-opacity: 0.7; }
+.lively-mascot.is-emotion-13 .lively-face__eye>ellipse {
+  ry: 9;
+}
+
+.lively-mascot.is-emotion-13 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-13 .lively-face__sad-mouth {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-13 .lively-face__angry-brow {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-13 .lively-face__blush {
+  fill: #ff6b6b;
+  fill-opacity: 0.7;
+}
 
 /* 14 Surprised */
-.lively-mascot.is-emotion-14 .lively-face__eye > ellipse { ry: 14; rx: 12; }
-.lively-mascot.is-emotion-14 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-14 .lively-face__open-mouth { visibility: visible; rx: 6; ry: 7; }
-.lively-mascot.is-emotion-14 .lively-face__blush { fill-opacity: 0.9; }
+.lively-mascot.is-emotion-14 .lively-face__eye>ellipse {
+  ry: 14;
+  rx: 12;
+}
+
+.lively-mascot.is-emotion-14 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-14 .lively-face__open-mouth {
+  visibility: visible;
+  rx: 6;
+  ry: 7;
+}
+
+.lively-mascot.is-emotion-14 .lively-face__blush {
+  fill-opacity: 0.9;
+}
 
 /* 15 Shy */
-.lively-mascot.is-emotion-15 .lively-face__eye { transform: translateY(3px); }
-.lively-mascot.is-emotion-15 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-15 .lively-face__happy { visibility: visible; }
-.lively-mascot.is-emotion-15 .lively-face__happy-mouth { visibility: visible; }
-.lively-mascot.is-emotion-15 .lively-face__blush { fill-opacity: 1; rx: 9; ry: 5; }
+.lively-mascot.is-emotion-15 .lively-face__eye {
+  transform: translateY(3px);
+}
+
+.lively-mascot.is-emotion-15 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-15 .lively-face__happy {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-15 .lively-face__happy-mouth {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-15 .lively-face__blush {
+  fill-opacity: 1;
+  rx: 9;
+  ry: 5;
+}
 
 /* 16 Love */
-.lively-mascot.is-emotion-16 .lively-face__eye > ellipse,
+.lively-mascot.is-emotion-16 .lively-face__eye>ellipse,
 .lively-mascot.is-emotion-16 .lively-face__pupil,
 .lively-mascot.is-emotion-16 .lively-face__shine,
-.lively-mascot.is-emotion-16 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-16 .lively-face__heart-eye { visibility: visible; }
-.lively-mascot.is-emotion-16 .lively-face__happy-mouth { visibility: visible; }
-.lively-mascot.is-emotion-16 .lively-face__blush { fill-opacity: 1; rx: 9; }
+.lively-mascot.is-emotion-16 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-16 .lively-face__heart-eye {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-16 .lively-face__happy-mouth {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-16 .lively-face__blush {
+  fill-opacity: 1;
+  rx: 9;
+}
 
 /* 17 Confused */
-.lively-mascot.is-emotion-17 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-17 .lively-face__sad-mouth { visibility: visible; }
-.lively-mascot.is-emotion-17 .lively-face__blush { fill-opacity: 0.4; }
+.lively-mascot.is-emotion-17 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-17 .lively-face__sad-mouth {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-17 .lively-face__blush {
+  fill-opacity: 0.4;
+}
 
 /* 18 Cool */
-.lively-mascot.is-emotion-18 .lively-face__eye > ellipse { ry: 6; }
-.lively-mascot.is-emotion-18 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-18 .lively-face__happy { visibility: visible; }
-.lively-mascot.is-emotion-18 .lively-face__blush { fill-opacity: 0.5; }
+.lively-mascot.is-emotion-18 .lively-face__eye>ellipse {
+  ry: 6;
+}
+
+.lively-mascot.is-emotion-18 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-18 .lively-face__happy {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-18 .lively-face__blush {
+  fill-opacity: 0.5;
+}
 
 /* 19 Smug */
-.lively-mascot.is-emotion-19 .lively-face__eye > ellipse { ry: 7; }
-.lively-mascot.is-emotion-19 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-19 .lively-face__happy { visibility: visible; }
-.lively-mascot.is-emotion-19 .lively-face__happy-mouth { visibility: visible; }
+.lively-mascot.is-emotion-19 .lively-face__eye>ellipse {
+  ry: 7;
+}
+
+.lively-mascot.is-emotion-19 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-19 .lively-face__happy {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-19 .lively-face__happy-mouth {
+  visibility: visible;
+}
 
 /* 20 Thinking */
-.lively-mascot.is-emotion-20 .lively-face__eye { transform: translateY(-3px); }
-.lively-mascot.is-emotion-20 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-20 .lively-face__flat-mouth { visibility: visible; }
+.lively-mascot.is-emotion-20 .lively-face__eye {
+  transform: translateY(-3px);
+}
+
+.lively-mascot.is-emotion-20 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-20 .lively-face__flat-mouth {
+  visibility: visible;
+}
 
 /* 21 Listening */
-.lively-mascot.is-emotion-21 .lively-face__eye > ellipse { ry: 13; }
+.lively-mascot.is-emotion-21 .lively-face__eye>ellipse {
+  ry: 13;
+}
 
 /* 22 Talking */
-.lively-mascot.is-emotion-22 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-22 .lively-face__open-mouth { visibility: visible; rx: 4; ry: 5; }
+.lively-mascot.is-emotion-22 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-22 .lively-face__open-mouth {
+  visibility: visible;
+  rx: 4;
+  ry: 5;
+}
 
 /* 23 Searching: default face (JS gaze handles eye direction) */
 
 /* 24 Reading */
-.lively-mascot.is-emotion-24 .lively-face__eye { transform: translateY(3px); }
-.lively-mascot.is-emotion-24 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-24 .lively-face__happy { visibility: visible; }
+.lively-mascot.is-emotion-24 .lively-face__eye {
+  transform: translateY(3px);
+}
+
+.lively-mascot.is-emotion-24 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-24 .lively-face__happy {
+  visibility: visible;
+}
 
 /* 25 Writing */
-.lively-mascot.is-emotion-25 .lively-face__eye { transform: translateY(2px) translateX(1px); }
+.lively-mascot.is-emotion-25 .lively-face__eye {
+  transform: translateY(2px) translateX(1px);
+}
 
 /* 26 Coding */
-.lively-mascot.is-emotion-26 .lively-face__eye > ellipse { ry: 8; }
-.lively-mascot.is-emotion-26 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-26 .lively-face__flat-mouth { visibility: visible; }
+.lively-mascot.is-emotion-26 .lively-face__eye>ellipse {
+  ry: 8;
+}
+
+.lively-mascot.is-emotion-26 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-26 .lively-face__flat-mouth {
+  visibility: visible;
+}
 
 /* 27 Designing: default face */
 
@@ -347,133 +637,332 @@
 .lively-mascot.is-emotion-28 .lively-face__eye {
   animation: lively-loading-eye-drift 3s ease-in-out infinite;
 }
-.lively-mascot.is-emotion-28 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-28 .lively-face__flat-mouth { visibility: visible; }
+
+.lively-mascot.is-emotion-28 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-28 .lively-face__flat-mouth {
+  visibility: visible;
+}
 
 /* 29 Processing */
-.lively-mascot.is-emotion-29 .lively-face__eye > ellipse { ry: 9; }
-.lively-mascot.is-emotion-29 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-29 .lively-face__flat-mouth { visibility: visible; }
+.lively-mascot.is-emotion-29 .lively-face__eye>ellipse {
+  ry: 9;
+}
+
+.lively-mascot.is-emotion-29 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-29 .lively-face__flat-mouth {
+  visibility: visible;
+}
 
 /* 30 Success */
-.lively-mascot.is-emotion-30 .lively-face__eye > ellipse,
+.lively-mascot.is-emotion-30 .lively-face__eye>ellipse,
 .lively-mascot.is-emotion-30 .lively-face__pupil,
 .lively-mascot.is-emotion-30 .lively-face__shine,
-.lively-mascot.is-emotion-30 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-30 .lively-face__happy { visibility: visible; }
-.lively-mascot.is-emotion-30 .lively-face__happy-mouth { visibility: visible; }
-.lively-mascot.is-emotion-30 .lively-face__blush { fill-opacity: 1; }
+.lively-mascot.is-emotion-30 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-30 .lively-face__happy {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-30 .lively-face__happy-mouth {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-30 .lively-face__blush {
+  fill-opacity: 1;
+}
 
 /* 31 Error */
-.lively-mascot.is-emotion-31 .lively-face__eye > ellipse,
+.lively-mascot.is-emotion-31 .lively-face__eye>ellipse,
 .lively-mascot.is-emotion-31 .lively-face__pupil,
 .lively-mascot.is-emotion-31 .lively-face__shine,
-.lively-mascot.is-emotion-31 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-31 .lively-face__x-eye { visibility: visible; }
-.lively-mascot.is-emotion-31 .lively-face__sad-mouth { visibility: visible; }
-.lively-mascot.is-emotion-31 .lively-face__blush { fill: #ff6b6b; fill-opacity: 0.7; }
+.lively-mascot.is-emotion-31 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-31 .lively-face__x-eye {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-31 .lively-face__sad-mouth {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-31 .lively-face__blush {
+  fill: #ff6b6b;
+  fill-opacity: 0.7;
+}
 
 /* 32 Grateful */
-.lively-mascot.is-emotion-32 .lively-face__eye > ellipse,
+.lively-mascot.is-emotion-32 .lively-face__eye>ellipse,
 .lively-mascot.is-emotion-32 .lively-face__pupil,
 .lively-mascot.is-emotion-32 .lively-face__shine,
-.lively-mascot.is-emotion-32 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-32 .lively-face__happy { visibility: visible; }
-.lively-mascot.is-emotion-32 .lively-face__happy-mouth { visibility: visible; }
-.lively-mascot.is-emotion-32 .lively-face__blush { fill: #ffb37a; fill-opacity: 0.85; }
+.lively-mascot.is-emotion-32 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-32 .lively-face__happy {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-32 .lively-face__happy-mouth {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-32 .lively-face__blush {
+  fill: #ffb37a;
+  fill-opacity: 0.85;
+}
 
 /* 33 Retrying */
-.lively-mascot.is-emotion-33 .lively-face__pupil { rx: 3; ry: 4; }
-.lively-mascot.is-emotion-33 .lively-face__mouth { d: path("M44 63 Q50 63 56 63"); }
+.lively-mascot.is-emotion-33 .lively-face__pupil {
+  rx: 3;
+  ry: 4;
+}
+
+.lively-mascot.is-emotion-33 .lively-face__mouth {
+  d: path("M44 63 Q50 63 56 63");
+}
 
 /* 34 Cancelled */
-.lively-mascot.is-emotion-34 .lively-face__pupil { cy: 47; ry: 3; }
-.lively-mascot.is-emotion-34 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-34 .lively-face__sad-mouth { visibility: visible; }
-.lively-mascot.is-emotion-34 .lively-face__blush { fill-opacity: 0.3; }
+.lively-mascot.is-emotion-34 .lively-face__pupil {
+  cy: 47;
+  ry: 3;
+}
+
+.lively-mascot.is-emotion-34 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-34 .lively-face__sad-mouth {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-34 .lively-face__blush {
+  fill-opacity: 0.3;
+}
 
 /* 35 Crying */
-.lively-mascot.is-emotion-35 .lively-face__eye > ellipse,
+.lively-mascot.is-emotion-35 .lively-face__eye>ellipse,
 .lively-mascot.is-emotion-35 .lively-face__pupil,
 .lively-mascot.is-emotion-35 .lively-face__shine,
-.lively-mascot.is-emotion-35 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-35 .lively-face__cry-eye { visibility: visible; }
-.lively-mascot.is-emotion-35 .lively-face__sad-mouth { visibility: visible; }
-.lively-mascot.is-emotion-35 .lively-face__tear { visibility: visible; }
-.lively-mascot.is-emotion-35 .lively-face__blush { fill: #6ec7ff; fill-opacity: 0.6; }
+.lively-mascot.is-emotion-35 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-35 .lively-face__cry-eye {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-35 .lively-face__sad-mouth {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-35 .lively-face__tear {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-35 .lively-face__blush {
+  fill: #6ec7ff;
+  fill-opacity: 0.6;
+}
 
 /* 36 Bored */
-.lively-mascot.is-emotion-36 .lively-face__pupil { cy: 46; ry: 2.5; }
-.lively-mascot.is-emotion-36 .lively-face__mouth { d: path("M44 64 Q50 64 56 64"); }
+.lively-mascot.is-emotion-36 .lively-face__pupil {
+  cy: 46;
+  ry: 2.5;
+}
+
+.lively-mascot.is-emotion-36 .lively-face__mouth {
+  d: path("M44 64 Q50 64 56 64");
+}
 
 /* 37 Nervous */
-.lively-mascot.is-emotion-37 .lively-face__sweat { visibility: visible; }
-.lively-mascot.is-emotion-37 .lively-face__pupil { animation: lively-nervous-eyes 0.4s ease-in-out infinite; }
+.lively-mascot.is-emotion-37 .lively-face__sweat {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-37 .lively-face__pupil {
+  animation: lively-nervous-eyes 0.4s ease-in-out infinite;
+}
 
 /* 38 Eureka */
-.lively-mascot.is-emotion-38 .lively-face__eye > ellipse,
+.lively-mascot.is-emotion-38 .lively-face__eye>ellipse,
 .lively-mascot.is-emotion-38 .lively-face__pupil,
 .lively-mascot.is-emotion-38 .lively-face__shine,
-.lively-mascot.is-emotion-38 .lively-face__mouth { visibility: hidden; }
-.lively-mascot.is-emotion-38 .lively-face__star-eye { visibility: visible; }
-.lively-mascot.is-emotion-38 .lively-face__happy { visibility: visible; }
-.lively-mascot.is-emotion-38 .lively-face__happy-mouth { visibility: visible; }
-.lively-mascot.is-emotion-38 .lively-face__sparkle { visibility: visible; }
+.lively-mascot.is-emotion-38 .lively-face__mouth {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-38 .lively-face__star-eye {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-38 .lively-face__happy {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-38 .lively-face__happy-mouth {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-38 .lively-face__sparkle {
+  visibility: visible;
+}
 
 /* 39 Waiting */
-.lively-mascot.is-emotion-39 .lively-face__pupil { cy: 47; }
-.lively-mascot.is-emotion-39 .lively-face__mouth { d: path("M44 64 Q50 64 56 64"); }
-.lively-mascot.is-emotion-39 .lively-face__waiting-dots { visibility: visible; }
+.lively-mascot.is-emotion-39 .lively-face__pupil {
+  cy: 47;
+}
+
+.lively-mascot.is-emotion-39 .lively-face__mouth {
+  d: path("M44 64 Q50 64 56 64");
+}
+
+.lively-mascot.is-emotion-39 .lively-face__waiting-dots {
+  visibility: visible;
+}
 
 /* ============================================================
  * SVG Element Base Styles
  * ============================================================ */
 
 /* --- Tear drops --- */
-.lively-face__tear { visibility: hidden; }
-.lively-mascot.is-emotion-35 .lively-face__tear--l { animation: lively-tear-fall 0.8s ease-in infinite; }
-.lively-mascot.is-emotion-35 .lively-face__tear--r { animation: lively-tear-fall 0.8s ease-in 0.3s infinite; }
+.lively-face__tear {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-35 .lively-face__tear--l {
+  animation: lively-tear-fall 0.8s ease-in infinite;
+}
+
+.lively-mascot.is-emotion-35 .lively-face__tear--r {
+  animation: lively-tear-fall 0.8s ease-in 0.3s infinite;
+}
+
 @keyframes lively-tear-fall {
-  0% { transform: translate(var(--tx, 40px), 52px); opacity: 0.9; }
-  100% { transform: translate(var(--tx, 40px), 72px); opacity: 0; }
+  0% {
+    transform: translate(var(--tx, 40px), 52px);
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: translate(var(--tx, 40px), 72px);
+    opacity: 0;
+  }
 }
 
 /* --- Sweat drop --- */
-.lively-face__sweat { visibility: hidden; }
-.lively-mascot.is-emotion-37 .lively-face__sweat { animation: lively-sweat-drip 1.2s ease-in infinite; }
+.lively-face__sweat {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-37 .lively-face__sweat {
+  animation: lively-sweat-drip 1.2s ease-in infinite;
+}
+
 @keyframes lively-sweat-drip {
-  0% { transform: translate(82px, 30px); opacity: 0.8; }
-  100% { transform: translate(82px, 48px); opacity: 0; }
+  0% {
+    transform: translate(82px, 30px);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: translate(82px, 48px);
+    opacity: 0;
+  }
 }
 
 /* --- Star eyes --- */
-.lively-face__star-eye { visibility: hidden; }
-.lively-mascot.is-emotion-38 .lively-face__star-eye { animation: lively-star-pulse 0.6s ease-in-out infinite; }
+.lively-face__star-eye {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-38 .lively-face__star-eye {
+  animation: lively-star-pulse 0.6s ease-in-out infinite;
+}
+
 @keyframes lively-star-pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.2);
+  }
 }
 
 /* --- Sparkles --- */
-.lively-face__sparkle { visibility: hidden; }
-.lively-mascot.is-emotion-38 .lively-face__sparkle--1 { animation: lively-sparkle-twinkle 0.8s ease-in-out infinite; }
-.lively-mascot.is-emotion-38 .lively-face__sparkle--2 { animation: lively-sparkle-twinkle 0.8s ease-in-out 0.4s infinite; }
+.lively-face__sparkle {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-38 .lively-face__sparkle--1 {
+  animation: lively-sparkle-twinkle 0.8s ease-in-out infinite;
+}
+
+.lively-mascot.is-emotion-38 .lively-face__sparkle--2 {
+  animation: lively-sparkle-twinkle 0.8s ease-in-out 0.4s infinite;
+}
+
 @keyframes lively-sparkle-twinkle {
-  0%, 100% { opacity: 0; transform: scale(0.5); }
-  50% { opacity: 1; transform: scale(1); }
+
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* --- Cry eyes --- */
-.lively-face__cry-eye { visibility: hidden; }
+.lively-face__cry-eye {
+  visibility: hidden;
+}
 
 /* --- Waiting dots --- */
-.lively-face__waiting-dots { visibility: hidden; }
-.lively-mascot.is-emotion-39 .lively-face__waiting-dots circle:nth-child(1) { animation: lively-dot-bounce 1.2s ease-in-out infinite; }
-.lively-mascot.is-emotion-39 .lively-face__waiting-dots circle:nth-child(2) { animation: lively-dot-bounce 1.2s ease-in-out 0.2s infinite; }
-.lively-mascot.is-emotion-39 .lively-face__waiting-dots circle:nth-child(3) { animation: lively-dot-bounce 1.2s ease-in-out 0.4s infinite; }
+.lively-face__waiting-dots {
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-39 .lively-face__waiting-dots circle:nth-child(1) {
+  animation: lively-dot-bounce 1.2s ease-in-out infinite;
+}
+
+.lively-mascot.is-emotion-39 .lively-face__waiting-dots circle:nth-child(2) {
+  animation: lively-dot-bounce 1.2s ease-in-out 0.2s infinite;
+}
+
+.lively-mascot.is-emotion-39 .lively-face__waiting-dots circle:nth-child(3) {
+  animation: lively-dot-bounce 1.2s ease-in-out 0.4s infinite;
+}
+
 @keyframes lively-dot-bounce {
-  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-  30% { transform: translateY(-4px); opacity: 1; }
+
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
 }
 
 /* ============================================================
@@ -495,17 +984,28 @@
   animation: lively-foot-tap 1.6s ease-in-out infinite;
 }
 
-.lively__foot svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.lively__foot svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
 
 /* Default foot positions (characters override via their own CSS) */
-.lively__foot--l { left: 18cqw; }
-.lively__foot--r { left: 60cqw; animation-delay: 0.8s; }
+.lively__foot--l {
+  left: 18cqw;
+}
+
+.lively__foot--r {
+  left: 60cqw;
+  animation-delay: 0.8s;
+}
 
 .lively-foot__body {
   fill: var(--lively-outline);
   stroke: var(--lively-outline);
   stroke-width: 1;
-  filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.18));
+  filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.12));
 }
 
 .lively-foot__shine {
@@ -517,6 +1017,7 @@
 .lively-mascot.is-happy .lively__foot--l {
   animation: lively-foot-kick-l 0.6s cubic-bezier(.3, 1.5, .5, 1);
 }
+
 .lively-mascot.is-happy .lively__foot--r {
   animation: lively-foot-kick-r 0.6s cubic-bezier(.3, 1.5, .5, 1);
 }
@@ -525,6 +1026,7 @@
 .lively-mascot.is-hopping .lively-mascot__rig {
   animation: lively-hop 0.9s cubic-bezier(.3, .7, .4, 1);
 }
+
 .lively-mascot.is-hopping .lively__foot {
   animation: lively-foot-tuck 0.9s ease-in-out;
 }
@@ -533,6 +1035,7 @@
  * Reduced Motion
  * ============================================================ */
 @media (prefers-reduced-motion: reduce) {
+
   .lively-body,
   .lively__leaf,
   .lively__ears,
@@ -540,7 +1043,8 @@
   .lively__tail,
   .lively__foot,
   .lively__ghost-hem,
-  .lively-face-wrap svg {
+  .lively-face-wrap svg,
+  .lively__loading-overlay::before {
     animation: none !important;
   }
 }
@@ -549,59 +1053,141 @@
  * Keyframes: Base
  * ============================================================ */
 @keyframes lively-breathe {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.035); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.035);
+  }
 }
 
 @keyframes lively-squish {
-  0% { transform: scale(1, 1); }
-  30% { transform: scale(1.12, 0.86); }
-  60% { transform: scale(0.94, 1.08); }
-  100% { transform: scale(1, 1); }
+  0% {
+    transform: scale(1, 1);
+  }
+
+  30% {
+    transform: scale(1.12, 0.86);
+  }
+
+  60% {
+    transform: scale(0.94, 1.08);
+  }
+
+  100% {
+    transform: scale(1, 1);
+  }
 }
 
 @keyframes lively-sway {
-  0%, 100% { transform: rotate(6deg); }
-  50% { transform: rotate(10deg) translateY(-2px); }
+
+  0%,
+  100% {
+    transform: rotate(6deg);
+  }
+
+  50% {
+    transform: rotate(10deg) translateY(-2px);
+  }
 }
 
 @keyframes lively-hop {
-  0% { transform: translateY(0); }
-  18% { transform: translateY(3px) scale(1.07, 0.88); }
-  45% { transform: translateY(-13px) scale(0.95, 1.07); }
-  72% { transform: translateY(0) scale(1.05, 0.93); }
-  100% { transform: translateY(0); }
+  0% {
+    transform: translateY(0);
+  }
+
+  18% {
+    transform: translateY(3px) scale(1.07, 0.88);
+  }
+
+  45% {
+    transform: translateY(-13px) scale(0.95, 1.07);
+  }
+
+  72% {
+    transform: translateY(0) scale(1.05, 0.93);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
 }
 
 @keyframes lively-leaf-sway {
-  0%, 100% { transform: rotate(8deg); }
-  50% { transform: rotate(20deg) translateY(-1px); }
+
+  0%,
+  100% {
+    transform: rotate(8deg);
+  }
+
+  50% {
+    transform: rotate(20deg) translateY(-1px);
+  }
 }
 
 @keyframes lively-leaf-spin {
-  0% { transform: rotate(8deg); }
-  100% { transform: rotate(368deg); }
+  0% {
+    transform: rotate(8deg);
+  }
+
+  100% {
+    transform: rotate(368deg);
+  }
 }
 
 @keyframes lively-foot-tap {
-  0%, 100% { transform: rotate(0deg) translateY(0); }
-  30% { transform: rotate(-11deg) translateY(-2px); }
-  60% { transform: rotate(5deg) translateY(0); }
+
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+
+  30% {
+    transform: rotate(-11deg) translateY(-2px);
+  }
+
+  60% {
+    transform: rotate(5deg) translateY(0);
+  }
 }
 
 @keyframes lively-foot-kick-l {
-  0%, 100% { transform: rotate(0deg) translateY(0); }
-  40% { transform: rotate(-26deg) translateY(-5px); }
+
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+
+  40% {
+    transform: rotate(-26deg) translateY(-5px);
+  }
 }
 
 @keyframes lively-foot-kick-r {
-  0%, 100% { transform: rotate(0deg) translateY(0); }
-  40% { transform: rotate(26deg) translateY(-5px); }
+
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+
+  40% {
+    transform: rotate(26deg) translateY(-5px);
+  }
 }
 
 @keyframes lively-foot-tuck {
-  0%, 100% { transform: rotate(0deg) translateY(0); }
-  40% { transform: rotate(0deg) translateY(-4px) scaleY(0.6); }
+
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+
+  40% {
+    transform: rotate(0deg) translateY(-4px) scaleY(0.6);
+  }
 }
 
 /* ============================================================
@@ -610,378 +1196,1103 @@
 
 /* --- Lifecycle --- */
 @keyframes lively-wake {
-  0% { transform: scale(0.9) rotate(-3deg); opacity: 0.6; }
-  50% { transform: scale(1.05) rotate(2deg); opacity: 1; }
-  100% { transform: scale(1) rotate(0); opacity: 1; }
+  0% {
+    transform: scale(0.9) rotate(-3deg);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: scale(1.05) rotate(2deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
 }
+
 @keyframes lively-deep-breathe {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.06); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.06);
+  }
 }
+
 @keyframes lively-ready {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
 }
+
 @keyframes lively-refresh {
-  0% { transform: rotate(0); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
+
 @keyframes lively-lowbatt {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
 }
+
 @keyframes lively-boot {
-  0% { transform: scale(0.3); opacity: 0; }
-  60% { transform: scale(1.1); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+
+  60% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* --- Reactions --- */
 @keyframes lively-happy-bounce {
-  0% { transform: translateY(0) scale(1); }
-  30% { transform: translateY(-12px) scale(1.05, 0.95); }
-  50% { transform: translateY(-16px) scale(0.95, 1.05); }
-  80% { transform: translateY(2px) scale(1.02, 0.98); }
-  100% { transform: translateY(0) scale(1); }
+  0% {
+    transform: translateY(0) scale(1);
+  }
+
+  30% {
+    transform: translateY(-12px) scale(1.05, 0.95);
+  }
+
+  50% {
+    transform: translateY(-16px) scale(0.95, 1.05);
+  }
+
+  80% {
+    transform: translateY(2px) scale(1.02, 0.98);
+  }
+
+  100% {
+    transform: translateY(0) scale(1);
+  }
 }
+
 @keyframes lively-excited {
-  0%, 100% { transform: translateY(0) rotate(0); }
-  25% { transform: translateY(-6px) rotate(-4deg); }
-  75% { transform: translateY(-6px) rotate(4deg); }
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+
+  25% {
+    transform: translateY(-6px) rotate(-4deg);
+  }
+
+  75% {
+    transform: translateY(-6px) rotate(4deg);
+  }
 }
+
 @keyframes lively-sad {
-  0%, 100% { transform: translateY(0) rotate(0); }
-  50% { transform: translateY(3px) rotate(-2deg); }
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+
+  50% {
+    transform: translateY(3px) rotate(-2deg);
+  }
 }
+
 @keyframes lively-surprise {
-  0% { transform: scale(1); }
-  30% { transform: scale(1.15, 0.88); }
-  60% { transform: scale(0.92, 1.1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  30% {
+    transform: scale(1.15, 0.88);
+  }
+
+  60% {
+    transform: scale(0.92, 1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
+
 @keyframes lively-love-pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.08); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.08);
+  }
 }
+
 @keyframes lively-confused {
-  0%, 100% { transform: rotate(0); }
-  25% { transform: rotate(-5deg); }
-  75% { transform: rotate(5deg); }
+
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+
+  25% {
+    transform: rotate(-5deg);
+  }
+
+  75% {
+    transform: rotate(5deg);
+  }
 }
+
 @keyframes lively-smug {
-  0%, 100% { transform: translateY(0) rotate(0); }
-  50% { transform: translateY(-2px) rotate(3deg); }
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+
+  50% {
+    transform: translateY(-2px) rotate(3deg);
+  }
 }
+
 @keyframes lively-shy {
-  0%, 100% { transform: translateX(0) rotate(0); }
-  30% { transform: translateX(3px) rotate(1deg); }
-  70% { transform: translateX(-2px) rotate(-0.5deg); }
+
+  0%,
+  100% {
+    transform: translateX(0) rotate(0);
+  }
+
+  30% {
+    transform: translateX(3px) rotate(1deg);
+  }
+
+  70% {
+    transform: translateX(-2px) rotate(-0.5deg);
+  }
 }
 
 /* --- Work States --- */
 @keyframes lively-thinking {
-  0%, 100% { transform: translateY(0); }
-  30% { transform: translateY(-4px); }
-  60% { transform: translateY(-2px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  30% {
+    transform: translateY(-4px);
+  }
+
+  60% {
+    transform: translateY(-2px);
+  }
 }
+
 @keyframes lively-listening {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.04, 0.96); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.04, 0.96);
+  }
 }
+
 @keyframes lively-talking {
-  0%, 100% { transform: scaleY(1); }
-  50% { transform: scaleY(1.03); }
+
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+
+  50% {
+    transform: scaleY(1.03);
+  }
 }
+
 @keyframes lively-searching {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  75% { transform: translateX(4px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-4px);
+  }
+
+  75% {
+    transform: translateX(4px);
+  }
 }
+
 @keyframes lively-reading {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(2px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(2px);
+  }
 }
+
 @keyframes lively-writing {
-  0%, 100% { transform: translateX(0) rotate(0); }
-  25% { transform: translateX(-2px) rotate(-1deg); }
-  75% { transform: translateX(2px) rotate(1deg); }
+
+  0%,
+  100% {
+    transform: translateX(0) rotate(0);
+  }
+
+  25% {
+    transform: translateX(-2px) rotate(-1deg);
+  }
+
+  75% {
+    transform: translateX(2px) rotate(1deg);
+  }
 }
+
 @keyframes lively-coding {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-2px);
+  }
 }
+
 @keyframes lively-designing {
-  0%, 100% { transform: rotate(0); }
-  33% { transform: rotate(-3deg); }
-  66% { transform: rotate(3deg); }
+
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+
+  33% {
+    transform: rotate(-3deg);
+  }
+
+  66% {
+    transform: rotate(3deg);
+  }
 }
+
 @keyframes lively-loading {
-  0% { transform: rotate(0); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
+
 @keyframes lively-processing {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(0.95); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(0.95);
+  }
 }
+
 @keyframes lively-success {
-  0% { transform: scale(1); }
-  30% { transform: scale(1.12, 0.88); }
-  60% { transform: scale(0.95, 1.08); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  30% {
+    transform: scale(1.12, 0.88);
+  }
+
+  60% {
+    transform: scale(0.95, 1.08);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* --- Loading keyframes --- */
-@keyframes lively-loading-pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.04); }
-}
 @keyframes lively-loading-eye-drift {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-2px); }
-  75% { transform: translateX(2px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-2px);
+  }
+
+  75% {
+    transform: translateX(2px);
+  }
 }
+
 @keyframes lively-leaf-spin-slow {
-  0% { transform: rotate(8deg) scale(1); }
-  50% { transform: rotate(188deg) scale(1.08); }
-  100% { transform: rotate(368deg) scale(1); }
+  0% {
+    transform: rotate(8deg) scale(1);
+  }
+
+  50% {
+    transform: rotate(188deg) scale(1.08);
+  }
+
+  100% {
+    transform: rotate(368deg) scale(1);
+  }
 }
-@keyframes lively-loading-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+
+@keyframes lively-loading-orbit {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes lively-loading-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
 }
 
 /* ============================================================
  * Keyframes: Leaf Emotion Animations
  * ============================================================ */
 @keyframes lively-leaf-sleep {
-  0%, 100% { transform: rotate(8deg) scaleY(0.9); }
-  50% { transform: rotate(12deg) scaleY(0.85); }
+
+  0%,
+  100% {
+    transform: rotate(8deg) scaleY(0.9);
+  }
+
+  50% {
+    transform: rotate(12deg) scaleY(0.85);
+  }
 }
+
 @keyframes lively-leaf-wake {
-  0% { transform: rotate(5deg) scale(0.9); }
-  50% { transform: rotate(25deg) scale(1.1); }
-  100% { transform: rotate(10deg) scale(1); }
+  0% {
+    transform: rotate(5deg) scale(0.9);
+  }
+
+  50% {
+    transform: rotate(25deg) scale(1.1);
+  }
+
+  100% {
+    transform: rotate(10deg) scale(1);
+  }
 }
+
 @keyframes lively-leaf-breathe {
-  0%, 100% { transform: rotate(8deg); }
-  50% { transform: rotate(16deg) scaleY(1.05); }
+
+  0%,
+  100% {
+    transform: rotate(8deg);
+  }
+
+  50% {
+    transform: rotate(16deg) scaleY(1.05);
+  }
 }
+
 @keyframes lively-leaf-ready {
-  0%, 100% { transform: rotate(10deg); }
-  50% { transform: rotate(18deg) translateY(-2px); }
+
+  0%,
+  100% {
+    transform: rotate(10deg);
+  }
+
+  50% {
+    transform: rotate(18deg) translateY(-2px);
+  }
 }
+
 @keyframes lively-leaf-pause {
-  0%, 100% { transform: rotate(8deg); opacity: 0.6; }
-  50% { transform: rotate(10deg); opacity: 0.5; }
+
+  0%,
+  100% {
+    transform: rotate(8deg);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: rotate(10deg);
+    opacity: 0.5;
+  }
 }
+
 @keyframes lively-leaf-refresh {
-  0% { transform: rotate(8deg); }
-  100% { transform: rotate(368deg); }
+  0% {
+    transform: rotate(8deg);
+  }
+
+  100% {
+    transform: rotate(368deg);
+  }
 }
+
 @keyframes lively-leaf-droop {
-  0%, 100% { transform: rotate(5deg) translateY(2px) scaleY(0.85); }
-  50% { transform: rotate(3deg) translateY(4px) scaleY(0.8); }
+
+  0%,
+  100% {
+    transform: rotate(5deg) translateY(2px) scaleY(0.85);
+  }
+
+  50% {
+    transform: rotate(3deg) translateY(4px) scaleY(0.8);
+  }
 }
+
 @keyframes lively-leaf-boot {
-  0% { transform: scale(0.5) rotate(0); }
-  60% { transform: scale(1.15) rotate(15deg); }
-  100% { transform: scale(1) rotate(10deg); }
+  0% {
+    transform: scale(0.5) rotate(0);
+  }
+
+  60% {
+    transform: scale(1.15) rotate(15deg);
+  }
+
+  100% {
+    transform: scale(1) rotate(10deg);
+  }
 }
+
 @keyframes lively-leaf-spin-fast {
-  0% { transform: rotate(8deg); }
-  100% { transform: rotate(368deg); }
+  0% {
+    transform: rotate(8deg);
+  }
+
+  100% {
+    transform: rotate(368deg);
+  }
 }
+
 @keyframes lively-leaf-flap {
-  0%, 100% { transform: rotate(8deg); }
-  25% { transform: rotate(28deg); }
-  75% { transform: rotate(-10deg); }
+
+  0%,
+  100% {
+    transform: rotate(8deg);
+  }
+
+  25% {
+    transform: rotate(28deg);
+  }
+
+  75% {
+    transform: rotate(-10deg);
+  }
 }
+
 @keyframes lively-leaf-angry {
-  0%, 100% { transform: rotate(8deg); }
-  25% { transform: rotate(-5deg); }
-  75% { transform: rotate(20deg); }
+
+  0%,
+  100% {
+    transform: rotate(8deg);
+  }
+
+  25% {
+    transform: rotate(-5deg);
+  }
+
+  75% {
+    transform: rotate(20deg);
+  }
 }
+
 @keyframes lively-leaf-jump {
-  0% { transform: rotate(8deg) translateY(0); }
-  50% { transform: rotate(20deg) translateY(-6px); }
-  100% { transform: rotate(8deg) translateY(0); }
+  0% {
+    transform: rotate(8deg) translateY(0);
+  }
+
+  50% {
+    transform: rotate(20deg) translateY(-6px);
+  }
+
+  100% {
+    transform: rotate(8deg) translateY(0);
+  }
 }
+
 @keyframes lively-leaf-shy {
-  0%, 100% { transform: rotate(12deg) scaleX(1); }
-  50% { transform: rotate(6deg) scaleX(-1); }
+
+  0%,
+  100% {
+    transform: rotate(12deg) scaleX(1);
+  }
+
+  50% {
+    transform: rotate(6deg) scaleX(-1);
+  }
 }
+
 @keyframes lively-leaf-love {
-  0%, 100% { transform: rotate(10deg) scale(1); }
-  50% { transform: rotate(15deg) scale(1.15); }
+
+  0%,
+  100% {
+    transform: rotate(10deg) scale(1);
+  }
+
+  50% {
+    transform: rotate(15deg) scale(1.15);
+  }
 }
+
 @keyframes lively-leaf-confused {
-  0%, 100% { transform: rotate(8deg); }
-  25% { transform: rotate(-8deg); }
-  75% { transform: rotate(22deg); }
+
+  0%,
+  100% {
+    transform: rotate(8deg);
+  }
+
+  25% {
+    transform: rotate(-8deg);
+  }
+
+  75% {
+    transform: rotate(22deg);
+  }
 }
+
 @keyframes lively-leaf-cool {
-  0%, 100% { transform: rotate(8deg); }
-  50% { transform: rotate(14deg) translateY(-1px); }
+
+  0%,
+  100% {
+    transform: rotate(8deg);
+  }
+
+  50% {
+    transform: rotate(14deg) translateY(-1px);
+  }
 }
+
 @keyframes lively-leaf-smug {
-  0%, 100% { transform: rotate(8deg) translateY(0); }
-  50% { transform: rotate(16deg) translateY(-2px); }
+
+  0%,
+  100% {
+    transform: rotate(8deg) translateY(0);
+  }
+
+  50% {
+    transform: rotate(16deg) translateY(-2px);
+  }
 }
+
 @keyframes lively-leaf-think {
-  0%, 100% { transform: rotate(8deg); }
-  50% { transform: rotate(20deg) translateY(-2px); }
+
+  0%,
+  100% {
+    transform: rotate(8deg);
+  }
+
+  50% {
+    transform: rotate(20deg) translateY(-2px);
+  }
 }
+
 @keyframes lively-leaf-perk {
-  0%, 100% { transform: rotate(8deg) scaleY(1); }
-  50% { transform: rotate(14deg) scaleY(1.1); }
+
+  0%,
+  100% {
+    transform: rotate(8deg) scaleY(1);
+  }
+
+  50% {
+    transform: rotate(14deg) scaleY(1.1);
+  }
 }
+
 @keyframes lively-leaf-talk {
-  0%, 100% { transform: rotate(10deg); }
-  50% { transform: rotate(18deg); }
+
+  0%,
+  100% {
+    transform: rotate(10deg);
+  }
+
+  50% {
+    transform: rotate(18deg);
+  }
 }
+
 @keyframes lively-leaf-search {
-  0%, 100% { transform: rotate(5deg) translateX(0); }
-  25% { transform: rotate(12deg) translateX(-3px); }
-  75% { transform: rotate(12deg) translateX(3px); }
+
+  0%,
+  100% {
+    transform: rotate(5deg) translateX(0);
+  }
+
+  25% {
+    transform: rotate(12deg) translateX(-3px);
+  }
+
+  75% {
+    transform: rotate(12deg) translateX(3px);
+  }
 }
+
 @keyframes lively-leaf-read {
-  0%, 100% { transform: rotate(6deg) translateY(0); }
-  50% { transform: rotate(4deg) translateY(2px); }
+
+  0%,
+  100% {
+    transform: rotate(6deg) translateY(0);
+  }
+
+  50% {
+    transform: rotate(4deg) translateY(2px);
+  }
 }
+
 @keyframes lively-leaf-write {
-  0%, 100% { transform: rotate(8deg) translateX(0); }
-  25% { transform: rotate(5deg) translateX(-2px); }
-  75% { transform: rotate(12deg) translateX(2px); }
+
+  0%,
+  100% {
+    transform: rotate(8deg) translateX(0);
+  }
+
+  25% {
+    transform: rotate(5deg) translateX(-2px);
+  }
+
+  75% {
+    transform: rotate(12deg) translateX(2px);
+  }
 }
+
 @keyframes lively-leaf-code {
-  0%, 100% { transform: rotate(8deg); }
-  50% { transform: rotate(16deg); }
+
+  0%,
+  100% {
+    transform: rotate(8deg);
+  }
+
+  50% {
+    transform: rotate(16deg);
+  }
 }
+
 @keyframes lively-leaf-design {
-  0%, 100% { transform: rotate(8deg); }
-  33% { transform: rotate(4deg); }
-  66% { transform: rotate(14deg); }
+
+  0%,
+  100% {
+    transform: rotate(8deg);
+  }
+
+  33% {
+    transform: rotate(4deg);
+  }
+
+  66% {
+    transform: rotate(14deg);
+  }
 }
+
 @keyframes lively-leaf-pulse {
-  0%, 100% { transform: rotate(8deg) scale(1); }
-  50% { transform: rotate(8deg) scale(1.1); }
+
+  0%,
+  100% {
+    transform: rotate(8deg) scale(1);
+  }
+
+  50% {
+    transform: rotate(8deg) scale(1.1);
+  }
 }
+
 @keyframes lively-leaf-celebrate {
-  0% { transform: rotate(8deg) scale(1); }
-  30% { transform: rotate(25deg) scale(1.15); }
-  60% { transform: rotate(-5deg) scale(1.05); }
-  100% { transform: rotate(8deg) scale(1); }
+  0% {
+    transform: rotate(8deg) scale(1);
+  }
+
+  30% {
+    transform: rotate(25deg) scale(1.15);
+  }
+
+  60% {
+    transform: rotate(-5deg) scale(1.05);
+  }
+
+  100% {
+    transform: rotate(8deg) scale(1);
+  }
 }
+
 @keyframes lively-leaf-error {
-  0%, 100% { transform: rotate(8deg); opacity: 1; }
-  50% { transform: rotate(-3deg); opacity: 0.5; }
+
+  0%,
+  100% {
+    transform: rotate(8deg);
+    opacity: 1;
+  }
+
+  50% {
+    transform: rotate(-3deg);
+    opacity: 0.5;
+  }
 }
 
 /* ============================================================
  * Keyframes: Foot Emotion Animations
  * ============================================================ */
 @keyframes lively-foot-rest {
-  0%, 100% { transform: rotate(0deg) translateY(0); }
-  50% { transform: rotate(0deg) translateY(-1px); }
+
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+
+  50% {
+    transform: rotate(0deg) translateY(-1px);
+  }
 }
+
 @keyframes lively-foot-wake {
-  0% { transform: rotate(0deg) scaleY(0.6); }
-  60% { transform: rotate(0deg) scaleY(1.1); }
-  100% { transform: rotate(0deg) scaleY(1); }
+  0% {
+    transform: rotate(0deg) scaleY(0.6);
+  }
+
+  60% {
+    transform: rotate(0deg) scaleY(1.1);
+  }
+
+  100% {
+    transform: rotate(0deg) scaleY(1);
+  }
 }
+
 @keyframes lively-foot-ready {
-  0%, 100% { transform: rotate(0deg) translateY(0); }
-  50% { transform: rotate(0deg) translateY(-2px); }
+
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+
+  50% {
+    transform: rotate(0deg) translateY(-2px);
+  }
 }
+
 @keyframes lively-foot-boot {
-  0% { transform: rotate(0deg) scaleY(0.3); }
-  60% { transform: rotate(0deg) scaleY(1.1); }
-  100% { transform: rotate(0deg) scaleY(1); }
+  0% {
+    transform: rotate(0deg) scaleY(0.3);
+  }
+
+  60% {
+    transform: rotate(0deg) scaleY(1.1);
+  }
+
+  100% {
+    transform: rotate(0deg) scaleY(1);
+  }
 }
+
 @keyframes lively-foot-kick {
-  0%, 100% { transform: rotate(0deg) translateY(0); }
-  40% { transform: rotate(-30deg) translateY(-6px); }
+
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+
+  40% {
+    transform: rotate(-30deg) translateY(-6px);
+  }
 }
+
 @keyframes lively-foot-jump {
-  0%, 100% { transform: rotate(0deg) translateY(0) scaleY(1); }
-  30% { transform: rotate(0deg) translateY(2px) scaleY(0.7); }
-  50% { transform: rotate(0deg) translateY(-8px) scaleY(1); }
+
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0) scaleY(1);
+  }
+
+  30% {
+    transform: rotate(0deg) translateY(2px) scaleY(0.7);
+  }
+
+  50% {
+    transform: rotate(0deg) translateY(-8px) scaleY(1);
+  }
 }
+
 @keyframes lively-foot-drag {
-  0%, 100% { transform: rotate(0deg) translateY(0); }
-  50% { transform: rotate(3deg) translateY(2px); }
+
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+
+  50% {
+    transform: rotate(3deg) translateY(2px);
+  }
 }
+
 @keyframes lively-foot-stomp {
-  0%, 100% { transform: rotate(0deg) translateY(0); }
-  30% { transform: rotate(0deg) translateY(-3px); }
-  60% { transform: rotate(0deg) translateY(2px); }
+
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+
+  30% {
+    transform: rotate(0deg) translateY(-3px);
+  }
+
+  60% {
+    transform: rotate(0deg) translateY(2px);
+  }
 }
+
 @keyframes lively-foot-tap-slow {
-  0%, 100% { transform: rotate(0deg) translateY(0); }
-  50% { transform: rotate(-5deg) translateY(-1px); }
+
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+
+  50% {
+    transform: rotate(-5deg) translateY(-1px);
+  }
 }
+
 @keyframes lively-foot-tap-fast {
-  0%, 100% { transform: rotate(0deg) translateY(0); }
-  30% { transform: rotate(-10deg) translateY(-2px); }
-  60% { transform: rotate(6deg) translateY(0); }
+
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+
+  30% {
+    transform: rotate(-10deg) translateY(-2px);
+  }
+
+  60% {
+    transform: rotate(6deg) translateY(0);
+  }
 }
+
 @keyframes lively-foot-cross {
-  0%, 100% { transform: rotate(0deg) translateX(0); }
-  50% { transform: rotate(0deg) translateX(4px); }
+
+  0%,
+  100% {
+    transform: rotate(0deg) translateX(0);
+  }
+
+  50% {
+    transform: rotate(0deg) translateX(4px);
+  }
 }
+
 @keyframes lively-foot-pose {
-  0%, 100% { transform: rotate(0deg) translateY(0); }
-  30% { transform: rotate(5deg) translateY(-2px); }
-  70% { transform: rotate(-3deg) translateY(-1px); }
+
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+
+  30% {
+    transform: rotate(5deg) translateY(-2px);
+  }
+
+  70% {
+    transform: rotate(-3deg) translateY(-1px);
+  }
 }
+
 @keyframes lively-foot-pace {
-  0%, 100% { transform: rotate(0deg) translateY(0); }
-  25% { transform: rotate(-6deg) translateY(-2px); }
-  75% { transform: rotate(6deg) translateY(-2px); }
+
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+
+  25% {
+    transform: rotate(-6deg) translateY(-2px);
+  }
+
+  75% {
+    transform: rotate(6deg) translateY(-2px);
+  }
 }
 
 /* ============================================================
  * Keyframes: Extended Emotions (35-39)
  * ============================================================ */
 @keyframes lively-nervous {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-1.5px); }
-  40% { transform: translateX(1.5px); }
-  60% { transform: translateX(-1px); }
-  80% { transform: translateX(1px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-1.5px);
+  }
+
+  40% {
+    transform: translateX(1.5px);
+  }
+
+  60% {
+    transform: translateX(-1px);
+  }
+
+  80% {
+    transform: translateX(1px);
+  }
 }
+
 @keyframes lively-leaf-nervous {
-  0%, 100% { transform: rotate(8deg); }
-  25% { transform: rotate(2deg); }
-  75% { transform: rotate(14deg); }
+
+  0%,
+  100% {
+    transform: rotate(8deg);
+  }
+
+  25% {
+    transform: rotate(2deg);
+  }
+
+  75% {
+    transform: rotate(14deg);
+  }
 }
+
 @keyframes lively-foot-nervous {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-2px);
+  }
 }
+
 @keyframes lively-nervous-eyes {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-1.5px); }
-  75% { transform: translateX(1.5px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-1.5px);
+  }
+
+  75% {
+    transform: translateX(1.5px);
+  }
 }
+
 @keyframes lively-eureka {
-  0% { transform: scale(1); }
-  20% { transform: scale(1.12, 0.9); }
-  40% { transform: scale(0.95, 1.08); }
-  60% { transform: scale(1.04, 0.97); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  20% {
+    transform: scale(1.12, 0.9);
+  }
+
+  40% {
+    transform: scale(0.95, 1.08);
+  }
+
+  60% {
+    transform: scale(1.04, 0.97);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
+
 @keyframes lively-leaf-eureka {
-  0% { transform: rotate(8deg) scale(1); }
-  50% { transform: rotate(35deg) scale(1.15); }
-  100% { transform: rotate(10deg) scale(1); }
+  0% {
+    transform: rotate(8deg) scale(1);
+  }
+
+  50% {
+    transform: rotate(35deg) scale(1.15);
+  }
+
+  100% {
+    transform: rotate(10deg) scale(1);
+  }
 }
+
 @keyframes lively-waiting {
-  0%, 100% { transform: translateX(0) rotate(0); }
-  30% { transform: translateX(-2px) rotate(-1deg); }
-  60% { transform: translateX(2px) rotate(1deg); }
+
+  0%,
+  100% {
+    transform: translateX(0) rotate(0);
+  }
+
+  30% {
+    transform: translateX(-2px) rotate(-1deg);
+  }
+
+  60% {
+    transform: translateX(2px) rotate(1deg);
+  }
 }
+
 @keyframes lively-leaf-waiting {
-  0%, 100% { transform: rotate(8deg); }
-  50% { transform: rotate(14deg); }
+
+  0%,
+  100% {
+    transform: rotate(8deg);
+  }
+
+  50% {
+    transform: rotate(14deg);
+  }
 }

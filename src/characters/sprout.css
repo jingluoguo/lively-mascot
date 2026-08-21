@@ -27,7 +27,7 @@
   width: 100%;
   height: 100%;
   overflow: visible;
-  filter: drop-shadow(2.8cqw 2.8cqw 0 var(--lively-outline));
+  filter: drop-shadow(1.2cqw 1.4cqw 0 color-mix(in srgb, var(--lively-outline) 55%, transparent));
 }
 
 .lively-sprout__stem {
@@ -62,22 +62,6 @@
 /* Happy click: leaf spins */
 .lively-mascot.is-happy .lively__leaf {
   animation: lively-leaf-spin 0.7s cubic-bezier(.3, 1.4, .4, 1);
-}
-
-/* --- Loading spinner overlay (28) --- */
-.lively__loading-overlay { display: none; }
-.lively-mascot.is-emotion-28 .lively__loading-overlay {
-  display: block;
-  position: absolute;
-  top: -4px; left: -4px; right: -4px; bottom: -4px;
-  border-radius: 50%;
-  border: 2.5px solid transparent;
-  border-top-color: var(--lively-outline);
-  border-right-color: var(--lively-outline);
-  opacity: 0.45;
-  animation: lively-loading-spin 1.4s linear infinite;
-  pointer-events: none;
-  z-index: 10;
 }
 
 /* --- Foot positioning for sprout --- */

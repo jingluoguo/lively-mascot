@@ -72,10 +72,6 @@
     feet.appendChild(footL);
     feet.appendChild(footR);
     rigEl.appendChild(feet);
-
-    // Loading spinner overlay (hidden by default, shown via .is-emotion-28)
-    var loadingOverlay = hEl("span", { class: "lively__loading-overlay", "aria-hidden": "true" });
-    rigEl.appendChild(loadingOverlay);
   }
 
   // Register sprout character when SDK is available

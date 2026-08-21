@@ -284,6 +284,7 @@
       hero = LivelyMascot.createMascot(container, {
         type: type,
         size: 180,
+        hopInterval: [3, 6],
         onClick: function () { say(function () { return T().sayGreeting(T().clickName(type), new Date()); }); },
       });
       currentCharType = type;

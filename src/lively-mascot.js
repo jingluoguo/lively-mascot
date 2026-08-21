@@ -220,6 +220,8 @@
     }, { onClick: options.onClick });
     character.render(rig.api, gazeEl);
     rig.api.registerGazeWrap(gazeEl);
+    // Loading ring overlay — shared by ALL characters (shown via .is-emotion-28).
+    gazeEl.appendChild(el("div", { class: "lively__loading-overlay", "aria-hidden": "true" }));
     root.appendChild(rigEl);
     target.appendChild(root);
 
