@@ -197,7 +197,7 @@
     var type = options.type || "sprout";
     var character = getCharacter(type);
     var root = el("div", {
-      class: "lively-mascot lively-mascot--" + character.id,
+      class: "lively-mascot lively-mascot--" + character.id + (options.animated === false ? " lively-mascot--static" : ""),
       style: "width:" + (options.size || 106) + "px;height:" + (options.size || 106) + "px",
       "aria-hidden": "true",
     });
@@ -213,7 +213,11 @@
       root.style.setProperty("--lively-accent", theme.accent || null);
     }
     applyTheme();
-    var rig = createRig(root, rigEl, { followCursor: options.followCursor, hopInterval: options.hopInterval }, { onClick: options.onClick });
+    var rig = createRig(root, rigEl, {
+      followCursor: options.followCursor,
+      hopInterval: options.hopInterval,
+      animated: options.animated
+    }, { onClick: options.onClick });
     character.render(rig.api, gazeEl);
     rig.api.registerGazeWrap(gazeEl);
     root.appendChild(rigEl);

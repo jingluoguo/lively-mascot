@@ -31,6 +31,17 @@
   user-select: none;
 }
 
+/* --- Static mode: no cursor-follow, no idle / loop animations ---
+   Used for thumbnail previews (e.g. the emotion gallery). The visible face is
+   still driven by the `is-emotion-XX` class; only motion is disabled. */
+.lively-mascot--static {
+  cursor: default;
+  pointer-events: none;
+}
+.lively-mascot--static * {
+  animation: none !important;
+}
+
 /* Rig layer: outer posture layer (hop / refresh rotation) */
 .lively-mascot__rig {
   position: absolute;
@@ -989,11 +1000,11 @@
 /* --- Leaf: sits on top of the head --- */
 .lively__leaf {
   position: absolute;
-  top: -42px;
+  top: -34cqw;
   left: 50%;
-  width: 46px;
-  height: 50px;
-  margin-left: -23px;
+  width: 37cqw;
+  height: 40cqw;
+  margin-left: -18.5cqw;
   transform-origin: 50% 100%;
   animation: lively-leaf-sway 2.6s ease-in-out infinite;
 }
@@ -1003,7 +1014,7 @@
   width: 100%;
   height: 100%;
   overflow: visible;
-  filter: drop-shadow(3px 3px 0 var(--lively-outline));
+  filter: drop-shadow(2.8cqw 2.8cqw 0 var(--lively-outline));
 }
 
 .lively-sprout__stem {
@@ -1074,14 +1085,18 @@
        follow body bounce / squash / boot / wake animations) --- */
 .lively__ears {
   position: absolute;
-  top: -24px;
+  top: -20cqw;
   left: 50%;
-  width: 76px;
-  height: 32px;
-  margin-left: -38px;
+  width: 66cqw;
+  height: 28.5cqw;
+  margin-left: -33cqw;
   z-index: 3;
   transform-origin: 50% 92%;
 }
+
+/* Each ear splays slightly outward for a more natural arc */
+.lively__ear-left { transform-box: fill-box; transform-origin: 50% 100%; transform: rotate(-7deg); }
+.lively__ear-right { transform-box: fill-box; transform-origin: 50% 100%; transform: rotate(7deg); }
 
 .lively__ears svg {
   display: block;
@@ -1271,11 +1286,11 @@
 /* --- Antenna (leaf channel, CSS-driven) --- */
 .lively__antenna {
   position: absolute;
-  top: -28px;
+  top: -22cqw;
   left: 50%;
-  width: 40px;
-  height: 36px;
-  margin-left: -20px;
+  width: 32cqw;
+  height: 29cqw;
+  margin-left: -16cqw;
   z-index: 3;
   transform-origin: 50% 100%;
   animation: lively-robot-antenna 2.6s ease-in-out infinite;

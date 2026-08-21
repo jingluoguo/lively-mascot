@@ -25,11 +25,11 @@
 /* --- Antenna (leaf channel, CSS-driven) --- */
 .lively__antenna {
   position: absolute;
-  top: -28px;
+  top: -22cqw;
   left: 50%;
-  width: 40px;
-  height: 36px;
-  margin-left: -20px;
+  width: 32cqw;
+  height: 29cqw;
+  margin-left: -16cqw;
   z-index: 3;
   transform-origin: 50% 100%;
   animation: lively-robot-antenna 2.6s ease-in-out infinite;

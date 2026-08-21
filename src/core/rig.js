@@ -15,6 +15,7 @@ var clamp = function (v, min, max) { return v < min ? min : v > max ? max : v; }
 function createRig(root, rigEl, config, handlers) {
   config = config || {};
   handlers = handlers || {};
+  var animated = config.animated !== false;
   var followCursor = config.followCursor !== false;
   var gazeRadiusX = config.gazeRadiusX || 200;
   var gazeRadiusY = config.gazeRadiusY || 160;
@@ -24,7 +25,7 @@ function createRig(root, rigEl, config, handlers) {
   var face = null;
   var happy = false;
   var hopping = false;
-  var following = followCursor;
+  var following = animated && followCursor;
   var currentEmotionId = "02"; // Default idle
   var bodyEl = null;
   var leafEl = null;
@@ -74,6 +75,13 @@ function createRig(root, rigEl, config, handlers) {
   function applyEmotionBehavior(id) {
     var def = getEmotionDef(id);
     if (!def) { clearEmotionBehavior(); return; }
+    // Static mode: the visible face is driven by the `is-emotion-XX` class
+    // (set on the root by the SDK), so we keep that but apply no motion —
+    // no body/leaf/foot animation and no filter flicker.
+    if (!animated) {
+      if (bodyEl) bodyEl.style.filter = def.bodyFilter || "";
+      return;
+    }
     // Body
     if (bodyEl) {
       bodyEl.style.animation = def.bodyAnim || "";
@@ -182,8 +190,11 @@ function createRig(root, rigEl, config, handlers) {
   }
 
   if (following) { raf = requestAnimationFrame(tick); window.addEventListener("pointermove", onPointerMove, { passive: true }); }
-  scheduleBlink(); scheduleHop();
-  root.addEventListener("pointerdown", fireClick);
+  if (animated) {
+    scheduleBlink();
+    scheduleHop();
+    root.addEventListener("pointerdown", fireClick);
+  }
 
   return {
     api: api,

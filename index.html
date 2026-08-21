@@ -125,15 +125,21 @@
     .palette__item figcaption { font-size: 13px; color: #666; text-align: center; transition: color .15s, font-weight .15s; }
     .palette__item.is-active figcaption { color: #1d1d1f; font-weight: 900; }
 
-    /* ---- Emotion Grid ---- */
+    /* ---- Emotion Grid (model on top, title below) ---- */
     .emotion-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-    .emotion-item { padding: 10px 8px; border-radius: 8px; border: 2px solid rgba(8, 8, 8, .1); background: #fafafa; cursor: pointer; text-align: center; transition: all .1s; }
+    .emotion-item {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 4px; padding: 22px 6px 12px;
+      border-radius: 8px; border: 2px solid rgba(8, 8, 8, .1); background: #fafafa;
+      cursor: pointer; text-align: center; transition: all .1s;
+    }
     .emotion-item:hover { background: #f0f0f0; transform: translateY(-2px); box-shadow: 2px 2px 0 rgba(0, 0, 0, .1); }
-    .emotion-item:active { transform: scale(0.93) translateY(1px); box-shadow: 1px 1px 0 rgba(0, 0, 0, .15); background: #e8e8e8; transition: transform .06s, box-shadow .06s, background .06s; }
+    .emotion-item:active { transform: scale(0.97) translateY(1px); box-shadow: 1px 1px 0 rgba(0, 0, 0, .15); background: #e8e8e8; transition: transform .06s, box-shadow .06s, background .06s; }
     .emotion-item.is-active { border-color: #080808; background: #fff; box-shadow: 3px 3px 0 #080808; transform: translate(-1px, -1px); }
     .emotion-item.is-active .emotion-item__name { color: #080808; }
+    .emotion-item__model { width: 50px; height: 50px; margin: 0 auto; pointer-events: none; }
     .emotion-item__name { font-size: 13px; font-weight: 700; color: #1d1d1f; }
-    .emotion-item__desc { font-size: 11px; color: #888; margin-top: 3px; }
+    .emotion-item__desc { font-size: 10px; line-height: 1.3; color: #888; margin-top: 1px; }
 
     /* ---- Footer: GitHub repo link (theme-matched) ---- */
     .footer { text-align: center; margin-top: 36px; }
@@ -269,6 +275,7 @@
     var hero = null;
     var currentCharType = 'sprout';
     var currentTheme = null;
+    var previewInstances = []; // static thumbnails in the emotion gallery
 
     function createHero(type) {
       if (hero) hero.destroy();
@@ -302,6 +309,7 @@
         charBtns.forEach(function (b) { b.classList.remove('is-active'); });
         btn.classList.add('is-active');
         createHero(type);
+        renderEmotionPreviews();
       });
       charBar.appendChild(btn);
       charBtns.push(btn);
@@ -321,6 +329,9 @@
           btn.classList.add('is-active');
           panels.forEach(function (p) { p.classList.remove('is-active'); });
           panels[i].classList.add('is-active');
+          // Re-render thumbnails when the (initially hidden) emotion panel
+          // becomes visible, so container-relative headwear sizes settle.
+          if (i === 1) renderEmotionPreviews();
         });
         tabsBar.appendChild(btn);
         tabBtns.push(btn);
@@ -355,6 +366,7 @@
       fig.addEventListener('click', function () {
         currentTheme = { body: p.color, outline: p.outline };
         hero.setTheme(currentTheme);
+        previewInstances.forEach(function (pInst) { pInst.setTheme(currentTheme); });
         if (activeSwatch) activeSwatch.classList.remove('is-active');
         fig.classList.add('is-active');
         activeSwatch = fig;
@@ -401,10 +413,13 @@
         item.className = 'emotion-item';
         if (e.id === '02') item.classList.add('is-active');
         item.dataset.emotionId = e.id;
+        var modelBox = document.createElement('div');
+        modelBox.className = 'emotion-item__model';
         var nameEl = document.createElement('div');
         nameEl.className = 'emotion-item__name';
         var descEl = document.createElement('div');
         descEl.className = 'emotion-item__desc';
+        item.appendChild(modelBox);
         item.appendChild(nameEl);
         item.appendChild(descEl);
         item.addEventListener('click', function () {
@@ -422,6 +437,28 @@
 
     emotionPanel.appendChild(subBar);
     subPanels.forEach(function (p) { emotionPanel.appendChild(p); });
+
+    // ---- Emotion gallery thumbnails (model on top, title below) ----
+    // Each card shows a small STATIC mascot (current character + theme) posing
+    // the emotion, with the emotion name as its caption. No cursor-follow,
+    // no idle animation — these are just previews.
+    function renderEmotionPreviews() {
+      previewInstances.forEach(function (p) { p.destroy(); });
+      previewInstances = [];
+      document.querySelectorAll('.emotion-item__model').forEach(function (box) {
+        var item = box.closest('.emotion-item');
+        var inst = LivelyMascot.createMascot(box, {
+          type: currentCharType,
+          size: 50,
+          animated: false,
+          followCursor: false
+        });
+        inst.setEmotion(item.dataset.emotionId);
+        if (currentTheme) inst.setTheme(currentTheme);
+        previewInstances.push(inst);
+      });
+    }
+    renderEmotionPreviews();
 
     // ---- Apply / refresh all text for the current language ----
     function applyLanguage() {

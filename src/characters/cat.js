@@ -35,14 +35,16 @@
   function renderCat(rig, rigEl) {
     // --- Ears: rounded cat ears, inner pink flush with head top ---
     var ears = hEl("span", { class: "lively__ears", "aria-hidden": "true" });
-    ears.appendChild(svg("svg", { viewBox: "0 0 76 32" }, [
-      // Left ear: pushed far out, sharper tip, narrower base
-      svg("path", { class: "lively__ear", d: "M2 31 C1 16 5 3 11 1 C17 5 22 18 26 31 C21 33 7 33 2 31 Z" }),
-      svg("path", { class: "lively__ear--inner", d: "M8 30 C7 20 10 10 14 8 C18 10 21 20 24 29 C19 31 12 31 8 30 Z" }),
-      // Right ear (mirror, pushed far out)
-      svg("path", { class: "lively__ear", d: "M74 31 C75 16 71 3 65 1 C59 5 54 18 50 31 C55 33 69 33 74 31 Z" }),
-      svg("path", { class: "lively__ear--inner", d: "M68 30 C69 20 66 10 62 8 C58 10 55 20 52 29 C57 31 64 31 68 30 Z" })
-    ]));
+    var earLeft = svg("g", { class: "lively__ear-left" }, [
+      // Triangular cat ear with a pointed tip and slightly curved sides
+      svg("path", { class: "lively__ear", d: "M1 26 C2 13 6 3 10 1 C14 3 19 13 19 26 C13 28 6 28 1 26 Z" }),
+      svg("path", { class: "lively__ear--inner", d: "M6 25 C6 16 8 9 10 7 C12 9 15 16 15 25 C11 26 8 26 6 25 Z" })
+    ]);
+    var earRight = svg("g", { class: "lively__ear-right" }, [
+      svg("path", { class: "lively__ear", d: "M59 26 C58 13 54 3 50 1 C46 3 41 13 41 26 C47 28 54 28 59 26 Z" }),
+      svg("path", { class: "lively__ear--inner", d: "M54 25 C54 16 52 9 50 7 C48 9 45 16 45 25 C49 26 52 26 54 25 Z" })
+    ]);
+    ears.appendChild(svg("svg", { viewBox: "0 0 60 26" }, [earLeft, earRight]));
     rig.registerLeaf(ears, { useLeafAnim: false }); // cat drives ears via its own CSS
 
     // --- Body ---

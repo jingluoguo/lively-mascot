@@ -13,14 +13,18 @@
        follow body bounce / squash / boot / wake animations) --- */
 .lively__ears {
   position: absolute;
-  top: -24px;
+  top: -20cqw;
   left: 50%;
-  width: 76px;
-  height: 32px;
-  margin-left: -38px;
+  width: 66cqw;
+  height: 28.5cqw;
+  margin-left: -33cqw;
   z-index: 3;
   transform-origin: 50% 92%;
 }
+
+/* Each ear splays slightly outward for a more natural arc */
+.lively__ear-left { transform-box: fill-box; transform-origin: 50% 100%; transform: rotate(-7deg); }
+.lively__ear-right { transform-box: fill-box; transform-origin: 50% 100%; transform: rotate(7deg); }
 
 .lively__ears svg {
   display: block;
