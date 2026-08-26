@@ -200,6 +200,17 @@ onMounted(() => LivelyMascot.defineMascotElement());
 
 ## 从源码构建
 
+### npm / 构建工具
+
+npm 包已提供 CommonJS、ESM 入口和 TypeScript 类型声明：
+
+```js
+import { createMascot, emotions } from "lively-mascot";
+// CommonJS：const { createMascot } = require("lively-mascot");
+```
+
+浏览器 CDN 场景仍使用 `dist/lively-mascot.min.js` 单文件。
+
 `dist/` 里的单文件是由 `scripts/build-dist.mjs`（基于 esbuild）生成的，它会把引擎与 5 个角色的源码按顺序拼接并压缩：
 
 ```bash

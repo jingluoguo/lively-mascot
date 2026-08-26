@@ -3,6 +3,23 @@
   "version": "0.1.0",
   "description": "Universal Animated Mascot Engine: 40 Emotions · 5 Characters · Pure SVG · Zero Dependencies · Data-Driven · Drop-in.",
   "license": "MIT",
+  "main": "./dist/lively-mascot.cjs",
+  "module": "./dist/lively-mascot.mjs",
+  "browser": "./dist/lively-mascot.min.js",
+  "unpkg": "./dist/lively-mascot.min.js",
+  "jsdelivr": "./dist/lively-mascot.min.js",
+  "types": "./types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "require": "./dist/lively-mascot.cjs",
+      "import": "./dist/lively-mascot.mjs",
+      "default": "./dist/lively-mascot.mjs"
+    },
+    "./dist/lively-mascot.min.js": "./dist/lively-mascot.min.js",
+    "./dist/lively-mascot.min.css": "./dist/lively-mascot.min.css",
+    "./package.json": "./package.json"
+  },
   "keywords": [
     "mascot",
     "animated",
@@ -24,6 +41,9 @@
   "files": [
     "dist/lively-mascot.min.js",
     "dist/lively-mascot.min.css",
+    "dist/lively-mascot.cjs",
+    "dist/lively-mascot.mjs",
+    "types/index.d.ts",
     "src/lively-mascot.js",
     "src/lively-mascot.css",
     "src/core/emotions.js",
@@ -44,8 +64,7 @@
     "type": "git",
     "url": "https://github.com/jingluoguo/lively-mascot"
   },
-  "dependencies": {
-    "esbuild": "^0.28.2",
-    "terser": "^5.50.0"
+  "devDependencies": {
+    "esbuild": "^0.28.2"
   }
 }

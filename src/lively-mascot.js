@@ -1,5 +1,5 @@
 /**
- * lively-mascot · core SDK (v0.7.0)
+ * lively-mascot · core SDK (v0.1.0)
  *
  * Requires: src/core/emotions.js, src/core/rig.js (loaded before this script)
  * Character files (src/characters/*.js) register themselves after this script.
@@ -9,7 +9,17 @@
 (function (root, factory) {
   if (typeof module === "object" && typeof module.exports === "object") {
     var emo = require("./core/emotions.js");
-    module.exports = factory(emo.groups, emo.emotions);
+    var api = factory(emo.groups, emo.emotions);
+    // Character modules are optional in the browser, where callers choose
+    // which scripts to include. The npm entry loads all bundled characters.
+    if (typeof globalThis !== "undefined") globalThis.LivelyMascot = api;
+    require("./core/rig.js");
+    require("./characters/sprout.js");
+    require("./characters/cat.js");
+    require("./characters/robot.js");
+    require("./characters/ghost.js");
+    require("./characters/jelly.js");
+    module.exports = api;
   } else {
     root.LivelyMascot = factory(
       root.LivelyEmotionGroups || {},

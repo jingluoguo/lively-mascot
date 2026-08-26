@@ -275,3 +275,8 @@ function createRig(root, rigEl, config, handlers) {
     }
   };
 }
+
+// The browser build still uses the top-level function. Exporting it here
+// also lets the CommonJS SDK entry assemble the same runtime in Node.
+if (typeof module === "object" && module.exports) module.exports = { createRig: createRig };
+if (typeof globalThis !== "undefined") globalThis.createRig = createRig;

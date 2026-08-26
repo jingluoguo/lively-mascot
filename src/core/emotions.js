@@ -194,3 +194,13 @@ var LivelyEmotionGroups = {
   "reaction":  { name: "情绪反应", order: 1 },
   "work":      { name: "工作状态", order: 2 }
 };
+
+// Keep the no-build browser global while making the data consumable from
+// Node/CommonJS when the source SDK is used as an npm entry point.
+if (typeof module === "object" && module.exports) {
+  module.exports = { emotions: LivelyEmotions, groups: LivelyEmotionGroups };
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.LivelyEmotions = LivelyEmotions;
+  globalThis.LivelyEmotionGroups = LivelyEmotionGroups;
+}
