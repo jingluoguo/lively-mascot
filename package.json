@@ -1,6 +1,6 @@
 {
   "name": "lively-mascot",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Universal Animated Mascot Engine: 40 Emotions · 5 Characters · Pure SVG · Zero Dependencies · Data-Driven · Drop-in.",
   "license": "MIT",
   "main": "./dist/lively-mascot.cjs",

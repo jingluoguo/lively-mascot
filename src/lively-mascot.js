@@ -1,5 +1,5 @@
 /**
- * lively-mascot · core SDK (v0.1.0)
+ * lively-mascot · core SDK (v0.2.0)
  *
  * Requires: src/core/emotions.js, src/core/rig.js (loaded before this script)
  * Character files (src/characters/*.js) register themselves after this script.
@@ -325,6 +325,6 @@
     characters: characters,
     emotions: LivelyEmotions,
     emotionGroups: LivelyEmotionGroups,
-    version: "0.1.0"
+    version: "0.2.0"
   };
 });
