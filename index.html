@@ -12,7 +12,11 @@
   <link rel="stylesheet" href="src/characters/ghost.css" />
   <link rel="stylesheet" href="src/characters/jelly.css" />
   <style>
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+    }
 
     body {
       margin: 0;
@@ -24,12 +28,49 @@
       min-height: 100vh;
     }
 
-    .page { max-width: 860px; margin: 0 auto; padding: 56px 24px 88px; }
-    .hero { text-align: center; }
-    .hero h1 { margin: 0 0 10px; font-size: 42px; letter-spacing: -1.5px; }
-    .hero__dot { color: #48ff42; text-shadow: 2px 2px 0 #080808; -webkit-text-stroke: 1.5px #080808; font-size: 30px; vertical-align: 6px; }
-    .hero__tagline { margin: 0 auto 14px; max-width: 580px; font-size: 16px; line-height: 1.7; color: #555; }
-    .hero__hint { display: inline-block; margin: 0; padding: 6px 14px; border: 2px solid #080808; border-radius: 999px; background: #fff; box-shadow: 3px 3px 0 #080808; font-size: 13px; color: #333; }
+    .page {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 56px 24px 88px;
+    }
+
+    .hero {
+      text-align: center;
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: 42px;
+      letter-spacing: -1.5px;
+    }
+
+    .hero__dot {
+      color: #48ff42;
+      text-shadow: 2px 2px 0 #080808;
+      -webkit-text-stroke: 1.5px #080808;
+      font-size: 30px;
+      vertical-align: 6px;
+    }
+
+    .hero__tagline {
+      margin: 0 auto 14px;
+      max-width: 580px;
+      font-size: 16px;
+      line-height: 1.7;
+      color: #555;
+    }
+
+    .hero__hint {
+      display: inline-block;
+      margin: 0;
+      padding: 6px 14px;
+      border: 2px solid #080808;
+      border-radius: 999px;
+      background: #fff;
+      box-shadow: 3px 3px 0 #080808;
+      font-size: 13px;
+      color: #333;
+    }
 
     /* ---- Language Toggle (matches neo-brutalist theme) ---- */
     .lang-switch {
@@ -46,6 +87,7 @@
       cursor: pointer;
       user-select: none;
     }
+
     .lang-switch__btn {
       border: none;
       background: transparent;
@@ -59,6 +101,7 @@
       cursor: pointer;
       transition: background .15s, color .15s;
     }
+
     .lang-switch__btn.is-active {
       background: #080808;
       color: #fff;
@@ -80,10 +123,12 @@
 
     /* ---- Character Selector ---- */
     .char-bar {
-      display: flex; gap: 10px;
+      display: flex;
+      gap: 10px;
       justify-content: center;
       margin-top: 36px;
     }
+
     .char-btn {
       width: 84px;
       padding: 9px 0;
@@ -91,52 +136,306 @@
       border-radius: 12px;
       background: #fff;
       box-shadow: 3px 3px 0 #080808;
-      font-size: 14px; font-weight: 700; color: #666;
+      font-size: 14px;
+      font-weight: 700;
+      color: #666;
       cursor: pointer;
       transition: all .15s;
     }
-    .char-btn:hover { background: #f0f0f0; transform: translate(-1px, -1px); }
-    .char-btn.is-active { background: #080808; color: #fff; transform: translate(1px, 1px); box-shadow: 1px 1px 0 #080808; }
+
+    .char-btn:hover {
+      background: #f0f0f0;
+      transform: translate(-1px, -1px);
+    }
+
+    .char-btn.is-active {
+      background: #080808;
+      color: #fff;
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0 #080808;
+    }
+
+    /* ---- View mode segmented control ---- */
+    .view-mode {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 22px;
+      margin: 0;
+      flex-wrap: wrap;
+    }
+
+    .view-mode__control {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .view-mode__label {
+      font-size: 12px;
+      font-weight: 800;
+      color: #777;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      white-space: nowrap;
+    }
+
+    .view-mode__group {
+      display: inline-flex;
+      padding: 3px;
+      border: 2px solid #080808;
+      border-radius: 999px;
+      background: #fff;
+      box-shadow: 3px 3px 0 #080808;
+    }
+
+    .view-mode__btn {
+      min-width: 52px;
+      padding: 5px 10px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: #777;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+
+    .view-mode__btn:hover {
+      background: #f0f0f0;
+      color: #1d1d1f;
+    }
+
+    .view-mode__btn.is-active {
+      background: #080808;
+      color: #fff;
+    }
 
     /* ---- Main Tabs (below character switcher) ---- */
-    .tabs { margin: 36px auto 0; max-width: 760px; }
-    .tabs__bar { display: flex; gap: 0; border: 2px solid #080808; border-radius: 12px 12px 0 0; background: #fff; box-shadow: 3px 3px 0 #080808; overflow: hidden; }
-    .tabs__btn { flex: 1; padding: 12px 0; border: none; border-right: 1px solid #080808; background: #f5f5f5; font-size: 14px; font-weight: 700; color: #666; cursor: pointer; transition: background .15s, color .15s; }
-    .tabs__btn:last-child { border-right: none; }
-    .tabs__btn:hover { background: #eee; }
-    .tabs__btn.is-active { background: #fff; color: #1d1d1f; }
-    .tabs__panel { display: none; border: 2px solid #080808; border-top: none; border-radius: 0 0 12px 12px; background: #fff; box-shadow: 3px 3px 0 #080808; padding: 20px; }
-    .tabs__panel.is-active { display: block; }
+    .tabs {
+      margin: 36px auto 0;
+      max-width: 760px;
+    }
+
+    .tabs__bar {
+      display: flex;
+      gap: 0;
+      border: 2px solid #080808;
+      border-radius: 12px 12px 0 0;
+      background: #fff;
+      box-shadow: 3px 3px 0 #080808;
+      overflow: hidden;
+    }
+
+    .tabs__btn {
+      flex: 1;
+      padding: 12px 0;
+      border: none;
+      border-right: 1px solid #080808;
+      background: #f5f5f5;
+      font-size: 14px;
+      font-weight: 700;
+      color: #666;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+
+    .tabs__btn:last-child {
+      border-right: none;
+    }
+
+    .tabs__btn:hover {
+      background: #eee;
+    }
+
+    .tabs__btn.is-active {
+      background: #fff;
+      color: #1d1d1f;
+    }
+
+    .tabs__panel {
+      display: none;
+      border: 2px solid #080808;
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+      background: #fff;
+      box-shadow: 3px 3px 0 #080808;
+      padding: 20px;
+    }
+
+    .tabs__panel.is-active {
+      display: block;
+    }
+
+    .tabs__panel.parameter-panel.is-active {
+      display: flex;
+      align-items: center;
+      min-height: 52px;
+    }
 
     /* ---- Sub Tabs ---- */
-    .sub-tabs { display: flex; gap: 6px; margin-bottom: 16px; }
-    .sub-tabs__btn { padding: 6px 14px; border: 2px solid #080808; border-radius: 999px; background: #fff; font-size: 12px; font-weight: 700; color: #666; cursor: pointer; transition: all .15s; }
-    .sub-tabs__btn:hover { background: #f0f0f0; }
-    .sub-tabs__btn.is-active { background: #080808; color: #fff; }
-    .sub-panel { display: none; }
-    .sub-panel.is-active { display: block; }
+    .sub-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .sub-tabs__btn {
+      padding: 6px 14px;
+      border: 2px solid #080808;
+      border-radius: 999px;
+      background: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      color: #666;
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .sub-tabs__btn:hover {
+      background: #f0f0f0;
+    }
+
+    .sub-tabs__btn.is-active {
+      background: #080808;
+      color: #fff;
+    }
+
+    .sub-panel {
+      display: none;
+    }
+
+    .sub-panel.is-active {
+      display: block;
+    }
 
     /* ---- Palette Grid ---- */
-    .palette { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
-    .palette__item { margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; height: 72px; padding: 8px 6px; border-radius: 10px; border: 2px solid rgba(8, 8, 8, .12); background: #fafafa; cursor: pointer; transition: border-color .15s, box-shadow .15s, background .15s, transform .15s; }
-    .palette__swatch { width: 36px; height: 36px; border-radius: 50%; box-shadow: 2px 2px 0 rgba(0, 0, 0, .15); }
-    .palette__item:hover { border-color: rgba(8, 8, 8, .35); }
-    .palette__item.is-active { border-color: #080808; background: #fff; box-shadow: 3px 3px 0 #080808; transform: translate(-1px, -1px); }
-    .palette__item figcaption { font-size: 13px; color: #666; text-align: center; transition: color .15s, font-weight .15s; }
-    .palette__item.is-active figcaption { color: #1d1d1f; font-weight: 900; }
+    .palette {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
 
-    /* ---- Emotion Grid ---- */
-    .emotion-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-    .emotion-item { padding: 10px 8px; border-radius: 8px; border: 2px solid rgba(8, 8, 8, .1); background: #fafafa; cursor: pointer; text-align: center; transition: all .1s; }
-    .emotion-item:hover { background: #f0f0f0; transform: translateY(-2px); box-shadow: 2px 2px 0 rgba(0, 0, 0, .1); }
-    .emotion-item:active { transform: scale(0.93) translateY(1px); box-shadow: 1px 1px 0 rgba(0, 0, 0, .15); background: #e8e8e8; transition: transform .06s, box-shadow .06s, background .06s; }
-    .emotion-item.is-active { border-color: #080808; background: #fff; box-shadow: 3px 3px 0 #080808; transform: translate(-1px, -1px); }
-    .emotion-item.is-active .emotion-item__name { color: #080808; }
-    .emotion-item__name { font-size: 13px; font-weight: 700; color: #1d1d1f; }
-    .emotion-item__desc { font-size: 11px; color: #888; margin-top: 3px; }
+    .palette__item {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 72px;
+      padding: 8px 6px;
+      border-radius: 10px;
+      border: 2px solid rgba(8, 8, 8, .12);
+      background: #fafafa;
+      cursor: pointer;
+      transition: border-color .15s, box-shadow .15s, background .15s, transform .15s;
+    }
+
+    .palette__swatch {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      box-shadow: 2px 2px 0 rgba(0, 0, 0, .15);
+    }
+
+    .palette__item:hover {
+      border-color: rgba(8, 8, 8, .35);
+    }
+
+    .palette__item.is-active {
+      border-color: #080808;
+      background: #fff;
+      box-shadow: 3px 3px 0 #080808;
+      transform: translate(-1px, -1px);
+    }
+
+    .palette__item figcaption {
+      font-size: 13px;
+      color: #666;
+      text-align: center;
+      transition: color .15s, font-weight .15s;
+    }
+
+    .palette__item.is-active figcaption {
+      color: #1d1d1f;
+      font-weight: 900;
+    }
+
+    /* ---- Emotion Grid (model on top, title below) ---- */
+    .emotion-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .emotion-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 22px 6px 12px;
+      border-radius: 8px;
+      border: 2px solid rgba(8, 8, 8, .1);
+      background: #fafafa;
+      cursor: pointer;
+      text-align: center;
+      transition: all .1s;
+    }
+
+    .emotion-item:hover {
+      background: #f0f0f0;
+      transform: translateY(-2px);
+      box-shadow: 2px 2px 0 rgba(0, 0, 0, .1);
+    }
+
+    .emotion-item:active {
+      transform: scale(0.97) translateY(1px);
+      box-shadow: 1px 1px 0 rgba(0, 0, 0, .15);
+      background: #e8e8e8;
+      transition: transform .06s, box-shadow .06s, background .06s;
+    }
+
+    .emotion-item.is-active {
+      border-color: #080808;
+      background: #fff;
+      box-shadow: 3px 3px 0 #080808;
+      transform: translate(-1px, -1px);
+    }
+
+    .emotion-item.is-active .emotion-item__name {
+      color: #080808;
+    }
+
+    .emotion-item__model {
+      width: 50px;
+      height: 50px;
+      margin: 0 auto;
+      pointer-events: none;
+    }
+
+    .emotion-item__name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1d1d1f;
+    }
+
+    .emotion-item__desc {
+      font-size: 10px;
+      line-height: 1.3;
+      color: #888;
+      margin-top: 1px;
+    }
 
     /* ---- Footer: GitHub repo link (theme-matched) ---- */
-    .footer { text-align: center; margin-top: 36px; }
+    .footer {
+      text-align: center;
+      margin-top: 36px;
+    }
+
     .footer__link {
       display: inline-flex;
       align-items: center;
@@ -152,14 +451,43 @@
       text-decoration: none;
       transition: all .15s;
     }
-    .footer__link:hover { background: #f0f0f0; transform: translate(-1px, -1px); box-shadow: 4px 4px 0 #080808; }
-    .footer__link:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 #080808; }
-    .footer__icon { color: #48ff42; text-shadow: 1px 1px 0 #080808; -webkit-text-stroke: 1px #080808; font-size: 16px; }
+
+    .footer__link:hover {
+      background: #f0f0f0;
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0 #080808;
+    }
+
+    .footer__link:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0 #080808;
+    }
+
+    .footer__icon {
+      color: #48ff42;
+      text-shadow: 1px 1px 0 #080808;
+      -webkit-text-stroke: 1px #080808;
+      font-size: 16px;
+    }
 
     @media (max-width: 720px) {
-      .palette { grid-template-columns: repeat(3, 1fr); }
-      .emotion-grid { grid-template-columns: repeat(3, 1fr); }
-      .lang-switch { top: 14px; right: 14px; }
+      .view-mode {
+        justify-content: center;
+        gap: 12px;
+      }
+
+      .palette {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .emotion-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .lang-switch {
+        top: 14px;
+        right: 14px;
+      }
     }
   </style>
 </head>
@@ -181,16 +509,34 @@
     <div class="stage">
       <section class="showcase" id="showcase"></section>
       <div class="char-bar" id="char-bar"></div>
-
       <div class="tabs" id="tabs">
         <div class="tabs__bar" id="tabs-bar"></div>
-        <div class="tabs__panel is-active" id="panel-color"></div>
+        <div class="tabs__panel parameter-panel is-active" id="panel-parameters">
+          <div class="view-mode" id="view-mode">
+            <div class="view-mode__control">
+              <span class="view-mode__label" id="view-mode-label"></span>
+              <div class="view-mode__group" role="group" aria-labelledby="view-mode-label">
+                <button type="button" class="view-mode__btn view-mode__mode-btn" data-mode="2d" aria-pressed="false">2D</button>
+                <button type="button" class="view-mode__btn view-mode__mode-btn is-active" data-mode="3d" aria-pressed="true">3D</button>
+              </div>
+            </div>
+            <div class="view-mode__control">
+              <span class="view-mode__label" id="outline-label"></span>
+              <div class="view-mode__group" role="group" aria-labelledby="outline-label">
+                <button type="button" class="view-mode__btn view-mode__outline-btn is-active" data-outline="visible" aria-pressed="true"></button>
+                <button type="button" class="view-mode__btn view-mode__outline-btn" data-outline="hidden" aria-pressed="false"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tabs__panel" id="panel-color"></div>
         <div class="tabs__panel" id="panel-emotion"></div>
       </div>
     </div>
 
     <footer class="footer">
-      <a class="footer__link" id="repo-link" href="https://github.com/jingluoguo/lively-mascot" target="_blank" rel="noopener">
+      <a class="footer__link" id="repo-link" href="https://github.com/jingluoguo/lively-mascot" target="_blank"
+        rel="noopener">
         <span class="footer__icon">★</span><span id="repo-label"></span>
       </a>
     </footer>
@@ -213,17 +559,24 @@
         tagline: '通用电子宠物引擎：40 种状态表情 · 多角色 · 纯 SVG 驱动 · 零依赖 · 即插即用。',
         hint: '把光标移到吉祥物上 · 点击让它开心',
         repoLabel: '在 GitHub 上查看源码',
+        viewMode: '视图', outline: '边框', outlineOn: '显示', outlineOff: '隐藏',
         charNames: {
           sprout: '🌱 嫩芽', cat: '🐱 小猫', robot: '🤖 机器人',
           ghost: '👻 幽灵', jelly: '🟢 果冻'
         },
-        tabs: ['颜色', '表情'],
+        tabs: ['参数', '颜色', '表情'],
         palette: ['薄荷绿', '天空蓝', '蜜桃橙', '薰衣草紫', '玫瑰粉', '柠檬黄'],
         groupNames: {
           lifecycle: '生命周期', reaction: '情绪反应', work: '工作状态'
         },
         clickName: function (type) {
-          return type === 'cat' ? '喵！' : '嫩芽';
+          return {
+            sprout: '嫩芽',
+            cat: '喵！',
+            robot: '哔哔！',
+            ghost: '呜～',
+            jelly: '啵！'
+          }[type] || '嫩芽';
         },
         sayGreeting: function (name, time) {
           return name + ' 说：你好！（点击于 ' + (time || new Date()).toLocaleTimeString() + '）';
@@ -236,17 +589,24 @@
         tagline: 'Universal e-pet engine: 40 status emotions · multi-character · pure SVG · zero deps · drop-in.',
         hint: 'Hover the mascot · click to make it happy',
         repoLabel: 'View source on GitHub',
+        viewMode: 'View', outline: 'Outline', outlineOn: 'On', outlineOff: 'Off',
         charNames: {
           sprout: '🌱 Sprout', cat: '🐱 Cat', robot: '🤖 Robot',
           ghost: '👻 Ghost', jelly: '🟢 Jelly'
         },
-        tabs: ['Color', 'Emotion'],
+        tabs: ['Parameters', 'Color', 'Emotion'],
         palette: ['Mint', 'Sky Blue', 'Peach', 'Lavender', 'Rose', 'Lemon'],
         groupNames: {
           lifecycle: 'Lifecycle', reaction: 'Reactions', work: 'Work states'
         },
         clickName: function (type) {
-          return type === 'cat' ? 'Meow!' : 'Sprout';
+          return {
+            sprout: 'Sprout',
+            cat: 'Meow!',
+            robot: 'Beep!',
+            ghost: 'Boo!',
+            jelly: 'Plop!'
+          }[type] || 'Sprout';
         },
         sayGreeting: function (name, time) {
           return name + ' says: hello! (clicked at ' + (time || new Date()).toLocaleTimeString() + ')';
@@ -268,7 +628,17 @@
     // ---- Current mascot instance ----
     var hero = null;
     var currentCharType = 'sprout';
+    var currentViewMode = '3d';
+    var outlineVisible = true;
     var currentTheme = null;
+    var CHAR_DEFAULT_THEMES = {
+      sprout: { body: '#48ff42', outline: '#080808', accent: '#ff9fb6' },
+      cat: { body: '#3d4852', outline: '#131a20', accent: '#eeb3c1' },
+      robot: { body: '#6f879b', outline: '#162332', accent: '#74e5ff' },
+      ghost: { body: '#bdeef2', outline: '#23434d', accent: '#a9d9ff' },
+      jelly: { body: '#f29cc2', outline: '#5a243e', accent: '#ffe0a8' }
+    };
+    var previewInstances = []; // static thumbnails in the emotion gallery
 
     function createHero(type) {
       if (hero) hero.destroy();
@@ -277,12 +647,13 @@
       hero = LivelyMascot.createMascot(container, {
         type: type,
         size: 180,
+        viewMode: currentViewMode,
+        outlineVisible: outlineVisible,
+        hopInterval: [3, 6],
         onClick: function () { say(function () { return T().sayGreeting(T().clickName(type), new Date()); }); },
       });
       currentCharType = type;
-      if (currentTheme) {
-        hero.setTheme(currentTheme);
-      }
+      hero.setTheme(currentTheme || CHAR_DEFAULT_THEMES[type]);
       var activeEmotion = document.querySelector('.emotion-item.is-active');
       if (activeEmotion) {
         hero.setEmotion(activeEmotion.dataset.emotionId);
@@ -302,9 +673,44 @@
         charBtns.forEach(function (b) { b.classList.remove('is-active'); });
         btn.classList.add('is-active');
         createHero(type);
+        renderEmotionPreviews();
       });
       charBar.appendChild(btn);
       charBtns.push(btn);
+    });
+
+    // ---- 2D / 3D view mode ----
+    var viewModeBtns = Array.prototype.slice.call(document.querySelectorAll('.view-mode__mode-btn'));
+    viewModeBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        currentViewMode = btn.dataset.mode;
+        viewModeBtns.forEach(function (b) {
+          var active = b.dataset.mode === currentViewMode;
+          b.classList.toggle('is-active', active);
+          b.setAttribute('aria-pressed', String(active));
+        });
+        if (hero) hero.setViewMode(currentViewMode);
+        previewInstances.forEach(function (pInst) { pInst.setViewMode(currentViewMode); });
+      });
+    });
+
+    // ---- Outer outline toggle ----
+    var outlineBtns = Array.prototype.slice.call(document.querySelectorAll('.view-mode__outline-btn'));
+    function syncOutlineToggle() {
+      outlineBtns.forEach(function (btn) {
+        var active = (btn.dataset.outline === 'visible') === outlineVisible;
+        btn.classList.toggle('is-active', active);
+        btn.setAttribute('aria-pressed', String(active));
+        btn.textContent = btn.dataset.outline === 'visible' ? T().outlineOn : T().outlineOff;
+      });
+    }
+    outlineBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        outlineVisible = btn.dataset.outline === 'visible';
+        syncOutlineToggle();
+        if (hero) hero.setOutlineVisible(outlineVisible);
+        previewInstances.forEach(function (pInst) { pInst.setOutlineVisible(outlineVisible); });
+      });
     });
 
     // ---- Main Tabs ----
@@ -321,6 +727,9 @@
           btn.classList.add('is-active');
           panels.forEach(function (p) { p.classList.remove('is-active'); });
           panels[i].classList.add('is-active');
+          // Re-render thumbnails when the (initially hidden) emotion panel
+          // becomes visible, so container-relative headwear sizes settle.
+          if (i === 2) renderEmotionPreviews();
         });
         tabsBar.appendChild(btn);
         tabBtns.push(btn);
@@ -329,12 +738,17 @@
 
     // ---- Color Panel ----
     var palettes = [
-      { name: '薄荷绿', en: 'Mint', color: '#48ff42', outline: '#080808' },
+      { name: '薄荷绿', en: 'Mint', color: '#48ff42', outline: '#080808', accent: '#ff9fb6' },
       { name: '天空蓝', en: 'Sky Blue', color: '#6ec7ff', outline: '#0b1e3a' },
       { name: '蜜桃橙', en: 'Peach', color: '#ffb37a', outline: '#5c2a12' },
       { name: '薰衣草紫', en: 'Lavender', color: '#c9a6ff', outline: '#2e1a4d' },
       { name: '玫瑰粉', en: 'Rose', color: '#ff9fb6', outline: '#5c1f33' },
       { name: '柠檬黄', en: 'Lemon', color: '#ffe066', outline: '#4d3d00' },
+      { name: '炭灰', en: 'Charcoal', color: '#3d4852', outline: '#131a20', accent: '#eeb3c1' },
+      { name: '奶油白', en: 'Cream', color: '#f1e7d8', outline: '#463a2e' },
+      { name: '钢蓝', en: 'Steel Blue', color: '#6f879b', outline: '#162332', accent: '#74e5ff' },
+      { name: '浅青', en: 'Pale Cyan', color: '#bdeef2', outline: '#23434d', accent: '#a9d9ff' },
+      { name: '莓果粉', en: 'Berry Pink', color: '#f29cc2', outline: '#5a243e', accent: '#ffe0a8' },
     ];
     var palettePanel = document.getElementById('panel-color');
     var paletteGrid = document.createElement('div');
@@ -353,8 +767,9 @@
       fig.appendChild(swatch);
       fig.appendChild(caption);
       fig.addEventListener('click', function () {
-        currentTheme = { body: p.color, outline: p.outline };
+        currentTheme = { body: p.color, outline: p.outline, accent: p.accent };
         hero.setTheme(currentTheme);
+        previewInstances.forEach(function (pInst) { pInst.setTheme(currentTheme); });
         if (activeSwatch) activeSwatch.classList.remove('is-active');
         fig.classList.add('is-active');
         activeSwatch = fig;
@@ -401,10 +816,13 @@
         item.className = 'emotion-item';
         if (e.id === '02') item.classList.add('is-active');
         item.dataset.emotionId = e.id;
+        var modelBox = document.createElement('div');
+        modelBox.className = 'emotion-item__model';
         var nameEl = document.createElement('div');
         nameEl.className = 'emotion-item__name';
         var descEl = document.createElement('div');
         descEl.className = 'emotion-item__desc';
+        item.appendChild(modelBox);
         item.appendChild(nameEl);
         item.appendChild(descEl);
         item.addEventListener('click', function () {
@@ -423,12 +841,39 @@
     emotionPanel.appendChild(subBar);
     subPanels.forEach(function (p) { emotionPanel.appendChild(p); });
 
+    // ---- Emotion gallery thumbnails (model on top, title below) ----
+    // Each card shows a small STATIC mascot (current character + theme) posing
+    // the emotion, with the emotion name as its caption. No cursor-follow,
+    // no idle animation — these are just previews.
+    function renderEmotionPreviews() {
+      previewInstances.forEach(function (p) { p.destroy(); });
+      previewInstances = [];
+      document.querySelectorAll('.emotion-item__model').forEach(function (box) {
+        var item = box.closest('.emotion-item');
+        var inst = LivelyMascot.createMascot(box, {
+          type: currentCharType,
+          size: 50,
+          animated: false,
+          followCursor: false,
+          viewMode: currentViewMode,
+          outlineVisible: outlineVisible
+        });
+        inst.setEmotion(item.dataset.emotionId);
+        inst.setTheme(currentTheme || CHAR_DEFAULT_THEMES[currentCharType]);
+        previewInstances.push(inst);
+      });
+    }
+    renderEmotionPreviews();
+
     // ---- Apply / refresh all text for the current language ----
     function applyLanguage() {
       var t = T();
       document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
       document.getElementById('tagline').textContent = t.tagline;
       document.getElementById('repo-label').textContent = t.repoLabel;
+      document.getElementById('view-mode-label').textContent = t.viewMode;
+      document.getElementById('outline-label').textContent = t.outline;
+      syncOutlineToggle();
       toggleButtons.forEach(function (b) {
         b.classList.toggle('is-active', b.dataset.lang === currentLang);
       });

@@ -11,6 +11,7 @@
  * - bodyFilter: CSS filter override for .lively-body
  * - blink:      false = force eyes closed/locked (default true)
  * - gaze:       false = pause cursor tracking (default true)
+ * - hop:        true = allow interval-driven hopping for this expression
  * - leafAnim:   CSS animation override for .lively__leaf
  * - footAnim:   CSS animation override for .lively__foot
  */
@@ -132,8 +133,10 @@ var LivelyEmotions = {
           leafAnim: "lively-leaf-designing 2.5s ease-in-out infinite" },
   "28": { id: "28", name: "Loading",    group: "work", desc: "加载中",
           gaze: false,
-          bodyAnim: "lively-loading-pulse 1.8s ease-in-out infinite",
-          leafAnim: "lively-leaf-spin-slow 1.6s linear infinite",
+          // Loading state is communicated by the rotated ring (CSS).
+          // Disable the base body sway so the ring stays concentric; the
+          // whole rig bounces instead to make the live mascot feel alive.
+          bodyAnim: "lively-loading-bounce 0.9s ease-in-out infinite",
           footAnim: "lively-foot-rest 3s ease-in-out infinite" },
   "29": { id: "29", name: "Processing", group: "work", desc: "处理中",
           bodyAnim: "lively-processing 1.5s ease-in-out infinite",
@@ -168,7 +171,7 @@ var LivelyEmotions = {
           leafAnim: "lively-leaf-droop 1.5s ease-in-out infinite",
           footAnim: "lively-foot-rest 3s ease-in-out infinite" },
   "36": { id: "36", name: "Bored",      group: "reaction", desc: "无聊",
-          bodyAnim: "lively-sad 4s ease-in-out infinite",
+          bodyAnim: "lively-bored 4s ease-in-out infinite",
           leafAnim: "lively-leaf-droop 5s ease-in-out infinite",
           footAnim: "lively-foot-rest 4s ease-in-out infinite" },
   "37": { id: "37", name: "Nervous",    group: "reaction", desc: "紧张",
@@ -191,3 +194,13 @@ var LivelyEmotionGroups = {
   "reaction":  { name: "情绪反应", order: 1 },
   "work":      { name: "工作状态", order: 2 }
 };
+
+// Keep the no-build browser global while making the data consumable from
+// Node/CommonJS when the source SDK is used as an npm entry point.
+if (typeof module === "object" && module.exports) {
+  module.exports = { emotions: LivelyEmotions, groups: LivelyEmotionGroups };
+}
+if (typeof globalThis !== "undefined") {
+  globalThis.LivelyEmotions = LivelyEmotions;
+  globalThis.LivelyEmotionGroups = LivelyEmotionGroups;
+}

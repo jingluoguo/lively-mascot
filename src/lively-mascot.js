@@ -1,5 +1,5 @@
 /**
- * lively-mascot · core SDK (v0.7.0)
+ * lively-mascot · core SDK (v0.2.0)
  *
  * Requires: src/core/emotions.js, src/core/rig.js (loaded before this script)
  * Character files (src/characters/*.js) register themselves after this script.
@@ -9,7 +9,17 @@
 (function (root, factory) {
   if (typeof module === "object" && typeof module.exports === "object") {
     var emo = require("./core/emotions.js");
-    module.exports = factory(emo.groups, emo.emotions);
+    var api = factory(emo.groups, emo.emotions);
+    // Character modules are optional in the browser, where callers choose
+    // which scripts to include. The npm entry loads all bundled characters.
+    if (typeof globalThis !== "undefined") globalThis.LivelyMascot = api;
+    require("./core/rig.js");
+    require("./characters/sprout.js");
+    require("./characters/cat.js");
+    require("./characters/robot.js");
+    require("./characters/ghost.js");
+    require("./characters/jelly.js");
+    module.exports = api;
   } else {
     root.LivelyMascot = factory(
       root.LivelyEmotionGroups || {},
@@ -111,6 +121,8 @@
     face.appendChild(svg("ellipse", { class: "lively-face__open-mouth", cx: 50, cy: 65, rx: 5, ry: 6 }));
     // Flat mouth
     face.appendChild(svg("line", { class: "lively-face__flat-mouth", x1: 43, y1: 65, x2: 57, y2: 65 }));
+    // Bored mouth: almost level, with a restrained lift at one corner.
+    face.appendChild(svg("path", { class: "lively-face__bored-mouth", d: "M42.5 65.2 C47.5 65.9 53 65.7 57.5 64.2" }));
     // Sleep eyes
     face.appendChild(svg("line", { class: "lively-face__sleep-eye lively-face__sleep-eye--l", x1: 27, y1: 43, x2: 41, y2: 43 }));
     face.appendChild(svg("line", { class: "lively-face__sleep-eye lively-face__sleep-eye--r", x1: 59, y1: 43, x2: 73, y2: 43 }));
@@ -191,13 +203,23 @@
   }
   function getCharacter(type) { return characters[type] || characters.sprout; }
 
+  function normalizeViewMode(mode) {
+    return String(mode || "3d").toLowerCase() === "2d" ? "2d" : "3d";
+  }
+
+  function normalizeOutlineVisible(value) {
+    return value !== false && String(value).toLowerCase() !== "false";
+  }
+
   // --- Core API ---
   function createMascot(target, options) {
     options = options || {};
     var type = options.type || "sprout";
     var character = getCharacter(type);
+    var viewMode = normalizeViewMode(options.viewMode || options.mode);
+    var outlineVisible = normalizeOutlineVisible(options.outlineVisible);
     var root = el("div", {
-      class: "lively-mascot lively-mascot--" + character.id,
+      class: "lively-mascot lively-mascot--" + character.id + " lively-mascot--" + viewMode + (!outlineVisible ? " lively-mascot--outline-hidden" : "") + (options.animated === false ? " lively-mascot--static" : ""),
       style: "width:" + (options.size || 106) + "px;height:" + (options.size || 106) + "px",
       "aria-hidden": "true",
     });
@@ -213,16 +235,41 @@
       root.style.setProperty("--lively-accent", theme.accent || null);
     }
     applyTheme();
-    var rig = createRig(root, rigEl, { followCursor: options.followCursor, hopInterval: options.hopInterval }, { onClick: options.onClick });
+    var rig = createRig(root, rigEl, {
+      followCursor: options.followCursor,
+      hopInterval: options.hopInterval,
+      animated: options.animated
+    }, { onClick: options.onClick });
     character.render(rig.api, gazeEl);
     rig.api.registerGazeWrap(gazeEl);
+    // Loading ring overlay — shared by ALL characters (shown via .is-emotion-28).
+    gazeEl.appendChild(el("div", { class: "lively__loading-overlay", "aria-hidden": "true" }));
     root.appendChild(rigEl);
     target.appendChild(root);
 
     return {
       el: root,
       type: character.id,
-      setTheme: function (p) { if (p.body) theme.body = p.body; if (p.outline) theme.outline = p.outline; applyTheme(); },
+      get viewMode() { return viewMode; },
+      setViewMode: function (mode) {
+        viewMode = normalizeViewMode(mode);
+        root.classList.toggle("lively-mascot--2d", viewMode === "2d");
+        root.classList.toggle("lively-mascot--3d", viewMode === "3d");
+        return viewMode;
+      },
+      get outlineVisible() { return outlineVisible; },
+      setOutlineVisible: function (visible) {
+        outlineVisible = normalizeOutlineVisible(visible);
+        root.classList.toggle("lively-mascot--outline-hidden", !outlineVisible);
+        return outlineVisible;
+      },
+      setTheme: function (p) {
+        p = p || {};
+        if (p.body) theme.body = p.body;
+        if (p.outline) theme.outline = p.outline;
+        if (p.accent) theme.accent = p.accent;
+        applyTheme();
+      },
       setEmotion: function (emotionId) {
         root.className = root.className.replace(/is-emotion-\d+/g, "").trim();
         root.classList.add("is-emotion-" + emotionId);
@@ -250,7 +297,7 @@
       LivelyMascotElement.prototype = Object.create(HTMLElement.prototype, {
         constructor: { value: LivelyMascotElement, writable: true, configurable: true }
       });
-      LivelyMascotElement.observedAttributes = ["type", "color", "size"];
+      LivelyMascotElement.observedAttributes = ["type", "color", "size", "view-mode", "mode", "show-outline"];
       LivelyMascotElement.prototype.connectedCallback = function () { this._render(); };
       LivelyMascotElement.prototype.disconnectedCallback = function () { if (this._inst) this._inst.destroy(); this._inst = null; this.textContent = ""; };
       LivelyMascotElement.prototype.attributeChangedCallback = function () { if (this.isConnected) this._render(); };
@@ -260,7 +307,9 @@
         this._inst = _create(this, {
           type: this.getAttribute("type"),
           color: this.getAttribute("color"),
-          size: this.getAttribute("size") ? Number(this.getAttribute("size")) : undefined
+          size: this.getAttribute("size") ? Number(this.getAttribute("size")) : undefined,
+          viewMode: this.getAttribute("view-mode") || this.getAttribute("mode") || undefined,
+          outlineVisible: this.getAttribute("show-outline") !== "false"
         });
       };
       return LivelyMascotElement;
@@ -276,6 +325,6 @@
     characters: characters,
     emotions: LivelyEmotions,
     emotionGroups: LivelyEmotionGroups,
-    version: "0.1.0"
+    version: "0.2.0"
   };
 });

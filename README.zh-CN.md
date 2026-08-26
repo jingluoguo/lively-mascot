@@ -26,7 +26,25 @@
 
 ## 快速开始
 
-### 方式 A — 一行 CDN 引入（免下载、免构建）
+### 方式 A — npm（应用项目推荐）
+
+安装 npm 包，并通过构建工具引入 SDK 和样式：
+
+```bash
+npm install lively-mascot
+```
+
+```js
+import { createMascot } from "lively-mascot";
+import "lively-mascot/dist/lively-mascot.min.css";
+
+const mascot = createMascot(document.getElementById("slot"), {
+  type: "sprout", size: 180
+});
+mascot.setEmotion("10");
+```
+
+### 方式 B — 一行 CDN 引入（免下载、免构建）
 
 整个引擎 + 5 个角色已打包成单文件放在 jsDelivr 上，只需两个标签：
 
@@ -50,7 +68,7 @@
 
 > 提示：把 `@master` 换成 `@latest` 可锁定版本，保证构建可复现。
 
-### 方式 B — 本地 / 模块化（分文件）
+### 方式 C — 本地 / 模块化（分文件）
 
 如果你更想自己托管源码文件（例如接入自己的构建工具链）：
 
@@ -92,9 +110,16 @@
 </script>
 ```
 
-### 方式 C — 在 React / Vue 中使用
+### 方式 D — 在 React / Vue 中使用
 
-不论哪个框架，先通过 CDN（或本地 `/dist`）加载一次引擎脚本，它会注册全局变量 `LivelyMascot`：
+npm 项目的 React/Vue 应用可直接导入 API 和样式：
+
+```js
+import { createMascot } from "lively-mascot";
+import "lively-mascot/dist/lively-mascot.min.css";
+```
+
+也可以通过 CDN 加载一次引擎脚本，它会注册全局变量 `LivelyMascot`：
 
 ```html
 <!-- 放在入口 HTML，全局只需一次 -->
@@ -168,7 +193,7 @@ const reset = () => inst && inst.clearEmotion();
 </script>
 
 <!-- 直接声明式使用，浏览器自动渲染并循环待机动画 -->
-<lively-mascot type="cat" color="#ffd66b" size="180"></lively-mascot>
+<lively-mascot type="cat" color="#ffd66b" size="180" view-mode="3d"></lively-mascot>
 <lively-mascot type="ghost" color="#9be7ff" size="160"></lively-mascot>
 ```
 
@@ -196,9 +221,20 @@ onMounted(() => LivelyMascot.defineMascotElement());
 </template>
 ```
 
-> 注意：声明式标签只响应 `type` / `color` / `size` 三个属性，改其中之一即自动重建；它拿不到实例、无法直接调 `setEmotion`。需要代码驱动切换表情时，请改用上方的 `createMascot` 用法。
+> 注意：声明式标签响应 `type` / `color` / `size` / `view-mode` / `show-outline` 属性，改其中之一即自动重建；它拿不到实例、无法直接调 `setEmotion`。需要代码驱动切换表情或视图时，请改用上方的 `createMascot` 用法。
 
 ## 从源码构建
+
+### npm / 构建工具
+
+npm 包已提供 CommonJS、ESM 入口和 TypeScript 类型声明：
+
+```js
+import { createMascot, emotions } from "lively-mascot";
+// CommonJS：const { createMascot } = require("lively-mascot");
+```
+
+浏览器 CDN 场景仍使用 `dist/lively-mascot.min.js` 单文件。
 
 `dist/` 里的单文件是由 `scripts/build-dist.mjs`（基于 esbuild）生成的，它会把引擎与 5 个角色的源码按顺序拼接并压缩：
 
@@ -221,8 +257,16 @@ npm run build      # 等价于：node scripts/build-dist.mjs
 | `accent`       | `string`  | —          | 点缀色（腮红等） |
 | `size`         | `number`  | `106`      | 容器尺寸 px      |
 | `followCursor` | `boolean` | `true`     | 是否跟随光标     |
+| `viewMode`     | `string`  | `"3d"`    | 视觉模式：`"2d"` 或 `"3d"`（轻量景深） |
+| `outlineVisible` | `boolean` | `true`   | 是否显示外轮廓     |
 
-**返回实例**：`{ el, type, setTheme, setEmotion(id), clearEmotion(), destroy() }`
+**返回实例**：`{ el, type, viewMode, setViewMode(mode), outlineVisible, setOutlineVisible(visible), setTheme, setEmotion(id), clearEmotion(), destroy() }`
+
+3D 是基于 CSS 的轻量景深效果，不依赖 WebGL。运行中的实例可通过 `setViewMode("2d")` / `setViewMode("3d")` 切换；声明式 `<lively-mascot>` 支持 `view-mode="2d"`（也兼容 `mode`）属性。
+
+设置 `outlineVisible: false` 或调用 `setOutlineVisible(false)` 可隐藏外轮廓线，同时保留眼睛和表情细节。声明式标签也支持 `show-outline="false"`。
+
+角色渲染器可以通过 rig API 注册和切换可替换的脸部配饰：`rig.registerFaceAccessory(name, element)` 与 `rig.setFaceAccessory(name)`。适合胡须、面罩、眼镜等模型细节。
 
 ### 表情行为
 

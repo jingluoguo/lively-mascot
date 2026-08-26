@@ -9,27 +9,34 @@
   background:
     linear-gradient(150deg, rgba(255,255,255,0.28), rgba(255,255,255,0) 55%),
     var(--lively-body);
-  box-shadow: 5px 5px 0 var(--lively-outline), inset 0 0 0 4px rgba(255,255,255,0.12);
+  box-shadow: 3px 3px 0 color-mix(in srgb, var(--lively-outline) 70%, transparent), inset 0 0 0 3px rgba(255,255,255,0.10);
 }
 
 /* subtle screen seam so it reads as a robot face panel */
 .lively-mascot--robot .lively-face-wrap {
   border-radius: 18%;
-  box-shadow: inset 0 0 0 3px rgba(0,0,0,0.10), inset 0 6px 14px rgba(0,0,0,0.12);
-  background: rgba(0,0,0,0.06);
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,0.07), inset 0 4px 10px rgba(0,0,0,0.07);
+  background: rgba(0,0,0,0.04);
 }
 .lively-mascot--robot .lively-face-wrap svg {
-  filter: drop-shadow(0 0 2px rgba(0,0,0,0.08));
+  filter: drop-shadow(0 0 1px rgba(0,0,0,0.05));
+}
+
+/* Keep robot cheeks warmer and quieter than the cyan antenna accent. */
+.lively-mascot--robot .lively-face__blush {
+  fill: #e7ad76;
+  fill-opacity: .58;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.12));
 }
 
 /* --- Antenna (leaf channel, CSS-driven) --- */
 .lively__antenna {
   position: absolute;
-  top: -28px;
+  top: -22cqw;
   left: 50%;
-  width: 40px;
-  height: 36px;
-  margin-left: -20px;
+  width: 32cqw;
+  height: 29cqw;
+  margin-left: -16cqw;
   z-index: 3;
   transform-origin: 50% 100%;
   animation: lively-robot-antenna 2.6s ease-in-out infinite;

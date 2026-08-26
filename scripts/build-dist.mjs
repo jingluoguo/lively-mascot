@@ -69,6 +69,22 @@ async function main() {
   await mkdir(outDir, { recursive: true });
   await writeFile(join(outDir, 'lively-mascot.min.js'), jsOut);
   await writeFile(join(outDir, 'lively-mascot.min.css'), css);
+  // Keep npm's module entry points thin: the source SDK is the canonical
+  // runtime, while the browser bundle remains the zero-build distribution.
+  await writeFile(join(outDir, 'lively-mascot.cjs'), 'module.exports = require("../src/lively-mascot.js");\n');
+  await writeFile(join(outDir, 'lively-mascot.mjs'), [
+    'import mascot from "./lively-mascot.cjs";',
+    'export const createMascot = mascot.createMascot;',
+    'export const registerCharacter = mascot.registerCharacter;',
+    'export const defineMascotElement = mascot.defineMascotElement;',
+    'export const buildFaceSvg = mascot.buildFaceSvg;',
+    'export const characters = mascot.characters;',
+    'export const emotions = mascot.emotions;',
+    'export const emotionGroups = mascot.emotionGroups;',
+    'export const version = mascot.version;',
+    'export default mascot;',
+    ''
+  ].join('\n'));
   console.log('Built dist/lively-mascot.min.js (' + jsOut.length + ' bytes)');
   console.log('Built dist/lively-mascot.min.css (' + css.length + ' bytes)');
 }

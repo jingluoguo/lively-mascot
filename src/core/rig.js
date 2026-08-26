@@ -15,6 +15,7 @@ var clamp = function (v, min, max) { return v < min ? min : v > max ? max : v; }
 function createRig(root, rigEl, config, handlers) {
   config = config || {};
   handlers = handlers || {};
+  var animated = config.animated !== false;
   var followCursor = config.followCursor !== false;
   var gazeRadiusX = config.gazeRadiusX || 200;
   var gazeRadiusY = config.gazeRadiusY || 160;
@@ -24,13 +25,15 @@ function createRig(root, rigEl, config, handlers) {
   var face = null;
   var happy = false;
   var hopping = false;
-  var following = followCursor;
+  var following = animated && followCursor;
   var currentEmotionId = "02"; // Default idle
   var bodyEl = null;
   var leafEl = null;
   var leafUseLeafAnim = true;
   var feetEl = null;
   var gazeEl = null;
+  var faceAccessories = {};
+  var activeFaceAccessory = null;
 
   var api = {
     registerPupil: function (elm, spec) {
@@ -47,9 +50,26 @@ function createRig(root, rigEl, config, handlers) {
     },
     registerFeet: function (elm) { feetEl = elm; },
     registerGazeWrap: function (elm) { gazeEl = elm; },
+    registerFaceAccessory: function (name, elm) {
+      if (!name || !elm) return;
+      faceAccessories[String(name)] = elm;
+      elm.classList.add("lively-face-accessory");
+      if (activeFaceAccessory === null) activeFaceAccessory = String(name);
+      elm.classList.toggle("is-active", activeFaceAccessory === String(name));
+    },
+    setFaceAccessory: function (name) {
+      var key = name == null ? null : String(name);
+      activeFaceAccessory = key;
+      for (var accessoryName in faceAccessories) {
+        if (Object.prototype.hasOwnProperty.call(faceAccessories, accessoryName)) {
+          faceAccessories[accessoryName].classList.toggle("is-active", accessoryName === key);
+        }
+      }
+    },
     setEmotionState: function (id) {
       currentEmotionId = String(id);
       applyEmotionBehavior(currentEmotionId);
+      syncHop();
     }
   };
 
@@ -64,6 +84,7 @@ function createRig(root, rigEl, config, handlers) {
     rigEl.style.animation = "";
     if (leafEl && leafUseLeafAnim) { leafEl.style.animation = ""; }
     if (feetEl) {
+      feetEl.style.removeProperty("--lively-state-filter");
       var footL = feetEl.querySelector(".lively__foot--l");
       var footR = feetEl.querySelector(".lively__foot--r");
       if (footL) footL.style.animation = "";
@@ -74,6 +95,14 @@ function createRig(root, rigEl, config, handlers) {
   function applyEmotionBehavior(id) {
     var def = getEmotionDef(id);
     if (!def) { clearEmotionBehavior(); return; }
+    // Static mode: the visible face is driven by the `is-emotion-XX` class
+    // (set on the root by the SDK), so we keep that but apply no motion —
+    // no body/leaf/foot animation and no filter flicker.
+    if (!animated) {
+      if (bodyEl) bodyEl.style.filter = def.bodyFilter || "";
+      if (feetEl) feetEl.style.setProperty("--lively-state-filter", def.bodyFilter || "brightness(1)");
+      return;
+    }
     // Body
     if (bodyEl) {
       bodyEl.style.animation = def.bodyAnim || "";
@@ -86,16 +115,19 @@ function createRig(root, rigEl, config, handlers) {
     }
     // Feet
     if (feetEl) {
+      feetEl.style.setProperty("--lively-state-filter", def.bodyFilter || "brightness(1)");
       var footL = feetEl.querySelector(".lively__foot--l");
       var footR = feetEl.querySelector(".lively__foot--r");
       if (footL) footL.style.animation = def.footAnim || "";
       if (footR) footR.style.animation = def.footAnim || "";
     }
-    // Refresh: rotate entire rig instead of just body
-    if (id === "06") {
+    // Refresh (06) + Loading (28): drive the entire rig (whole mascot
+    // bounces / rotates with feet attached) instead of just the body.
+    if (id === "06" || id === "28") {
       if (bodyEl) bodyEl.style.animation = "";
       rigEl.style.animation = def.bodyAnim || "";
     } else {
+      // Everything else: keep the rig stationary so overlays line up.
       rigEl.style.animation = "";
     }
   }
@@ -132,7 +164,26 @@ function createRig(root, rigEl, config, handlers) {
       p.el.setAttribute("transform", "translate(" + (curX * p.spec.maxX).toFixed(2) + " " + (curY * p.spec.maxY).toFixed(2) + ")");
     }
     if (face) face.setAttribute("transform", "rotate(" + (curX * 3).toFixed(2) + " 50 52)");
-    (gazeEl || rigEl).style.transform = "rotate(" + (curX * 5).toFixed(2) + "deg) translate3d(" + (curX * 4).toFixed(1) + "px, " + (curY * 2.5).toFixed(1) + "px, 0)";
+    var postureEl = gazeEl || rigEl;
+    if (root.classList.contains("lively-mascot--3d")) {
+      // Keep the character's parts in one shared 3D posture layer. Pointer
+      // position steers the turn, while active expressions retain a subtle
+      // living tilt after gaze tracking has intentionally paused.
+      var emotionPhase = performance.now() / 720 + Number(currentEmotionId || 0) * 0.67;
+      var emotionPitch = currentEmotionId === "02" ? 0 : Math.sin(emotionPhase) * 1.2;
+      var emotionYaw = currentEmotionId === "02" ? 0 : Math.cos(emotionPhase * 0.82) * 1.7;
+      var pitch = 3.2 - curY * 7.2 + emotionPitch;
+      var yaw = -3.2 + curX * 9.4 + emotionYaw;
+      // A flat SVG silhouette naturally narrows at a camera angle. Gently
+      // compensate that projection so the mascot keeps its rounded volume.
+      var volumeX = 1 + Math.abs(yaw) * 0.0027;
+      var volumeY = 1 + Math.abs(pitch) * 0.0022;
+      root.style.setProperty("--lively-gloss-x", (25 + curX * 15).toFixed(1) + "%");
+      root.style.setProperty("--lively-gloss-y", (18 + curY * 12).toFixed(1) + "%");
+      postureEl.style.transform = "translate3d(" + (curX * 2.2).toFixed(1) + "px, " + (curY * 1.4).toFixed(1) + "px, 3px) scale3d(" + volumeX.toFixed(3) + ", " + volumeY.toFixed(3) + ", 1) rotateZ(" + (curX * 1.8).toFixed(2) + "deg) rotateX(" + pitch.toFixed(2) + "deg) rotateY(" + yaw.toFixed(2) + "deg)";
+    } else {
+      postureEl.style.transform = "rotate(" + (curX * 5).toFixed(2) + "deg) translate3d(" + (curX * 4).toFixed(1) + "px, " + (curY * 2.5).toFixed(1) + "px, 0)";
+    }
     raf = requestAnimationFrame(tick);
   }
 
@@ -165,12 +216,36 @@ function createRig(root, rigEl, config, handlers) {
 
   // --- Hop ---
   var hopTimer = 0, hopResetTimer = 0;
+
+  // A hop is an expression-specific action, never a background interruption.
+  function canHop() {
+    var def = getEmotionDef(currentEmotionId);
+    return animated && !!currentHopInterval && !!(def && def.hop);
+  }
+
+  function stopHop() {
+    clearTimeout(hopTimer);
+    clearTimeout(hopResetTimer);
+    hopTimer = 0;
+    hopResetTimer = 0;
+    setHopping(false);
+  }
+
   function scheduleHop() {
-    if (!currentHopInterval) return;
+    if (!canHop()) return;
     hopTimer = window.setTimeout(function () {
+      if (!canHop()) return;
       setHopping(true);
-      hopResetTimer = window.setTimeout(function () { setHopping(false); scheduleHop(); }, 900);
+      hopResetTimer = window.setTimeout(function () {
+        setHopping(false);
+        scheduleHop();
+      }, 900);
     }, currentHopInterval[0] * 1000 + Math.random() * (currentHopInterval[1] - currentHopInterval[0]) * 1000);
+  }
+
+  function syncHop() {
+    stopHop();
+    scheduleHop();
   }
 
   function fireClick() {
@@ -182,8 +257,11 @@ function createRig(root, rigEl, config, handlers) {
   }
 
   if (following) { raf = requestAnimationFrame(tick); window.addEventListener("pointermove", onPointerMove, { passive: true }); }
-  scheduleBlink(); scheduleHop();
-  root.addEventListener("pointerdown", fireClick);
+  if (animated) {
+    scheduleBlink();
+    syncHop();
+    root.addEventListener("pointerdown", fireClick);
+  }
 
   return {
     api: api,
@@ -197,3 +275,8 @@ function createRig(root, rigEl, config, handlers) {
     }
   };
 }
+
+// The browser build still uses the top-level function. Exporting it here
+// also lets the CommonJS SDK entry assemble the same runtime in Node.
+if (typeof module === "object" && module.exports) module.exports = { createRig: createRig };
+if (typeof globalThis !== "undefined") globalThis.createRig = createRig;
