@@ -241,6 +241,15 @@
   animation: lively-sway 3.6s ease-in-out infinite;
 }
 
+/* These characters read best when their head/body rests upright. They retain
+   a quiet idle lift, while their attached ears, leaf, and antenna keep their
+   own independent motion. */
+.lively-mascot--sprout .lively-body,
+.lively-mascot--cat .lively-body,
+.lively-mascot--robot .lively-body {
+  animation-name: lively-upright-sway;
+}
+
 /* Immersive mode keeps internal facial detail readable while removing the
    sticker-like silhouette ink from the body and exposed outer accessories. */
 .lively-mascot.lively-mascot--outline-hidden .lively-body {
@@ -367,6 +376,7 @@
 .lively-face__sad-mouth,
 .lively-face__open-mouth,
 .lively-face__flat-mouth,
+.lively-face__bored-mouth,
 .lively-face__sleep-eye,
 .lively-face__angry-brow,
 .lively-face__x-eye,
@@ -375,7 +385,8 @@
 }
 
 .lively-face__sad-mouth,
-.lively-face__flat-mouth {
+.lively-face__flat-mouth,
+.lively-face__bored-mouth {
   fill: none;
   stroke: var(--lively-outline);
   stroke-width: 2.6;
@@ -927,13 +938,25 @@
 }
 
 /* 36 Bored */
-.lively-mascot.is-emotion-36 .lively-face__pupil {
-  cy: 46;
-  ry: 2.5;
+.lively-mascot.is-emotion-36 .lively-face__eye {
+  transform: translateY(4px) scaleY(.5);
+}
+
+.lively-mascot.is-emotion-36 .lively-face__pupil,
+.lively-mascot.is-emotion-36 .lively-face__shine {
+  transform: translateY(2px);
 }
 
 .lively-mascot.is-emotion-36 .lively-face__mouth {
-  d: path("M44 64 Q50 64 56 64");
+  visibility: hidden;
+}
+
+.lively-mascot.is-emotion-36 .lively-face__bored-mouth {
+  visibility: visible;
+}
+
+.lively-mascot.is-emotion-36 .lively-face__blush {
+  fill-opacity: .36;
 }
 
 /* 37 Nervous */
@@ -1250,6 +1273,18 @@
   }
 }
 
+@keyframes lively-upright-sway {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
 @keyframes lively-hop {
   0% {
     transform: translateY(0);
@@ -1479,6 +1514,18 @@
 
   50% {
     transform: translateY(3px) rotate(-2deg);
+  }
+}
+
+@keyframes lively-bored {
+
+  0%,
+  100% {
+    transform: translateY(1px) rotate(-1deg) scale(1, .99);
+  }
+
+  50% {
+    transform: translateY(4px) rotate(-2.2deg) scale(1.012, .972);
   }
 }
 

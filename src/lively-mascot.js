@@ -111,6 +111,8 @@
     face.appendChild(svg("ellipse", { class: "lively-face__open-mouth", cx: 50, cy: 65, rx: 5, ry: 6 }));
     // Flat mouth
     face.appendChild(svg("line", { class: "lively-face__flat-mouth", x1: 43, y1: 65, x2: 57, y2: 65 }));
+    // Bored mouth: almost level, with a restrained lift at one corner.
+    face.appendChild(svg("path", { class: "lively-face__bored-mouth", d: "M42.5 65.2 C47.5 65.9 53 65.7 57.5 64.2" }));
     // Sleep eyes
     face.appendChild(svg("line", { class: "lively-face__sleep-eye lively-face__sleep-eye--l", x1: 27, y1: 43, x2: 41, y2: 43 }));
     face.appendChild(svg("line", { class: "lively-face__sleep-eye lively-face__sleep-eye--r", x1: 59, y1: 43, x2: 73, y2: 43 }));

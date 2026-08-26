@@ -69,6 +69,7 @@ function createRig(root, rigEl, config, handlers) {
     setEmotionState: function (id) {
       currentEmotionId = String(id);
       applyEmotionBehavior(currentEmotionId);
+      syncHop();
     }
   };
 
@@ -215,12 +216,36 @@ function createRig(root, rigEl, config, handlers) {
 
   // --- Hop ---
   var hopTimer = 0, hopResetTimer = 0;
+
+  // A hop is an expression-specific action, never a background interruption.
+  function canHop() {
+    var def = getEmotionDef(currentEmotionId);
+    return animated && !!currentHopInterval && !!(def && def.hop);
+  }
+
+  function stopHop() {
+    clearTimeout(hopTimer);
+    clearTimeout(hopResetTimer);
+    hopTimer = 0;
+    hopResetTimer = 0;
+    setHopping(false);
+  }
+
   function scheduleHop() {
-    if (!currentHopInterval) return;
+    if (!canHop()) return;
     hopTimer = window.setTimeout(function () {
+      if (!canHop()) return;
       setHopping(true);
-      hopResetTimer = window.setTimeout(function () { setHopping(false); scheduleHop(); }, 900);
+      hopResetTimer = window.setTimeout(function () {
+        setHopping(false);
+        scheduleHop();
+      }, 900);
     }, currentHopInterval[0] * 1000 + Math.random() * (currentHopInterval[1] - currentHopInterval[0]) * 1000);
+  }
+
+  function syncHop() {
+    stopHop();
+    scheduleHop();
   }
 
   function fireClick() {
@@ -234,7 +259,7 @@ function createRig(root, rigEl, config, handlers) {
   if (following) { raf = requestAnimationFrame(tick); window.addEventListener("pointermove", onPointerMove, { passive: true }); }
   if (animated) {
     scheduleBlink();
-    scheduleHop();
+    syncHop();
     root.addEventListener("pointerdown", fireClick);
   }
 

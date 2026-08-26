@@ -11,6 +11,7 @@
  * - bodyFilter: CSS filter override for .lively-body
  * - blink:      false = force eyes closed/locked (default true)
  * - gaze:       false = pause cursor tracking (default true)
+ * - hop:        true = allow interval-driven hopping for this expression
  * - leafAnim:   CSS animation override for .lively__leaf
  * - footAnim:   CSS animation override for .lively__foot
  */
@@ -170,7 +171,7 @@ var LivelyEmotions = {
           leafAnim: "lively-leaf-droop 1.5s ease-in-out infinite",
           footAnim: "lively-foot-rest 3s ease-in-out infinite" },
   "36": { id: "36", name: "Bored",      group: "reaction", desc: "无聊",
-          bodyAnim: "lively-sad 4s ease-in-out infinite",
+          bodyAnim: "lively-bored 4s ease-in-out infinite",
           leafAnim: "lively-leaf-droop 5s ease-in-out infinite",
           footAnim: "lively-foot-rest 4s ease-in-out infinite" },
   "37": { id: "37", name: "Nervous",    group: "reaction", desc: "紧张",
