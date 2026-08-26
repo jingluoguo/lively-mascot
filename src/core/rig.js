@@ -83,6 +83,7 @@ function createRig(root, rigEl, config, handlers) {
     rigEl.style.animation = "";
     if (leafEl && leafUseLeafAnim) { leafEl.style.animation = ""; }
     if (feetEl) {
+      feetEl.style.removeProperty("--lively-state-filter");
       var footL = feetEl.querySelector(".lively__foot--l");
       var footR = feetEl.querySelector(".lively__foot--r");
       if (footL) footL.style.animation = "";
@@ -98,6 +99,7 @@ function createRig(root, rigEl, config, handlers) {
     // no body/leaf/foot animation and no filter flicker.
     if (!animated) {
       if (bodyEl) bodyEl.style.filter = def.bodyFilter || "";
+      if (feetEl) feetEl.style.setProperty("--lively-state-filter", def.bodyFilter || "brightness(1)");
       return;
     }
     // Body
@@ -112,6 +114,7 @@ function createRig(root, rigEl, config, handlers) {
     }
     // Feet
     if (feetEl) {
+      feetEl.style.setProperty("--lively-state-filter", def.bodyFilter || "brightness(1)");
       var footL = feetEl.querySelector(".lively__foot--l");
       var footR = feetEl.querySelector(".lively__foot--r");
       if (footL) footL.style.animation = def.footAnim || "";
@@ -160,7 +163,26 @@ function createRig(root, rigEl, config, handlers) {
       p.el.setAttribute("transform", "translate(" + (curX * p.spec.maxX).toFixed(2) + " " + (curY * p.spec.maxY).toFixed(2) + ")");
     }
     if (face) face.setAttribute("transform", "rotate(" + (curX * 3).toFixed(2) + " 50 52)");
-    (gazeEl || rigEl).style.transform = "rotate(" + (curX * 5).toFixed(2) + "deg) translate3d(" + (curX * 4).toFixed(1) + "px, " + (curY * 2.5).toFixed(1) + "px, 0) var(--lively-depth-transform, rotateX(0deg) rotateY(0deg))";
+    var postureEl = gazeEl || rigEl;
+    if (root.classList.contains("lively-mascot--3d")) {
+      // Keep the character's parts in one shared 3D posture layer. Pointer
+      // position steers the turn, while active expressions retain a subtle
+      // living tilt after gaze tracking has intentionally paused.
+      var emotionPhase = performance.now() / 720 + Number(currentEmotionId || 0) * 0.67;
+      var emotionPitch = currentEmotionId === "02" ? 0 : Math.sin(emotionPhase) * 1.2;
+      var emotionYaw = currentEmotionId === "02" ? 0 : Math.cos(emotionPhase * 0.82) * 1.7;
+      var pitch = 3.2 - curY * 7.2 + emotionPitch;
+      var yaw = -3.2 + curX * 9.4 + emotionYaw;
+      // A flat SVG silhouette naturally narrows at a camera angle. Gently
+      // compensate that projection so the mascot keeps its rounded volume.
+      var volumeX = 1 + Math.abs(yaw) * 0.0027;
+      var volumeY = 1 + Math.abs(pitch) * 0.0022;
+      root.style.setProperty("--lively-gloss-x", (25 + curX * 15).toFixed(1) + "%");
+      root.style.setProperty("--lively-gloss-y", (18 + curY * 12).toFixed(1) + "%");
+      postureEl.style.transform = "translate3d(" + (curX * 2.2).toFixed(1) + "px, " + (curY * 1.4).toFixed(1) + "px, 3px) scale3d(" + volumeX.toFixed(3) + ", " + volumeY.toFixed(3) + ", 1) rotateZ(" + (curX * 1.8).toFixed(2) + "deg) rotateX(" + pitch.toFixed(2) + "deg) rotateY(" + yaw.toFixed(2) + "deg)";
+    } else {
+      postureEl.style.transform = "rotate(" + (curX * 5).toFixed(2) + "deg) translate3d(" + (curX * 4).toFixed(1) + "px, " + (curY * 2.5).toFixed(1) + "px, 0)";
+    }
     raf = requestAnimationFrame(tick);
   }
 

@@ -54,6 +54,10 @@
   transform-style: preserve-3d;
 }
 
+.lively-mascot--3d .lively-mascot__gaze {
+  transform-origin: 50% 58%;
+}
+
 .lively-mascot__gaze { transform: var(--lively-depth-transform); }
 
 .lively-mascot.lively-mascot--3d .lively-body {
@@ -115,7 +119,10 @@
   filter: drop-shadow(2px 4px 3px rgba(0,0,0,.16));
 }
 .lively-mascot--3d .lively__tail svg { transform: translateZ(9px); }
-.lively-mascot--3d .lively__feet { transform: translateZ(5px); filter: drop-shadow(0 5px 4px rgba(0,0,0,.20)); }
+.lively-mascot--3d .lively__feet {
+  transform: translateZ(5px);
+  filter: var(--lively-state-filter, brightness(1)) drop-shadow(0 5px 4px rgba(0,0,0,.20));
+}
 .lively-mascot--3d .lively__foot svg {
   transform: translateZ(10px);
   filter: drop-shadow(1px 3px 3px rgba(0,0,0,.20));
@@ -1114,10 +1121,12 @@
  * Feet
  * ============================================================ */
 .lively__feet {
+  --lively-state-filter: brightness(1);
   position: absolute;
   bottom: -7cqw;
   left: 0;
   width: 100%;
+  filter: var(--lively-state-filter);
 }
 
 .lively__foot {
