@@ -42,21 +42,13 @@
     var face = LivelyMascot.buildFaceSvg(rig);
     body.appendChild(face.wrap);
 
-    // Wavy hem is a CHILD of the body, not a sibling. That way it rides
-    // the same float/squish transform as the body and can never detach.
-    // The filled band merges with the body fill (same color) and covers
-    // the body's bottom outline; only the wavy bottom edge is stroked.
-    // Three gentle, broad lobes read as a classic ghost tail instead of
-    // the ball-with-tentacles look.
+    // The body CSS owns the filled wavy silhouette. This SVG adds only the
+    // optional ink line for outline mode, so the lower edge stays seamless.
     var hem = hEl("div", { class: "lively__ghost-hem" });
-    hem.appendChild(svg("svg", { viewBox: "0 0 100 14", preserveAspectRatio: "none" }, [
-      svg("path", {
-        class: "lively-ghost__hem-fill",
-        d: "M0 0 Q50 2 100 0 V5 q -16.7 9 -33.3 0 q -16.7 9 -33.3 0 q -16.7 9 -33.4 0 Z"
-      }),
+    hem.appendChild(svg("svg", { viewBox: "0 0 100 6", preserveAspectRatio: "none" }, [
       svg("path", {
         class: "lively-ghost__hem-stroke",
-        d: "M0 0 V5 q 16.7 9 33.3 0 q 16.7 9 33.3 0 q 16.7 9 33.4 0 V0"
+        d: "M0 0 C11.1 6 22.2 6 33.3 0 C44.4 6 55.6 6 66.7 0 C77.8 6 88.9 6 100 0"
       })
     ]));
     body.appendChild(hem);

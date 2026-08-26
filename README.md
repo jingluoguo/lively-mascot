@@ -196,7 +196,7 @@ onMounted(() => LivelyMascot.defineMascotElement());
 </template>
 ```
 
-> Note: the declarative tag reacts to the `type` / `color` / `size` / `view-mode` attributes and rebuilds when any of them change. It does not expose an instance, so you cannot call `setEmotion` directly. When you need code-driven emotion or view-mode switching, use the `createMascot` approach above.
+> Note: the declarative tag reacts to the `type` / `color` / `size` / `view-mode` / `show-outline` attributes and rebuilds when any of them change. It does not expose an instance, so you cannot call `setEmotion` directly. When you need code-driven emotion or view-mode switching, use the `createMascot` approach above.
 
 ## Building from Source
 
@@ -222,10 +222,13 @@ This regenerates `dist/lively-mascot.min.js` and `dist/lively-mascot.min.css`. R
 | `size`         | `number`  | `106`      | Container size in px      |
 | `followCursor` | `boolean` | `true`     | Enable gaze tracking      |
 | `viewMode`     | `string`  | `"3d"`    | Visual mode: `"2d"` or `"3d"` (lightweight depth) |
+| `outlineVisible` | `boolean` | `true` | Show the outer silhouette outline |
 
-**Returns**: `{ el, type, viewMode, setViewMode(mode), setTheme, setEmotion(id), clearEmotion(), destroy() }`
+**Returns**: `{ el, type, viewMode, setViewMode(mode), outlineVisible, setOutlineVisible(visible), setTheme, setEmotion(id), clearEmotion(), destroy() }`
 
 3D is a lightweight CSS depth treatment with no WebGL dependency. Switch a live instance with `setViewMode("2d")` / `setViewMode("3d")`; declarative `<lively-mascot>` also accepts `view-mode="2d"` (with `mode` as an alias).
+
+Set `outlineVisible: false` or call `setOutlineVisible(false)` to hide the outer silhouette ink while keeping facial details visible. The declarative element accepts `show-outline="false"` as well.
 
 Character renderers can register interchangeable face decorations through the rig API: `rig.registerFaceAccessory(name, element)` and `rig.setFaceAccessory(name)`. This is useful for optional whiskers, masks, glasses, or other model-specific details.
 

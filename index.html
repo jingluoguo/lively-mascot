@@ -159,9 +159,16 @@
     .view-mode {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin: 18px auto 0;
+      justify-content: flex-start;
+      gap: 22px;
+      margin: 0;
+      flex-wrap: wrap;
+    }
+
+    .view-mode__control {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
     }
 
     .view-mode__label {
@@ -170,6 +177,7 @@
       color: #777;
       text-transform: uppercase;
       letter-spacing: .08em;
+      white-space: nowrap;
     }
 
     .view-mode__group {
@@ -259,6 +267,12 @@
 
     .tabs__panel.is-active {
       display: block;
+    }
+
+    .tabs__panel.parameter-panel.is-active {
+      display: flex;
+      align-items: center;
+      min-height: 52px;
     }
 
     /* ---- Sub Tabs ---- */
@@ -457,6 +471,11 @@
     }
 
     @media (max-width: 720px) {
+      .view-mode {
+        justify-content: center;
+        gap: 12px;
+      }
+
       .palette {
         grid-template-columns: repeat(3, 1fr);
       }
@@ -490,16 +509,27 @@
     <div class="stage">
       <section class="showcase" id="showcase"></section>
       <div class="char-bar" id="char-bar"></div>
-      <div class="view-mode" id="view-mode">
-        <div class="view-mode__group" role="group" aria-label="View mode">
-          <button type="button" class="view-mode__btn" data-mode="2d" aria-pressed="false">2D</button>
-          <button type="button" class="view-mode__btn is-active" data-mode="3d" aria-pressed="true">3D</button>
-        </div>
-      </div>
-
       <div class="tabs" id="tabs">
         <div class="tabs__bar" id="tabs-bar"></div>
-        <div class="tabs__panel is-active" id="panel-color"></div>
+        <div class="tabs__panel parameter-panel is-active" id="panel-parameters">
+          <div class="view-mode" id="view-mode">
+            <div class="view-mode__control">
+              <span class="view-mode__label" id="view-mode-label"></span>
+              <div class="view-mode__group" role="group" aria-labelledby="view-mode-label">
+                <button type="button" class="view-mode__btn view-mode__mode-btn" data-mode="2d" aria-pressed="false">2D</button>
+                <button type="button" class="view-mode__btn view-mode__mode-btn is-active" data-mode="3d" aria-pressed="true">3D</button>
+              </div>
+            </div>
+            <div class="view-mode__control">
+              <span class="view-mode__label" id="outline-label"></span>
+              <div class="view-mode__group" role="group" aria-labelledby="outline-label">
+                <button type="button" class="view-mode__btn view-mode__outline-btn is-active" data-outline="visible" aria-pressed="true"></button>
+                <button type="button" class="view-mode__btn view-mode__outline-btn" data-outline="hidden" aria-pressed="false"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tabs__panel" id="panel-color"></div>
         <div class="tabs__panel" id="panel-emotion"></div>
       </div>
     </div>
@@ -529,17 +559,24 @@
         tagline: '通用电子宠物引擎：40 种状态表情 · 多角色 · 纯 SVG 驱动 · 零依赖 · 即插即用。',
         hint: '把光标移到吉祥物上 · 点击让它开心',
         repoLabel: '在 GitHub 上查看源码',
+        viewMode: '视图', outline: '边框', outlineOn: '显示', outlineOff: '隐藏',
         charNames: {
           sprout: '🌱 嫩芽', cat: '🐱 小猫', robot: '🤖 机器人',
           ghost: '👻 幽灵', jelly: '🟢 果冻'
         },
-        tabs: ['颜色', '表情'],
+        tabs: ['参数', '颜色', '表情'],
         palette: ['薄荷绿', '天空蓝', '蜜桃橙', '薰衣草紫', '玫瑰粉', '柠檬黄'],
         groupNames: {
           lifecycle: '生命周期', reaction: '情绪反应', work: '工作状态'
         },
         clickName: function (type) {
-          return type === 'cat' ? '喵！' : '嫩芽';
+          return {
+            sprout: '嫩芽',
+            cat: '喵！',
+            robot: '哔哔！',
+            ghost: '呜～',
+            jelly: '啵！'
+          }[type] || '嫩芽';
         },
         sayGreeting: function (name, time) {
           return name + ' 说：你好！（点击于 ' + (time || new Date()).toLocaleTimeString() + '）';
@@ -552,17 +589,24 @@
         tagline: 'Universal e-pet engine: 40 status emotions · multi-character · pure SVG · zero deps · drop-in.',
         hint: 'Hover the mascot · click to make it happy',
         repoLabel: 'View source on GitHub',
+        viewMode: 'View', outline: 'Outline', outlineOn: 'On', outlineOff: 'Off',
         charNames: {
           sprout: '🌱 Sprout', cat: '🐱 Cat', robot: '🤖 Robot',
           ghost: '👻 Ghost', jelly: '🟢 Jelly'
         },
-        tabs: ['Color', 'Emotion'],
+        tabs: ['Parameters', 'Color', 'Emotion'],
         palette: ['Mint', 'Sky Blue', 'Peach', 'Lavender', 'Rose', 'Lemon'],
         groupNames: {
           lifecycle: 'Lifecycle', reaction: 'Reactions', work: 'Work states'
         },
         clickName: function (type) {
-          return type === 'cat' ? 'Meow!' : 'Sprout';
+          return {
+            sprout: 'Sprout',
+            cat: 'Meow!',
+            robot: 'Beep!',
+            ghost: 'Boo!',
+            jelly: 'Plop!'
+          }[type] || 'Sprout';
         },
         sayGreeting: function (name, time) {
           return name + ' says: hello! (clicked at ' + (time || new Date()).toLocaleTimeString() + ')';
@@ -585,6 +629,7 @@
     var hero = null;
     var currentCharType = 'sprout';
     var currentViewMode = '3d';
+    var outlineVisible = true;
     var currentTheme = null;
     var CHAR_DEFAULT_THEMES = {
       sprout: { body: '#48ff42', outline: '#080808', accent: '#ff9fb6' },
@@ -603,6 +648,7 @@
         type: type,
         size: 180,
         viewMode: currentViewMode,
+        outlineVisible: outlineVisible,
         hopInterval: [3, 6],
         onClick: function () { say(function () { return T().sayGreeting(T().clickName(type), new Date()); }); },
       });
@@ -634,7 +680,7 @@
     });
 
     // ---- 2D / 3D view mode ----
-    var viewModeBtns = Array.prototype.slice.call(document.querySelectorAll('.view-mode__btn'));
+    var viewModeBtns = Array.prototype.slice.call(document.querySelectorAll('.view-mode__mode-btn'));
     viewModeBtns.forEach(function (btn) {
       btn.addEventListener('click', function () {
         currentViewMode = btn.dataset.mode;
@@ -645,6 +691,25 @@
         });
         if (hero) hero.setViewMode(currentViewMode);
         previewInstances.forEach(function (pInst) { pInst.setViewMode(currentViewMode); });
+      });
+    });
+
+    // ---- Outer outline toggle ----
+    var outlineBtns = Array.prototype.slice.call(document.querySelectorAll('.view-mode__outline-btn'));
+    function syncOutlineToggle() {
+      outlineBtns.forEach(function (btn) {
+        var active = (btn.dataset.outline === 'visible') === outlineVisible;
+        btn.classList.toggle('is-active', active);
+        btn.setAttribute('aria-pressed', String(active));
+        btn.textContent = btn.dataset.outline === 'visible' ? T().outlineOn : T().outlineOff;
+      });
+    }
+    outlineBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        outlineVisible = btn.dataset.outline === 'visible';
+        syncOutlineToggle();
+        if (hero) hero.setOutlineVisible(outlineVisible);
+        previewInstances.forEach(function (pInst) { pInst.setOutlineVisible(outlineVisible); });
       });
     });
 
@@ -664,7 +729,7 @@
           panels[i].classList.add('is-active');
           // Re-render thumbnails when the (initially hidden) emotion panel
           // becomes visible, so container-relative headwear sizes settle.
-          if (i === 1) renderEmotionPreviews();
+          if (i === 2) renderEmotionPreviews();
         });
         tabsBar.appendChild(btn);
         tabBtns.push(btn);
@@ -790,7 +855,8 @@
           size: 50,
           animated: false,
           followCursor: false,
-          viewMode: currentViewMode
+          viewMode: currentViewMode,
+          outlineVisible: outlineVisible
         });
         inst.setEmotion(item.dataset.emotionId);
         inst.setTheme(currentTheme || CHAR_DEFAULT_THEMES[currentCharType]);
@@ -805,6 +871,9 @@
       document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
       document.getElementById('tagline').textContent = t.tagline;
       document.getElementById('repo-label').textContent = t.repoLabel;
+      document.getElementById('view-mode-label').textContent = t.viewMode;
+      document.getElementById('outline-label').textContent = t.outline;
+      syncOutlineToggle();
       toggleButtons.forEach(function (b) {
         b.classList.toggle('is-active', b.dataset.lang === currentLang);
       });

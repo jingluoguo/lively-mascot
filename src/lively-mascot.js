@@ -195,14 +195,19 @@
     return String(mode || "3d").toLowerCase() === "2d" ? "2d" : "3d";
   }
 
+  function normalizeOutlineVisible(value) {
+    return value !== false && String(value).toLowerCase() !== "false";
+  }
+
   // --- Core API ---
   function createMascot(target, options) {
     options = options || {};
     var type = options.type || "sprout";
     var character = getCharacter(type);
     var viewMode = normalizeViewMode(options.viewMode || options.mode);
+    var outlineVisible = normalizeOutlineVisible(options.outlineVisible);
     var root = el("div", {
-      class: "lively-mascot lively-mascot--" + character.id + " lively-mascot--" + viewMode + (options.animated === false ? " lively-mascot--static" : ""),
+      class: "lively-mascot lively-mascot--" + character.id + " lively-mascot--" + viewMode + (!outlineVisible ? " lively-mascot--outline-hidden" : "") + (options.animated === false ? " lively-mascot--static" : ""),
       style: "width:" + (options.size || 106) + "px;height:" + (options.size || 106) + "px",
       "aria-hidden": "true",
     });
@@ -240,6 +245,12 @@
         root.classList.toggle("lively-mascot--3d", viewMode === "3d");
         return viewMode;
       },
+      get outlineVisible() { return outlineVisible; },
+      setOutlineVisible: function (visible) {
+        outlineVisible = normalizeOutlineVisible(visible);
+        root.classList.toggle("lively-mascot--outline-hidden", !outlineVisible);
+        return outlineVisible;
+      },
       setTheme: function (p) {
         p = p || {};
         if (p.body) theme.body = p.body;
@@ -274,7 +285,7 @@
       LivelyMascotElement.prototype = Object.create(HTMLElement.prototype, {
         constructor: { value: LivelyMascotElement, writable: true, configurable: true }
       });
-      LivelyMascotElement.observedAttributes = ["type", "color", "size", "view-mode", "mode"];
+      LivelyMascotElement.observedAttributes = ["type", "color", "size", "view-mode", "mode", "show-outline"];
       LivelyMascotElement.prototype.connectedCallback = function () { this._render(); };
       LivelyMascotElement.prototype.disconnectedCallback = function () { if (this._inst) this._inst.destroy(); this._inst = null; this.textContent = ""; };
       LivelyMascotElement.prototype.attributeChangedCallback = function () { if (this.isConnected) this._render(); };
@@ -285,7 +296,8 @@
           type: this.getAttribute("type"),
           color: this.getAttribute("color"),
           size: this.getAttribute("size") ? Number(this.getAttribute("size")) : undefined,
-          viewMode: this.getAttribute("view-mode") || this.getAttribute("mode") || undefined
+          viewMode: this.getAttribute("view-mode") || this.getAttribute("mode") || undefined,
+          outlineVisible: this.getAttribute("show-outline") !== "false"
         });
       };
       return LivelyMascotElement;

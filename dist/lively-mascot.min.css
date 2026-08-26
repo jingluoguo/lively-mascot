@@ -234,6 +234,33 @@
   animation: lively-sway 3.6s ease-in-out infinite;
 }
 
+/* Immersive mode keeps internal facial detail readable while removing the
+   sticker-like silhouette ink from the body and exposed outer accessories. */
+.lively-mascot.lively-mascot--outline-hidden .lively-body {
+  border-width: 0;
+}
+
+.lively-mascot.lively-mascot--2d.lively-mascot--outline-hidden .lively-body {
+  box-shadow: none;
+}
+
+/* With the ink geometry removed, the shared light pass fills the entire body
+   edge instead of forming a separate rim around the silhouette. */
+.lively-mascot.lively-mascot--3d.lively-mascot--outline-hidden .lively-body::before {
+  inset: 0;
+}
+
+.lively-mascot.lively-mascot--3d.lively-mascot--outline-hidden .lively-body::after {
+  display: none;
+}
+
+.lively-mascot--outline-hidden .lively-sprout__leaf,
+.lively-mascot--outline-hidden .lively__ear,
+.lively-mascot--outline-hidden .lively-cat__tail-outline,
+.lively-mascot--outline-hidden .lively-ghost__hem-stroke {
+  stroke-opacity: 0;
+}
+
 .lively-mascot.is-happy .lively-body {
   animation: lively-squish 0.6s cubic-bezier(.3, 1.6, .4, 1);
 }
@@ -2903,6 +2930,13 @@
   border-color: var(--lively-outline);
   border-bottom-width: 0;
   box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+  /* One shallow three-lobed silhouette in both outline states. */
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath fill='white' d='M0 0H100V94C88.9 100 77.8 100 66.7 94C55.6 100 44.4 100 33.3 94C22.2 100 11.1 100 0 94Z'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath fill='white' d='M0 0H100V94C88.9 100 77.8 100 66.7 94C55.6 100 44.4 100 33.3 94C22.2 100 11.1 100 0 94Z'/%3E%3C/svg%3E");
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
   /* float instead of the default sway */
   animation: lively-ghost-float 3.4s ease-in-out infinite;
 }
@@ -2918,29 +2952,23 @@
 /* no hard hop for a ghost */
 .lively-mascot--ghost.is-hopping .lively-mascot__rig { animation: none; }
 
-/* --- Wavy hem (child of the body, so it floats WITH the body) ---
-   The filled band shares the body color, so it visually merges into the
-   body and hides the body's bottom outline. Only the wavy bottom edge is
-   stroked, giving one continuous ghost silhouette. Because it is a child
-   of .lively-body, it inherits the float/squish transform and can never
-   detach. Three broad, shallow lobes keep it ghost-like (not octopus). */
+/* The SVG only supplies the optional bottom ink. The body itself owns the
+   filled wavy silhouette, so there is never a second colour layer to join. */
 .lively__ghost-hem {
   position: absolute;
   left: 0;
-  bottom: -5cqw;          /* band overlaps body so the seam is invisible */
+  bottom: 0;
   width: 100%;
+  height: 6cqw;
   line-height: 0;
-  z-index: 1;             /* sit in front so the band covers the body's bottom outline */
+  z-index: 1;
   pointer-events: none;
 }
 .lively__ghost-hem svg {
   display: block;
   width: 100%;
-  height: 11cqw;
+  height: 100%;
   overflow: visible;
-}
-.lively-ghost__hem-fill {
-  display: none;
 }
 .lively-ghost__hem-stroke {
   fill: none;
@@ -2949,6 +2977,15 @@
   stroke-linejoin: round;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
+}
+
+.lively-mascot--ghost.lively-mascot--outline-hidden .lively__ghost-hem {
+  display: none;
+}
+
+/* The shared rectangular inner rim cannot follow the custom lower contour. */
+.lively-mascot--ghost .lively-body::after {
+  display: none;
 }
 /* ============================================================
  * lively-mascot · Jelly Character

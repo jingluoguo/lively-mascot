@@ -196,7 +196,7 @@ onMounted(() => LivelyMascot.defineMascotElement());
 </template>
 ```
 
-> 注意：声明式标签响应 `type` / `color` / `size` / `view-mode` 属性，改其中之一即自动重建；它拿不到实例、无法直接调 `setEmotion`。需要代码驱动切换表情或视图时，请改用上方的 `createMascot` 用法。
+> 注意：声明式标签响应 `type` / `color` / `size` / `view-mode` / `show-outline` 属性，改其中之一即自动重建；它拿不到实例、无法直接调 `setEmotion`。需要代码驱动切换表情或视图时，请改用上方的 `createMascot` 用法。
 
 ## 从源码构建
 
@@ -222,10 +222,13 @@ npm run build      # 等价于：node scripts/build-dist.mjs
 | `size`         | `number`  | `106`      | 容器尺寸 px      |
 | `followCursor` | `boolean` | `true`     | 是否跟随光标     |
 | `viewMode`     | `string`  | `"3d"`    | 视觉模式：`"2d"` 或 `"3d"`（轻量景深） |
+| `outlineVisible` | `boolean` | `true`   | 是否显示外轮廓     |
 
-**返回实例**：`{ el, type, viewMode, setViewMode(mode), setTheme, setEmotion(id), clearEmotion(), destroy() }`
+**返回实例**：`{ el, type, viewMode, setViewMode(mode), outlineVisible, setOutlineVisible(visible), setTheme, setEmotion(id), clearEmotion(), destroy() }`
 
 3D 是基于 CSS 的轻量景深效果，不依赖 WebGL。运行中的实例可通过 `setViewMode("2d")` / `setViewMode("3d")` 切换；声明式 `<lively-mascot>` 支持 `view-mode="2d"`（也兼容 `mode`）属性。
+
+设置 `outlineVisible: false` 或调用 `setOutlineVisible(false)` 可隐藏外轮廓线，同时保留眼睛和表情细节。声明式标签也支持 `show-outline="false"`。
 
 角色渲染器可以通过 rig API 注册和切换可替换的脸部配饰：`rig.registerFaceAccessory(name, element)` 与 `rig.setFaceAccessory(name)`。适合胡须、面罩、眼镜等模型细节。
 
