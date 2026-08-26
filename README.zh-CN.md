@@ -227,6 +227,8 @@ npm run build      # 等价于：node scripts/build-dist.mjs
 
 3D 是基于 CSS 的轻量景深效果，不依赖 WebGL。运行中的实例可通过 `setViewMode("2d")` / `setViewMode("3d")` 切换；声明式 `<lively-mascot>` 支持 `view-mode="2d"`（也兼容 `mode`）属性。
 
+角色渲染器可以通过 rig API 注册和切换可替换的脸部配饰：`rig.registerFaceAccessory(name, element)` 与 `rig.setFaceAccessory(name)`。适合胡须、面罩、眼镜等模型细节。
+
 ### 表情行为
 
 每个表情可配置以下行为：

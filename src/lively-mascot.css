@@ -55,33 +55,32 @@
 
 .lively-mascot__gaze { transform: var(--lively-depth-transform); }
 
-.lively-mascot--3d .lively-body {
+.lively-mascot.lively-mascot--3d .lively-body {
   box-shadow:
     0 13px 20px rgba(15, 17, 18, .20),
     0 3px 5px rgba(15, 17, 18, .14),
-    inset -11px -13px 18px color-mix(in srgb, var(--lively-outline) 18%, transparent),
-    inset 5px 4px 10px color-mix(in srgb, white 16%, transparent);
-  filter: saturate(1.05) contrast(1.02);
+    inset -10px -12px 18px rgba(10, 15, 20, .18),
+    inset 6px 6px 12px rgba(255,255,255,.18);
+  filter: saturate(1.02) contrast(1.01);
 }
 
 .lively-mascot--3d .lively-body::before {
   content: "";
   position: absolute;
-  inset: 3% 11% 45% 7%;
-  border-radius: 34% 61% 43% 57% / 43% 42% 64% 55%;
+  inset: 0;
+  border-radius: inherit;
   background:
-    radial-gradient(ellipse at var(--lively-gloss-x) var(--lively-gloss-y), rgba(255,255,255,.58) 0 3%, rgba(255,255,255,.22) 11%, transparent 30%),
-    radial-gradient(ellipse at 55% 28%, rgba(255,255,255,.11), transparent 42%),
-    linear-gradient(148deg, rgba(255,255,255,.16), rgba(255,255,255,0) 61%);
-  opacity: .72;
+    radial-gradient(ellipse at var(--lively-gloss-x) var(--lively-gloss-y), rgba(255,255,255,.30) 0%, rgba(255,255,255,.16) 16%, transparent 43%),
+    linear-gradient(145deg, rgba(255,255,255,.11) 0%, rgba(255,255,255,0) 43%),
+    linear-gradient(325deg, rgba(10,15,20,.14) 0%, rgba(10,15,20,0) 42%);
+  opacity: .86;
   pointer-events: none;
-  transform: translateZ(4px) rotate(-7deg) skewX(-5deg);
-  mix-blend-mode: screen;
-  filter: blur(.35px);
+  transform: translateZ(4px);
+  filter: blur(.65px);
 }
 
 .lively-mascot--3d .lively-face-wrap {
-  transform: translateZ(7px);
+  transform: translateZ(5px);
   filter: drop-shadow(0 2px 2px rgba(0,0,0,.10));
 }
 .lively-mascot--3d .lively__leaf,
@@ -96,24 +95,33 @@
   filter: drop-shadow(2px 4px 3px rgba(0,0,0,.16));
 }
 
-/* Accessories use their own depth planes so they do not read as flat decals. */
-.lively-mascot--3d .lively__tail,
-.lively-mascot--3d .lively__ghost-hem {
+/* Solid accessories use their own depth planes so they do not read as flat decals. */
+.lively-mascot--3d .lively__tail {
   transform-style: preserve-3d;
   filter: drop-shadow(2px 4px 3px rgba(0,0,0,.16));
 }
 .lively-mascot--3d .lively__tail svg { transform: translateZ(4px); }
-.lively-mascot--3d .lively__ghost-hem svg { transform: translateZ(3px); }
 .lively-mascot--3d .lively__feet { transform: translateZ(2px); filter: drop-shadow(0 4px 3px rgba(0,0,0,.18)); }
 .lively-mascot--3d .lively__foot svg {
   transform: translateZ(5px);
   filter: drop-shadow(1px 2px 2px rgba(0,0,0,.18));
 }
 
-/* Different materials catch the same softbox differently. */
-.lively-mascot--robot { --lively-gloss-x: 18%; --lively-gloss-y: 14%; }
-.lively-mascot--jelly { --lively-gloss-x: 33%; --lively-gloss-y: 21%; }
-.lively-mascot--ghost { --lively-gloss-x: 42%; --lively-gloss-y: 16%; }
+/* Shared foot lighting: a softbox reflection sits on the upper-left of
+   every foot shape, including rectangular robot feet. */
+.lively-mascot--3d .lively__foot::after {
+  content: "";
+  position: absolute;
+  left: 16%;
+  top: 13%;
+  width: 52%;
+  height: 30%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255,255,255,.48) 0%, rgba(255,255,255,.16) 45%, transparent 76%);
+  filter: blur(.45px);
+  pointer-events: none;
+  z-index: 2;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .lively-mascot--3d .lively-body::before { transform: none; }
@@ -222,6 +230,14 @@
 .lively-face-wrap {
   position: absolute;
   inset: 4px;
+}
+
+.lively-face-accessory {
+  visibility: hidden;
+}
+
+.lively-face-accessory.is-active {
+  visibility: visible;
 }
 
 .lively-face-wrap svg {
@@ -1129,6 +1145,8 @@
   .lively__ears,
   .lively__antenna,
   .lively__tail,
+  .lively-cat__whiskers,
+  .lively-cat__whisker,
   .lively__foot,
   .lively__ghost-hem,
   .lively-face-wrap svg,

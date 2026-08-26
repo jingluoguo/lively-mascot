@@ -52,7 +52,7 @@
     hem.appendChild(svg("svg", { viewBox: "0 0 100 14", preserveAspectRatio: "none" }, [
       svg("path", {
         class: "lively-ghost__hem-fill",
-        d: "M0 0 H100 V5 q -16.7 9 -33.3 0 q -16.7 9 -33.3 0 q -16.7 9 -33.4 0 Z"
+        d: "M0 0 Q50 2 100 0 V5 q -16.7 9 -33.3 0 q -16.7 9 -33.3 0 q -16.7 9 -33.4 0 Z"
       }),
       svg("path", {
         class: "lively-ghost__hem-stroke",

@@ -227,6 +227,8 @@ This regenerates `dist/lively-mascot.min.js` and `dist/lively-mascot.min.css`. R
 
 3D is a lightweight CSS depth treatment with no WebGL dependency. Switch a live instance with `setViewMode("2d")` / `setViewMode("3d")`; declarative `<lively-mascot>` also accepts `view-mode="2d"` (with `mode` as an alias).
 
+Character renderers can register interchangeable face decorations through the rig API: `rig.registerFaceAccessory(name, element)` and `rig.setFaceAccessory(name)`. This is useful for optional whiskers, masks, glasses, or other model-specific details.
+
 ### Emotion Behaviors
 
 Each emotion can configure:

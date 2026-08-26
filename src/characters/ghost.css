@@ -16,6 +16,7 @@
   border-radius: 50% 50% 0 0 / 62% 62% 0 0;
   background: color-mix(in srgb, var(--lively-body) 72%, white);
   border-color: var(--lively-outline);
+  border-bottom-width: 0;
   box-shadow: 0 8px 18px rgba(0,0,0,0.12);
   /* float instead of the default sway */
   animation: lively-ghost-float 3.4s ease-in-out infinite;
@@ -54,8 +55,7 @@
   overflow: visible;
 }
 .lively-ghost__hem-fill {
-  fill: color-mix(in srgb, var(--lively-body) 72%, white);
-  stroke: none;
+  display: none;
 }
 .lively-ghost__hem-stroke {
   fill: none;

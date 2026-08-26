@@ -240,7 +240,13 @@
         root.classList.toggle("lively-mascot--3d", viewMode === "3d");
         return viewMode;
       },
-      setTheme: function (p) { if (p.body) theme.body = p.body; if (p.outline) theme.outline = p.outline; applyTheme(); },
+      setTheme: function (p) {
+        p = p || {};
+        if (p.body) theme.body = p.body;
+        if (p.outline) theme.outline = p.outline;
+        if (p.accent) theme.accent = p.accent;
+        applyTheme();
+      },
       setEmotion: function (emotionId) {
         root.className = root.className.replace(/is-emotion-\d+/g, "").trim();
         root.classList.add("is-emotion-" + emotionId);

@@ -300,7 +300,7 @@
     /* ---- Palette Grid ---- */
     .palette {
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 10px;
     }
 
@@ -586,6 +586,13 @@
     var currentCharType = 'sprout';
     var currentViewMode = '3d';
     var currentTheme = null;
+    var CHAR_DEFAULT_THEMES = {
+      sprout: { body: '#48ff42', outline: '#080808', accent: '#ff9fb6' },
+      cat: { body: '#3d4852', outline: '#131a20', accent: '#eeb3c1' },
+      robot: { body: '#6f879b', outline: '#162332', accent: '#74e5ff' },
+      ghost: { body: '#bdeef2', outline: '#23434d', accent: '#a9d9ff' },
+      jelly: { body: '#f29cc2', outline: '#5a243e', accent: '#ffe0a8' }
+    };
     var previewInstances = []; // static thumbnails in the emotion gallery
 
     function createHero(type) {
@@ -600,9 +607,7 @@
         onClick: function () { say(function () { return T().sayGreeting(T().clickName(type), new Date()); }); },
       });
       currentCharType = type;
-      if (currentTheme) {
-        hero.setTheme(currentTheme);
-      }
+      hero.setTheme(currentTheme || CHAR_DEFAULT_THEMES[type]);
       var activeEmotion = document.querySelector('.emotion-item.is-active');
       if (activeEmotion) {
         hero.setEmotion(activeEmotion.dataset.emotionId);
@@ -668,12 +673,17 @@
 
     // ---- Color Panel ----
     var palettes = [
-      { name: '薄荷绿', en: 'Mint', color: '#48ff42', outline: '#080808' },
+      { name: '薄荷绿', en: 'Mint', color: '#48ff42', outline: '#080808', accent: '#ff9fb6' },
       { name: '天空蓝', en: 'Sky Blue', color: '#6ec7ff', outline: '#0b1e3a' },
       { name: '蜜桃橙', en: 'Peach', color: '#ffb37a', outline: '#5c2a12' },
       { name: '薰衣草紫', en: 'Lavender', color: '#c9a6ff', outline: '#2e1a4d' },
       { name: '玫瑰粉', en: 'Rose', color: '#ff9fb6', outline: '#5c1f33' },
       { name: '柠檬黄', en: 'Lemon', color: '#ffe066', outline: '#4d3d00' },
+      { name: '炭灰', en: 'Charcoal', color: '#3d4852', outline: '#131a20', accent: '#eeb3c1' },
+      { name: '奶油白', en: 'Cream', color: '#f1e7d8', outline: '#463a2e' },
+      { name: '钢蓝', en: 'Steel Blue', color: '#6f879b', outline: '#162332', accent: '#74e5ff' },
+      { name: '浅青', en: 'Pale Cyan', color: '#bdeef2', outline: '#23434d', accent: '#a9d9ff' },
+      { name: '莓果粉', en: 'Berry Pink', color: '#f29cc2', outline: '#5a243e', accent: '#ffe0a8' },
     ];
     var palettePanel = document.getElementById('panel-color');
     var paletteGrid = document.createElement('div');
@@ -692,7 +702,7 @@
       fig.appendChild(swatch);
       fig.appendChild(caption);
       fig.addEventListener('click', function () {
-        currentTheme = { body: p.color, outline: p.outline };
+        currentTheme = { body: p.color, outline: p.outline, accent: p.accent };
         hero.setTheme(currentTheme);
         previewInstances.forEach(function (pInst) { pInst.setTheme(currentTheme); });
         if (activeSwatch) activeSwatch.classList.remove('is-active');
@@ -783,7 +793,7 @@
           viewMode: currentViewMode
         });
         inst.setEmotion(item.dataset.emotionId);
-        if (currentTheme) inst.setTheme(currentTheme);
+        inst.setTheme(currentTheme || CHAR_DEFAULT_THEMES[currentCharType]);
         previewInstances.push(inst);
       });
     }

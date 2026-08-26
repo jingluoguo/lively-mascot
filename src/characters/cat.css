@@ -1,22 +1,29 @@
 /* ============================================================
  * lively-mascot · Cat Character Styles
  *
- * A round cat with triangular ears, a curved tail, and whiskers.
+ * An original charcoal cat with pointed ears, a curled tail, and floating whiskers.
  * ============================================================ */
 
-/* --- Body shape: more rounded than sprout --- */
+/* --- Body shape: a compact feline head with a slightly tapered jaw --- */
 .lively-mascot--cat .lively-body {
-  border-radius: 50% 50% 48% 48%;
+  border-radius: 48% 48% 43% 43% / 45% 45% 55% 55%;
 }
 
-/* --- Ears: rounded cat ears on top (nested inside body so they
+/* A charcoal default gives the cat its own identity; inline themes still win. */
+.lively-mascot--cat {
+  --lively-body: #3d4852;
+  --lively-outline: #131a20;
+  --lively-accent: #eeb3c1;
+}
+
+/* --- Ears: pointed cat ears on top (nested inside body so they
        follow body bounce / squash / boot / wake animations) --- */
 .lively__ears {
   position: absolute;
-  top: -20cqw;
+  top: -17cqw;
   left: 50%;
   width: 66cqw;
-  height: 28.5cqw;
+  height: 29cqw;
   margin-left: -33cqw;
   z-index: 3;
   transform-origin: 50% 92%;
@@ -47,6 +54,62 @@
   opacity: 0.85;
 }
 
+.lively-cat__muzzle {
+  fill: #eee5d9;
+  opacity: .82;
+}
+
+.lively-cat__whiskers {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  overflow: visible;
+  animation: lively-cat-whiskers-float 3.8s ease-in-out infinite;
+}
+
+.lively-cat__whiskers svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.18));
+}
+
+.lively-cat__whisker {
+  fill: none;
+  stroke: color-mix(in srgb, white 82%, var(--lively-outline));
+  stroke-width: 1.15;
+  stroke-linecap: round;
+  opacity: .9;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.lively-cat__whisker--l1,
+.lively-cat__whisker--r3 { animation: lively-cat-whisker-drift-a 3.2s ease-in-out infinite; }
+.lively-cat__whisker--l2,
+.lively-cat__whisker--r2 { animation: lively-cat-whisker-drift-b 3.8s ease-in-out .25s infinite; }
+.lively-cat__whisker--l3,
+.lively-cat__whisker--r1 { animation: lively-cat-whisker-drift-c 3.5s ease-in-out .5s infinite; }
+
+/* Whiskers are a face accessory, so emotions can pose them independently. */
+.lively-mascot.is-emotion-00 .lively-cat__whiskers,
+.lively-mascot.is-emotion-12 .lively-cat__whiskers {
+  animation: lively-cat-whiskers-droop 2.5s ease-in-out infinite;
+}
+.lively-mascot.is-emotion-10 .lively-cat__whiskers,
+.lively-mascot.is-emotion-11 .lively-cat__whiskers {
+  animation: lively-cat-whiskers-alert .5s ease-in-out infinite alternate;
+}
+.lively-mascot.is-emotion-13 .lively-cat__whiskers {
+  animation: lively-cat-whiskers-puff .34s ease-in-out infinite alternate;
+}
+.lively-mascot.is-emotion-14 .lively-cat__whiskers,
+.lively-mascot.is-emotion-37 .lively-cat__whiskers {
+  animation: lively-cat-whiskers-twitch .42s ease-in-out infinite;
+}
+
 /* Happy click: ears wiggle */
 .lively-mascot.is-happy .lively__ears {
   animation: lively-cat-ear-wiggle 0.5s ease-in-out;
@@ -56,9 +119,9 @@
 .lively__tail {
   position: absolute;
   bottom: 8cqw;
-  right: -14cqw;
-  width: 30cqw;
-  height: 30cqw;
+  right: -15cqw;
+  width: 31cqw;
+  height: 35cqw;
   transform-origin: 0% 100%;
   animation: lively-cat-tail-sway 2.4s ease-in-out infinite;
   z-index: -1;
@@ -74,7 +137,7 @@
 .lively-cat__tail-path {
   fill: none;
   stroke: var(--lively-body);
-  stroke-width: 5;
+  stroke-width: 5.5;
   stroke-linecap: round;
 }
 
@@ -90,6 +153,14 @@
   fill: var(--lively-body);
   stroke: var(--lively-outline);
   stroke-width: 2;
+}
+
+.lively-cat__toe-lines {
+  fill: none;
+  stroke: var(--lively-outline);
+  stroke-width: .9;
+  stroke-linecap: round;
+  opacity: .72;
 }
 
 /* Happy click: tail wags fast */
@@ -110,7 +181,16 @@
 .lively-face__cat-nose {
   fill: var(--lively-accent);
   stroke: var(--lively-outline);
-  stroke-width: 1;
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+}
+
+.lively-face__cat-nose-bridge {
+  fill: none;
+  stroke: var(--lively-outline);
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  opacity: .8;
 }
 
 /* --- Foot positioning for cat --- */
@@ -121,6 +201,52 @@
 .lively-mascot--cat .lively-foot__body {
   rx: 8;
   ry: 5;
+  fill: var(--lively-body);
+  stroke: var(--lively-outline);
+  stroke-width: 1.3;
+}
+
+.lively-mascot--cat .lively-foot__shine { opacity: .62; }
+
+@keyframes lively-cat-whiskers-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.5px); }
+}
+
+@keyframes lively-cat-whisker-drift-a {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  50% { transform: rotate(-2deg) translateY(-1px); }
+}
+
+@keyframes lively-cat-whisker-drift-b {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  50% { transform: rotate(1.5deg) translateY(1px); }
+}
+
+@keyframes lively-cat-whisker-drift-c {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  50% { transform: rotate(-1deg) translateY(1.5px); }
+}
+
+@keyframes lively-cat-whiskers-droop {
+  0%, 100% { transform: translateY(1px) rotate(0deg); }
+  50% { transform: translateY(3px) rotate(2deg); }
+}
+
+@keyframes lively-cat-whiskers-alert {
+  from { transform: translateY(0) scale(1); }
+  to { transform: translateY(-1px) scale(1.035); }
+}
+
+@keyframes lively-cat-whiskers-puff {
+  from { transform: translateX(0) scale(1); }
+  to { transform: translateX(-1px) scale(1.06, 1.02); }
+}
+
+@keyframes lively-cat-whiskers-twitch {
+  0%, 100% { transform: rotate(0deg); }
+  35% { transform: rotate(-2deg); }
+  70% { transform: rotate(1.5deg); }
 }
 
 /* --- Cat-specific ear emotion animations --- */
