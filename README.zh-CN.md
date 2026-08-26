@@ -26,7 +26,25 @@
 
 ## 快速开始
 
-### 方式 A — 一行 CDN 引入（免下载、免构建）
+### 方式 A — npm（应用项目推荐）
+
+安装 npm 包，并通过构建工具引入 SDK 和样式：
+
+```bash
+npm install lively-mascot
+```
+
+```js
+import { createMascot } from "lively-mascot";
+import "lively-mascot/dist/lively-mascot.min.css";
+
+const mascot = createMascot(document.getElementById("slot"), {
+  type: "sprout", size: 180
+});
+mascot.setEmotion("10");
+```
+
+### 方式 B — 一行 CDN 引入（免下载、免构建）
 
 整个引擎 + 5 个角色已打包成单文件放在 jsDelivr 上，只需两个标签：
 
@@ -50,7 +68,7 @@
 
 > 提示：把 `@master` 换成 `@latest` 可锁定版本，保证构建可复现。
 
-### 方式 B — 本地 / 模块化（分文件）
+### 方式 C — 本地 / 模块化（分文件）
 
 如果你更想自己托管源码文件（例如接入自己的构建工具链）：
 
@@ -92,9 +110,16 @@
 </script>
 ```
 
-### 方式 C — 在 React / Vue 中使用
+### 方式 D — 在 React / Vue 中使用
 
-不论哪个框架，先通过 CDN（或本地 `/dist`）加载一次引擎脚本，它会注册全局变量 `LivelyMascot`：
+npm 项目的 React/Vue 应用可直接导入 API 和样式：
+
+```js
+import { createMascot } from "lively-mascot";
+import "lively-mascot/dist/lively-mascot.min.css";
+```
+
+也可以通过 CDN 加载一次引擎脚本，它会注册全局变量 `LivelyMascot`：
 
 ```html
 <!-- 放在入口 HTML，全局只需一次 -->

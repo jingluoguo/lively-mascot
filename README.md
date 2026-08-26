@@ -26,7 +26,25 @@ An expression system for chatbots, desktop pets, web widgets, and AI assistants.
 
 ## Quick Start
 
-### Option A — One-line CDN (no download, no build)
+### Option A — npm (recommended for apps)
+
+Install the package and import the SDK and stylesheet from your bundler:
+
+```bash
+npm install lively-mascot
+```
+
+```js
+import { createMascot } from "lively-mascot";
+import "lively-mascot/dist/lively-mascot.min.css";
+
+const mascot = createMascot(document.getElementById("slot"), {
+  type: "sprout", size: 180
+});
+mascot.setEmotion("10");
+```
+
+### Option B — One-line CDN (no download, no build)
 
 The whole engine + all 5 characters ship as a single bundled file on jsDelivr. Just two tags:
 
@@ -50,7 +68,7 @@ The whole engine + all 5 characters ship as a single bundled file on jsDelivr. J
 
 > Tip: pin a version with `@latest` instead of `@master` for reproducible builds.
 
-### Option B — Local / modular (split files)
+### Option C — Local / modular (split files)
 
 If you prefer to serve the source files yourself (e.g. bundle via your own toolchain):
 
@@ -92,9 +110,16 @@ If you prefer to serve the source files yourself (e.g. bundle via your own toolc
 </script>
 ```
 
-### Option C — Using in React / Vue
+### Option D — Using in React / Vue
 
-Either way, load the engine script once (via CDN or local `/dist`); it registers the global `LivelyMascot`:
+For npm-based React/Vue apps, import the API and stylesheet directly:
+
+```js
+import { createMascot } from "lively-mascot";
+import "lively-mascot/dist/lively-mascot.min.css";
+```
+
+Alternatively, load the engine script once via CDN; it registers the global `LivelyMascot`:
 
 ```html
 <!-- Add to your entry HTML once, app-wide -->
