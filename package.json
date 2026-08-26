@@ -44,6 +44,8 @@
     "dist/lively-mascot.cjs",
     "dist/lively-mascot.mjs",
     "types/index.d.ts",
+    "CHANGELOG.md",
+    "CHANGELOG.zh-CN.md",
     "src/lively-mascot.js",
     "src/lively-mascot.css",
     "src/core/emotions.js",
