@@ -22,6 +22,9 @@
   --lively-body: #48ff42;
   --lively-outline: #080808;
   --lively-accent: #ff9fb6;
+  --lively-depth-transform: rotateX(0deg) rotateY(0deg);
+  --lively-gloss-x: 25%;
+  --lively-gloss-y: 18%;
   position: relative;
   display: inline-block;
   width: 106px;
@@ -29,6 +32,91 @@
   container-type: inline-size;
   cursor: pointer;
   user-select: none;
+}
+
+/* 2D view keeps the original flat, sticker-like rendering. */
+.lively-mascot--2d {
+  perspective: none;
+}
+
+/* Lightweight depth treatment: the same SVG character gains a shallow
+   camera angle, layered parts, and directional shading without WebGL. */
+.lively-mascot--3d {
+  --lively-depth-transform: rotateX(0deg) rotateY(0deg);
+  perspective: 900px;
+  perspective-origin: 50% 50%;
+}
+
+.lively-mascot--3d .lively-mascot__rig,
+.lively-mascot--3d .lively-mascot__gaze,
+.lively-mascot.lively-mascot--3d .lively-body {
+  transform-style: preserve-3d;
+}
+
+.lively-mascot__gaze { transform: var(--lively-depth-transform); }
+
+.lively-mascot--3d .lively-body {
+  box-shadow:
+    0 13px 20px rgba(15, 17, 18, .20),
+    0 3px 5px rgba(15, 17, 18, .14),
+    inset -11px -13px 18px color-mix(in srgb, var(--lively-outline) 18%, transparent),
+    inset 5px 4px 10px color-mix(in srgb, white 16%, transparent);
+  filter: saturate(1.05) contrast(1.02);
+}
+
+.lively-mascot--3d .lively-body::before {
+  content: "";
+  position: absolute;
+  inset: 3% 11% 45% 7%;
+  border-radius: 34% 61% 43% 57% / 43% 42% 64% 55%;
+  background:
+    radial-gradient(ellipse at var(--lively-gloss-x) var(--lively-gloss-y), rgba(255,255,255,.58) 0 3%, rgba(255,255,255,.22) 11%, transparent 30%),
+    radial-gradient(ellipse at 55% 28%, rgba(255,255,255,.11), transparent 42%),
+    linear-gradient(148deg, rgba(255,255,255,.16), rgba(255,255,255,0) 61%);
+  opacity: .72;
+  pointer-events: none;
+  transform: translateZ(4px) rotate(-7deg) skewX(-5deg);
+  mix-blend-mode: screen;
+  filter: blur(.35px);
+}
+
+.lively-mascot--3d .lively-face-wrap {
+  transform: translateZ(7px);
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,.10));
+}
+.lively-mascot--3d .lively__leaf,
+.lively-mascot--3d .lively__ears,
+.lively-mascot--3d .lively__antenna {
+  filter: drop-shadow(2px 4px 3px rgba(0,0,0,.18));
+}
+.lively-mascot--3d .lively__leaf svg,
+.lively-mascot--3d .lively__ears svg,
+.lively-mascot--3d .lively__antenna svg {
+  transform: translateZ(6px);
+  filter: drop-shadow(2px 4px 3px rgba(0,0,0,.16));
+}
+
+/* Accessories use their own depth planes so they do not read as flat decals. */
+.lively-mascot--3d .lively__tail,
+.lively-mascot--3d .lively__ghost-hem {
+  transform-style: preserve-3d;
+  filter: drop-shadow(2px 4px 3px rgba(0,0,0,.16));
+}
+.lively-mascot--3d .lively__tail svg { transform: translateZ(4px); }
+.lively-mascot--3d .lively__ghost-hem svg { transform: translateZ(3px); }
+.lively-mascot--3d .lively__feet { transform: translateZ(2px); filter: drop-shadow(0 4px 3px rgba(0,0,0,.18)); }
+.lively-mascot--3d .lively__foot svg {
+  transform: translateZ(5px);
+  filter: drop-shadow(1px 2px 2px rgba(0,0,0,.18));
+}
+
+/* Different materials catch the same softbox differently. */
+.lively-mascot--robot { --lively-gloss-x: 18%; --lively-gloss-y: 14%; }
+.lively-mascot--jelly { --lively-gloss-x: 33%; --lively-gloss-y: 21%; }
+.lively-mascot--ghost { --lively-gloss-x: 42%; --lively-gloss-y: 16%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lively-mascot--3d .lively-body::before { transform: none; }
 }
 
 /* --- Static mode: no cursor-follow, no idle / loop animations ---

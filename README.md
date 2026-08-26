@@ -168,7 +168,7 @@ const reset = () => inst && inst.clearEmotion();
 </script>
 
 <!-- Declarative usage; the browser renders and loops the idle animation -->
-<lively-mascot type="cat" color="#ffd66b" size="180"></lively-mascot>
+<lively-mascot type="cat" color="#ffd66b" size="180" view-mode="3d"></lively-mascot>
 <lively-mascot type="ghost" color="#9be7ff" size="160"></lively-mascot>
 ```
 
@@ -196,7 +196,7 @@ onMounted(() => LivelyMascot.defineMascotElement());
 </template>
 ```
 
-> Note: the declarative tag only reacts to the `type` / `color` / `size` attributes and rebuilds when any of them change. It does not expose an instance, so you cannot call `setEmotion` directly. When you need code-driven emotion switching, use the `createMascot` approach above.
+> Note: the declarative tag reacts to the `type` / `color` / `size` / `view-mode` attributes and rebuilds when any of them change. It does not expose an instance, so you cannot call `setEmotion` directly. When you need code-driven emotion or view-mode switching, use the `createMascot` approach above.
 
 ## Building from Source
 
@@ -221,8 +221,11 @@ This regenerates `dist/lively-mascot.min.js` and `dist/lively-mascot.min.css`. R
 | `accent`       | `string`  | —          | Accent color (blush etc.) |
 | `size`         | `number`  | `106`      | Container size in px      |
 | `followCursor` | `boolean` | `true`     | Enable gaze tracking      |
+| `viewMode`     | `string`  | `"3d"`    | Visual mode: `"2d"` or `"3d"` (lightweight depth) |
 
-**Returns**: `{ el, type, setTheme, setEmotion(id), clearEmotion(), destroy() }`
+**Returns**: `{ el, type, viewMode, setViewMode(mode), setTheme, setEmotion(id), clearEmotion(), destroy() }`
+
+3D is a lightweight CSS depth treatment with no WebGL dependency. Switch a live instance with `setViewMode("2d")` / `setViewMode("3d")`; declarative `<lively-mascot>` also accepts `view-mode="2d"` (with `mode` as an alias).
 
 ### Emotion Behaviors
 

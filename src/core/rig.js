@@ -142,7 +142,7 @@ function createRig(root, rigEl, config, handlers) {
       p.el.setAttribute("transform", "translate(" + (curX * p.spec.maxX).toFixed(2) + " " + (curY * p.spec.maxY).toFixed(2) + ")");
     }
     if (face) face.setAttribute("transform", "rotate(" + (curX * 3).toFixed(2) + " 50 52)");
-    (gazeEl || rigEl).style.transform = "rotate(" + (curX * 5).toFixed(2) + "deg) translate3d(" + (curX * 4).toFixed(1) + "px, " + (curY * 2.5).toFixed(1) + "px, 0)";
+    (gazeEl || rigEl).style.transform = "rotate(" + (curX * 5).toFixed(2) + "deg) translate3d(" + (curX * 4).toFixed(1) + "px, " + (curY * 2.5).toFixed(1) + "px, 0) var(--lively-depth-transform, rotateX(0deg) rotateY(0deg))";
     raf = requestAnimationFrame(tick);
   }
 

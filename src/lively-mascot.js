@@ -191,13 +191,18 @@
   }
   function getCharacter(type) { return characters[type] || characters.sprout; }
 
+  function normalizeViewMode(mode) {
+    return String(mode || "3d").toLowerCase() === "2d" ? "2d" : "3d";
+  }
+
   // --- Core API ---
   function createMascot(target, options) {
     options = options || {};
     var type = options.type || "sprout";
     var character = getCharacter(type);
+    var viewMode = normalizeViewMode(options.viewMode || options.mode);
     var root = el("div", {
-      class: "lively-mascot lively-mascot--" + character.id + (options.animated === false ? " lively-mascot--static" : ""),
+      class: "lively-mascot lively-mascot--" + character.id + " lively-mascot--" + viewMode + (options.animated === false ? " lively-mascot--static" : ""),
       style: "width:" + (options.size || 106) + "px;height:" + (options.size || 106) + "px",
       "aria-hidden": "true",
     });
@@ -228,6 +233,13 @@
     return {
       el: root,
       type: character.id,
+      get viewMode() { return viewMode; },
+      setViewMode: function (mode) {
+        viewMode = normalizeViewMode(mode);
+        root.classList.toggle("lively-mascot--2d", viewMode === "2d");
+        root.classList.toggle("lively-mascot--3d", viewMode === "3d");
+        return viewMode;
+      },
       setTheme: function (p) { if (p.body) theme.body = p.body; if (p.outline) theme.outline = p.outline; applyTheme(); },
       setEmotion: function (emotionId) {
         root.className = root.className.replace(/is-emotion-\d+/g, "").trim();
@@ -256,7 +268,7 @@
       LivelyMascotElement.prototype = Object.create(HTMLElement.prototype, {
         constructor: { value: LivelyMascotElement, writable: true, configurable: true }
       });
-      LivelyMascotElement.observedAttributes = ["type", "color", "size"];
+      LivelyMascotElement.observedAttributes = ["type", "color", "size", "view-mode", "mode"];
       LivelyMascotElement.prototype.connectedCallback = function () { this._render(); };
       LivelyMascotElement.prototype.disconnectedCallback = function () { if (this._inst) this._inst.destroy(); this._inst = null; this.textContent = ""; };
       LivelyMascotElement.prototype.attributeChangedCallback = function () { if (this.isConnected) this._render(); };
@@ -266,7 +278,8 @@
         this._inst = _create(this, {
           type: this.getAttribute("type"),
           color: this.getAttribute("color"),
-          size: this.getAttribute("size") ? Number(this.getAttribute("size")) : undefined
+          size: this.getAttribute("size") ? Number(this.getAttribute("size")) : undefined,
+          viewMode: this.getAttribute("view-mode") || this.getAttribute("mode") || undefined
         });
       };
       return LivelyMascotElement;

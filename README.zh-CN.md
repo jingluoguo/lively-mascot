@@ -168,7 +168,7 @@ const reset = () => inst && inst.clearEmotion();
 </script>
 
 <!-- 直接声明式使用，浏览器自动渲染并循环待机动画 -->
-<lively-mascot type="cat" color="#ffd66b" size="180"></lively-mascot>
+<lively-mascot type="cat" color="#ffd66b" size="180" view-mode="3d"></lively-mascot>
 <lively-mascot type="ghost" color="#9be7ff" size="160"></lively-mascot>
 ```
 
@@ -196,7 +196,7 @@ onMounted(() => LivelyMascot.defineMascotElement());
 </template>
 ```
 
-> 注意：声明式标签只响应 `type` / `color` / `size` 三个属性，改其中之一即自动重建；它拿不到实例、无法直接调 `setEmotion`。需要代码驱动切换表情时，请改用上方的 `createMascot` 用法。
+> 注意：声明式标签响应 `type` / `color` / `size` / `view-mode` 属性，改其中之一即自动重建；它拿不到实例、无法直接调 `setEmotion`。需要代码驱动切换表情或视图时，请改用上方的 `createMascot` 用法。
 
 ## 从源码构建
 
@@ -221,8 +221,11 @@ npm run build      # 等价于：node scripts/build-dist.mjs
 | `accent`       | `string`  | —          | 点缀色（腮红等） |
 | `size`         | `number`  | `106`      | 容器尺寸 px      |
 | `followCursor` | `boolean` | `true`     | 是否跟随光标     |
+| `viewMode`     | `string`  | `"3d"`    | 视觉模式：`"2d"` 或 `"3d"`（轻量景深） |
 
-**返回实例**：`{ el, type, setTheme, setEmotion(id), clearEmotion(), destroy() }`
+**返回实例**：`{ el, type, viewMode, setViewMode(mode), setTheme, setEmotion(id), clearEmotion(), destroy() }`
+
+3D 是基于 CSS 的轻量景深效果，不依赖 WebGL。运行中的实例可通过 `setViewMode("2d")` / `setViewMode("3d")` 切换；声明式 `<lively-mascot>` 支持 `view-mode="2d"`（也兼容 `mode`）属性。
 
 ### 表情行为
 
