@@ -118,11 +118,11 @@
 /* --- Tail: curved behind the body --- */
 .lively__tail {
   position: absolute;
-  bottom: 8cqw;
-  right: -15cqw;
-  width: 31cqw;
-  height: 35cqw;
-  transform-origin: 0% 100%;
+  bottom: 3cqw;
+  right: -14cqw;
+  width: 37cqw;
+  height: 42cqw;
+  transform-origin: 10% 100%;
   animation: lively-cat-tail-sway 2.4s ease-in-out infinite;
   z-index: -1;
 }
@@ -134,18 +134,28 @@
   overflow: visible;
 }
 
+/* The outer wrapper handles the broad wag; this inner motion lets the
+   curved portion breathe and gives the tip a gentle vertical response. */
+.lively-cat__tail-motion {
+  transform-box: fill-box;
+  transform-origin: 4% 94%;
+  animation: lively-cat-tail-ripple 2.4s ease-in-out infinite;
+}
+
 .lively-cat__tail-path {
   fill: none;
   stroke: var(--lively-body);
-  stroke-width: 5.5;
+  stroke-width: 6.6;
   stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .lively-cat__tail-outline {
   fill: none;
   stroke: var(--lively-outline);
-  stroke-width: 7;
+  stroke-width: 8.2;
   stroke-linecap: round;
+  stroke-linejoin: round;
   opacity: 0.18;
 }
 
@@ -290,8 +300,14 @@
 
 /* --- Cat tail keyframes --- */
 @keyframes lively-cat-tail-sway {
-  0%, 100% { transform: rotate(-5deg); }
-  50% { transform: rotate(10deg); }
+  0%, 100% { transform: rotate(-5deg) translateY(0); }
+  50% { transform: rotate(10deg) translateY(-1px); }
+}
+
+@keyframes lively-cat-tail-ripple {
+  0%, 100% { transform: rotate(0deg) scaleY(1); }
+  42% { transform: rotate(2.2deg) translateY(-1px) scaleY(.965); }
+  68% { transform: rotate(-1.1deg) translateY(.5px) scaleY(1.012); }
 }
 
 @keyframes lively-cat-tail-wag {

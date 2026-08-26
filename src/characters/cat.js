@@ -52,10 +52,14 @@
 
     // --- Tail ---
     var tail = hEl("span", { class: "lively__tail", "aria-hidden": "true" });
-    tail.appendChild(svg("svg", { viewBox: "0 0 42 48" }, [
-      svg("path", { class: "lively-cat__tail-outline", d: "M4 45 C1 33, 8 21, 20 15 C29 10, 38 11, 38 18 C38 24, 33 27, 29 23" }),
-      svg("path", { class: "lively-cat__tail-path", d: "M4 45 C1 33, 8 21, 20 15 C29 10, 38 11, 38 18 C38 24, 33 27, 29 23" }),
-      svg("circle", { class: "lively-cat__tail-tip", cx: 29, cy: 23, r: 3 })
+    // The tail begins well inside the body silhouette. Its visible curve can
+    // therefore emerge from behind the flank instead of ending at the edge.
+    tail.appendChild(svg("svg", { viewBox: "0 0 52 58" }, [
+      svg("g", { class: "lively-cat__tail-motion" }, [
+        svg("path", { class: "lively-cat__tail-outline", d: "M-10 56 C-7 40, 0 25, 17 16 C28 10, 43 11, 46 20 C48 27, 42 32, 35 28" }),
+        svg("path", { class: "lively-cat__tail-path", d: "M-10 56 C-7 40, 0 25, 17 16 C28 10, 43 11, 46 20 C48 27, 42 32, 35 28" }),
+        svg("circle", { class: "lively-cat__tail-tip", cx: 35, cy: 28, r: 3.2 })
+      ])
     ]));
 
     // --- Face (shared) ---
