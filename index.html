@@ -470,6 +470,92 @@
       font-size: 16px;
     }
 
+    /* ---- Custom color pickers (native <input type=color>) ---- */
+    .color-custom {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      padding-bottom: 18px;
+      border-bottom: 2px dashed rgba(8, 8, 8, .15);
+    }
+
+    .color-field {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .color-field__label {
+      font-size: 12px;
+      font-weight: 800;
+      color: #777;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      white-space: nowrap;
+    }
+
+    .color-field__picker {
+      position: relative;
+      display: inline-block;
+      padding: 0;
+      width: 46px;
+      height: 34px;
+      border: 2px solid #080808;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 3px 3px 0 #080808;
+      cursor: pointer;
+      overflow: hidden;
+      transition: transform .15s, box-shadow .15s;
+    }
+
+    .color-field__picker:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0 #080808;
+    }
+
+    .color-field__picker:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0 #080808;
+    }
+
+    .color-field__picker input[type="color"] {
+      -webkit-appearance: none;
+      appearance: none;
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      width: calc(100% + 8px);
+      height: calc(100% + 8px);
+      border: none;
+      padding: 0;
+      background: none;
+      cursor: pointer;
+    }
+
+    .color-field__picker input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    .color-field__picker input[type="color"]::-webkit-color-swatch {
+      border: none;
+      border-radius: 0;
+    }
+
+    /* ---- Preset palette grid heading ---- */
+    .panel-subtitle {
+      display: block;
+      margin: 4px 0 14px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #777;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
     @media (max-width: 720px) {
       .view-mode {
         justify-content: center;
@@ -565,6 +651,8 @@
           ghost: '👻 幽灵', jelly: '🟢 果冻'
         },
         tabs: ['参数', '颜色', '表情'],
+        colorFields: { body: '身体', outline: '描边', accent: '点缀' },
+        presetTitle: '预设配色',
         palette: ['薄荷绿', '天空蓝', '蜜桃橙', '薰衣草紫', '玫瑰粉', '柠檬黄'],
         groupNames: {
           lifecycle: '生命周期', reaction: '情绪反应', work: '工作状态'
@@ -595,6 +683,8 @@
           ghost: '👻 Ghost', jelly: '🟢 Jelly'
         },
         tabs: ['Parameters', 'Color', 'Emotion'],
+        colorFields: { body: 'Body', outline: 'Outline', accent: 'Accent' },
+        presetTitle: 'Presets',
         palette: ['Mint', 'Sky Blue', 'Peach', 'Lavender', 'Rose', 'Lemon'],
         groupNames: {
           lifecycle: 'Lifecycle', reaction: 'Reactions', work: 'Work states'
@@ -654,6 +744,7 @@
       });
       currentCharType = type;
       hero.setTheme(currentTheme || CHAR_DEFAULT_THEMES[type]);
+      if (typeof syncColorInputs === 'function') syncColorInputs();
       var activeEmotion = document.querySelector('.emotion-item.is-active');
       if (activeEmotion) {
         hero.setEmotion(activeEmotion.dataset.emotionId);
@@ -755,6 +846,53 @@
     paletteGrid.className = 'palette';
     var paletteCaptions = [];
     var activeSwatch = null;
+    var colorInputs = {};
+
+    // ---- Custom color pickers (native <input type=color>) ----
+    var presetTitle = document.createElement('span');
+    presetTitle.className = 'panel-subtitle';
+    palettePanel.appendChild(presetTitle);
+
+    var colorCustom = document.createElement('div');
+    colorCustom.className = 'color-custom';
+    var colorKeys = ['body', 'outline', 'accent'];
+    colorKeys.forEach(function (key) {
+      var field = document.createElement('label');
+      field.className = 'color-field';
+      var label = document.createElement('span');
+      label.className = 'color-field__label';
+      label.dataset.colorKey = key;
+      var picker = document.createElement('span');
+      picker.className = 'color-field__picker';
+      var input = document.createElement('input');
+      input.type = 'color';
+      input.dataset.key = key;
+      input.addEventListener('input', function () {
+        if (!currentTheme) currentTheme = Object.assign({}, CHAR_DEFAULT_THEMES[currentCharType]);
+        currentTheme[key] = input.value;
+        applyThemeToAll();
+        if (activeSwatch) { activeSwatch.classList.remove('is-active'); activeSwatch = null; }
+      });
+      picker.appendChild(input);
+      field.appendChild(label);
+      field.appendChild(picker);
+      colorCustom.appendChild(field);
+      colorInputs[key] = input;
+    });
+    palettePanel.appendChild(colorCustom);
+
+    // keep the three pickers in sync with whatever theme is currently applied
+    function syncColorInputs() {
+      var t = currentTheme || CHAR_DEFAULT_THEMES[currentCharType];
+      colorInputs.body.value = t.body;
+      colorInputs.outline.value = t.outline;
+      colorInputs.accent.value = t.accent || CHAR_DEFAULT_THEMES[currentCharType].accent;
+    }
+
+    function applyThemeToAll() {
+      hero.setTheme(currentTheme);
+      previewInstances.forEach(function (pInst) { pInst.setTheme(currentTheme); });
+    }
 
     palettes.forEach(function (p) {
       var fig = document.createElement('figure');
@@ -767,9 +905,13 @@
       fig.appendChild(swatch);
       fig.appendChild(caption);
       fig.addEventListener('click', function () {
-        currentTheme = { body: p.color, outline: p.outline, accent: p.accent };
-        hero.setTheme(currentTheme);
-        previewInstances.forEach(function (pInst) { pInst.setTheme(currentTheme); });
+        currentTheme = {
+          body: p.color,
+          outline: p.outline,
+          accent: p.accent || (currentTheme && currentTheme.accent) || CHAR_DEFAULT_THEMES[currentCharType].accent
+        };
+        applyThemeToAll();
+        syncColorInputs();
         if (activeSwatch) activeSwatch.classList.remove('is-active');
         fig.classList.add('is-active');
         activeSwatch = fig;
@@ -897,6 +1039,12 @@
       // Palette captions
       paletteCaptions.forEach(function (cap, i) {
         cap.textContent = currentLang === 'zh' ? palettes[i].name : palettes[i].en;
+      });
+
+      // Custom picker labels + preset subtitle
+      if (presetTitle) presetTitle.textContent = t.presetTitle;
+      document.querySelectorAll('.color-field__label').forEach(function (lab) {
+        lab.textContent = t.colorFields[lab.dataset.colorKey];
       });
 
       // Emotion sub-tab captions
