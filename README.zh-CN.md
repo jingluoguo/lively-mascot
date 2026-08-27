@@ -18,6 +18,7 @@
 - **40 种状态表情**：覆盖生命周期（睡眠/待机）、情绪反应（开心/生气）、工作状态（思考/搜索）与扩展状态（无聊/紧张/灵光一现/等待）。
 - **多角色内置**：随库附赠 5 个角色 —— **嫩芽**（植物系）、**小猫**（宠物系）、**机器人**（科技方块头+天线）、**幽灵**（圆顶浮空半透明、3 道波浪裙边）、**果冻**（Q 弹形变）。通过 `type` 选项切换，引擎层零改动。
 - **全要素联动**：每个表情控制眼睛、嘴巴、腮红、身体、附属件（叶子/耳朵/尾巴）及四肢 —— 依据角色解剖结构提供独立动画通道。
+- **多种五官**：可通过 `setFaceVariant("default" | "simple" | "dot")` 在默认表现力五官、简约胶囊眼和圆点眼之间切换。每种样式都直接调整当前眼形，不会叠加替换图层。
 - **配置驱动**：每个表情都是纯数据组合（动画 + 滤镜 + 行为参数），支持运行时注册新表情。
 - **零依赖、零构建**：原生 JS，无框架依赖，按标准 `<script>` 标签顺序引入即可。
 - **即插即用**：支持 Web Component `<lively-mascot>` 和函数式 API `createMascot`。
@@ -260,11 +261,13 @@ npm run build      # 等价于：node scripts/build-dist.mjs
 | `viewMode`     | `string`  | `"3d"`    | 视觉模式：`"2d"` 或 `"3d"`（轻量景深） |
 | `outlineVisible` | `boolean` | `true`   | 是否显示外轮廓     |
 
-**返回实例**：`{ el, type, viewMode, setViewMode(mode), outlineVisible, setOutlineVisible(visible), setTheme, setEmotion(id), clearEmotion(), destroy() }`
+**返回实例**：`{ el, type, viewMode, setViewMode(mode), outlineVisible, setOutlineVisible(visible), setFaceVariant(variant), setTheme, setEmotion(id), clearEmotion(), destroy() }`
 
 3D 是基于 CSS 的轻量景深效果，不依赖 WebGL。运行中的实例可通过 `setViewMode("2d")` / `setViewMode("3d")` 切换；声明式 `<lively-mascot>` 支持 `view-mode="2d"`（也兼容 `mode`）属性。
 
 设置 `outlineVisible: false` 或调用 `setOutlineVisible(false)` 可隐藏外轮廓线，同时保留眼睛和表情细节。声明式标签也支持 `show-outline="false"`。
+
+运行时可调用 `setFaceVariant("default")`、`setFaceVariant("simple")` 或 `setFaceVariant("dot")` 切换五官样式。简约和圆点样式会保留当前表情对眼睛的位置、大小和倾斜调整，同时隐藏其他五官图层。
 
 角色渲染器可以通过 rig API 注册和切换可替换的脸部配饰：`rig.registerFaceAccessory(name, element)` 与 `rig.setFaceAccessory(name)`。适合胡须、面罩、眼镜等模型细节。
 
@@ -286,7 +289,7 @@ npm run build      # 等价于：node scripts/build-dist.mjs
 | 分组         | ID    | 表情                                                                                                                         |
 | :----------- | :---- | :--------------------------------------------------------------------------------------------------------------------------- |
 | **生命周期** | 00-09 | Sleep · Wake · Idle · Breathe · Ready · Pause · Refresh · LowBattery · Offline · Boot                                        |
-| **情绪反应** | 10-19 | Happy · Excited · Sad · Angry · Surprised · Shy · Love · Confused · Cool · Smug                                              |
+| **情绪反应** | 10-19 | Happy · Curious · Aggrieved · Angry · Surprised · Shy · Love · Confused · Cool · Smug                                   |
 | **工作状态** | 20-31 | Thinking · Listening · Talking · Searching · Reading · Writing · Coding · Designing · Loading · Processing · Success · Error |
 | **扩展状态** | 32-39 | Grateful · Retrying · Cancelled · Crying · Bored · Nervous · Eureka · Waiting                                                |
 

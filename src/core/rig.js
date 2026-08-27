@@ -68,6 +68,7 @@ function createRig(root, rigEl, config, handlers) {
     },
     setEmotionState: function (id) {
       currentEmotionId = String(id);
+      resetBlinkCycle();
       applyEmotionBehavior(currentEmotionId);
       syncHop();
     }
@@ -214,6 +215,13 @@ function createRig(root, rigEl, config, handlers) {
     }, blinkDelay);
   }
 
+  function resetBlinkCycle() {
+    clearTimeout(blinkTimer);
+    clearTimeout(phaseTimer);
+    for (var i = 0; i < eyes.length; i++) eyes[i].classList.remove("is-blinking");
+    if (animated) scheduleBlink();
+  }
+
   // --- Hop ---
   var hopTimer = 0, hopResetTimer = 0;
 
@@ -252,6 +260,7 @@ function createRig(root, rigEl, config, handlers) {
     if (handlers.onClick) handlers.onClick();
     // Skip happy flash if a non-idle emotion is active (avoid face overlap)
     if (currentEmotionId !== "02") return;
+    resetBlinkCycle();
     setHappy(true);
     setTimeout(function(){ setHappy(false); }, 950);
   }

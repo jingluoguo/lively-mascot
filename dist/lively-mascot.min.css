@@ -336,6 +336,91 @@
   fill: #fff;
 }
 
+.lively-face__shine--small {
+  opacity: 0.82;
+}
+
+.lively-face__bored-eye {
+  display: none;
+  fill: #fff;
+  stroke: var(--lively-outline);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* --- Face variant: simple / dot ---
+   Both minimal modes keep only the selected eye shape. Emotion states pose
+   that shape in place; they do not replace it with another face layer. */
+
+/* Minimal eye primitives are hidden until their face variant is selected. */
+.lively-face__capsule,
+.lively-face__dot-eye {
+  display: none;
+  fill: var(--lively-outline);
+  stroke: none;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Hide the default round eye in simple / dot modes. */
+.lively-mascot--face-simple .lively-face__eye > ellipse,
+.lively-mascot--face-dot .lively-face__eye > ellipse {
+  display: none;
+}
+
+/* Simple uses a narrow vertical pill; Dot uses an actual circle. */
+.lively-mascot--face-simple .lively-face__capsule,
+.lively-mascot--face-dot .lively-face__dot-eye {
+  display: block;
+}
+
+.lively-mascot--face-simple .lively-face__mouth,
+.lively-mascot--face-simple .lively-face__sad-mouth,
+.lively-mascot--face-simple .lively-face__open-mouth,
+.lively-mascot--face-simple .lively-face__flat-mouth,
+.lively-mascot--face-simple .lively-face__bored-mouth,
+.lively-mascot--face-simple .lively-face__happy,
+.lively-mascot--face-simple .lively-face__bored-eye,
+.lively-mascot--face-simple .lively-face__happy-mouth,
+.lively-mascot--face-simple .lively-face__blush,
+.lively-mascot--face-simple .lively-face__pupil,
+.lively-mascot--face-simple .lively-face__shine,
+.lively-mascot--face-simple .lively-face__sleep-eye,
+.lively-mascot--face-simple .lively-face__x-eye,
+.lively-mascot--face-simple .lively-face__heart-eye,
+.lively-mascot--face-simple .lively-face__cry-eye,
+.lively-mascot--face-simple .lively-face__tear,
+.lively-mascot--face-simple .lively-face__sweat,
+.lively-mascot--face-simple .lively-face__star-eye,
+.lively-mascot--face-simple .lively-face__sparkle,
+.lively-mascot--face-simple .lively-face__waiting-dots,
+.lively-mascot--face-simple .lively-face__angry-brow,
+
+.lively-mascot--face-dot .lively-face__mouth,
+.lively-mascot--face-dot .lively-face__sad-mouth,
+.lively-mascot--face-dot .lively-face__open-mouth,
+.lively-mascot--face-dot .lively-face__flat-mouth,
+.lively-mascot--face-dot .lively-face__bored-mouth,
+.lively-mascot--face-dot .lively-face__happy,
+.lively-mascot--face-dot .lively-face__bored-eye,
+.lively-mascot--face-dot .lively-face__happy-mouth,
+.lively-mascot--face-dot .lively-face__blush,
+.lively-mascot--face-dot .lively-face__pupil,
+.lively-mascot--face-dot .lively-face__shine,
+.lively-mascot--face-dot .lively-face__sleep-eye,
+.lively-mascot--face-dot .lively-face__x-eye,
+.lively-mascot--face-dot .lively-face__heart-eye,
+.lively-mascot--face-dot .lively-face__cry-eye,
+.lively-mascot--face-dot .lively-face__tear,
+.lively-mascot--face-dot .lively-face__sweat,
+.lively-mascot--face-dot .lively-face__star-eye,
+.lively-mascot--face-dot .lively-face__sparkle,
+.lively-mascot--face-dot .lively-face__waiting-dots,
+.lively-mascot--face-dot .lively-face__angry-brow {
+  visibility: hidden;
+}
+
 /* --- Blush --- */
 .lively-face__blush {
   fill: var(--lively-accent);
@@ -349,6 +434,12 @@
   stroke: var(--lively-outline);
   stroke-width: 2.6;
   stroke-linecap: round;
+}
+
+.lively-face__happy {
+  stroke-width: 3.2;
+  transform-box: fill-box;
+  transform-origin: center;
 }
 
 .lively-face__happy-mouth {
@@ -370,6 +461,10 @@
 .lively-mascot.is-happy .lively-face__happy,
 .lively-mascot.is-happy .lively-face__happy-mouth {
   visibility: visible;
+}
+
+.lively-mascot.is-happy .lively-face__happy {
+  animation: lively-happy-eye-arrive 0.55s cubic-bezier(.2, .85, .25, 1) both;
 }
 
 /* --- Alt face elements: hidden by default --- */
@@ -451,6 +546,10 @@
 }
 
 /* 01 Wake */
+.lively-mascot.is-emotion-01 .lively-face__eye {
+  animation: lively-eye-wake-open 1.15s cubic-bezier(.2, .75, .25, 1) both;
+}
+
 .lively-mascot.is-emotion-01 .lively-face__mouth {
   visibility: hidden;
 }
@@ -542,15 +641,16 @@
 }
 
 /* 10 Happy */
-.lively-mascot.is-emotion-10 .lively-face__eye>ellipse,
-.lively-mascot.is-emotion-10 .lively-face__pupil,
-.lively-mascot.is-emotion-10 .lively-face__shine,
 .lively-mascot.is-emotion-10 .lively-face__mouth {
   visibility: hidden;
 }
 
-.lively-mascot.is-emotion-10 .lively-face__happy {
-  visibility: visible;
+.lively-mascot--face-default.is-emotion-10 .lively-face__eye {
+  transform: translateY(-1px) scale(1.08, 1.1);
+}
+
+.lively-mascot--face-default.is-emotion-10 .lively-face__pupil {
+  transform: translateY(-1px) scale(1.08);
 }
 
 .lively-mascot.is-emotion-10 .lively-face__happy-mouth {
@@ -561,30 +661,56 @@
   fill-opacity: 1;
 }
 
-/* 11 Excited */
-.lively-mascot.is-emotion-11 .lively-face__eye>ellipse,
-.lively-mascot.is-emotion-11 .lively-face__pupil,
-.lively-mascot.is-emotion-11 .lively-face__shine,
+/* 11 Curious */
+.lively-mascot--face-default.is-emotion-11 .lively-face__eye--l {
+  transform: translate(1px, -1px) scale(1.04, 1.08);
+  animation: lively-curious-default-eye-l 3.2s ease-in-out infinite;
+}
+
+.lively-mascot--face-default.is-emotion-11 .lively-face__eye--r {
+  transform: translate(2px, -2px) scale(1.14, 1.18);
+  animation: lively-curious-default-eye-r 3.2s ease-in-out infinite;
+}
+
+.lively-mascot--face-default.is-emotion-11 .lively-face__pupil {
+  transform: translate(2px, -2px);
+  animation: lively-curious-pupil 3.2s ease-in-out infinite;
+}
+
 .lively-mascot.is-emotion-11 .lively-face__mouth {
   visibility: hidden;
 }
 
-.lively-mascot.is-emotion-11 .lively-face__happy {
+.lively-mascot.is-emotion-11 .lively-face__open-mouth {
   visibility: visible;
-}
-
-.lively-mascot.is-emotion-11 .lively-face__happy-mouth {
-  visibility: visible;
+  rx: 3;
+  ry: 4;
 }
 
 .lively-mascot.is-emotion-11 .lively-face__blush {
-  fill-opacity: 1;
-  rx: 9;
+  fill-opacity: .5;
 }
 
-/* 12 Sad */
-.lively-mascot.is-emotion-12 .lively-face__eye {
-  transform: translateY(2px) scaleY(0.85);
+/* 12 Aggrieved */
+.lively-mascot--face-default.is-emotion-12 .lively-face__eye--l {
+  transform: translate(1.5px, 2px) rotate(-4deg) scale(1.02, .98);
+}
+
+.lively-mascot--face-default.is-emotion-12 .lively-face__eye--r {
+  transform: translate(-1.5px, 2px) rotate(4deg) scale(1.02, .98);
+}
+
+.lively-mascot--face-default.is-emotion-12 .lively-face__eye > ellipse {
+  rx: 10.5;
+  ry: 13;
+}
+
+.lively-mascot--face-default.is-emotion-12 .lively-face__eye--l .lively-face__pupil {
+  transform: translate(.8px, 2px);
+}
+
+.lively-mascot--face-default.is-emotion-12 .lively-face__eye--r .lively-face__pupil {
+  transform: translate(-.8px, 2px);
 }
 
 .lively-mascot.is-emotion-12 .lively-face__mouth {
@@ -596,7 +722,7 @@
 }
 
 .lively-mascot.is-emotion-12 .lively-face__blush {
-  fill-opacity: 0.3;
+  fill-opacity: .6;
 }
 
 /* 13 Angry */
@@ -642,12 +768,18 @@
 }
 
 /* 15 Shy */
-.lively-mascot.is-emotion-15 .lively-face__eye {
-  transform: translateY(3px);
+.lively-mascot.is-emotion-15 .lively-face__eye>ellipse,
+.lively-mascot.is-emotion-15 .lively-face__pupil,
+.lively-mascot.is-emotion-15 .lively-face__shine {
+  visibility: hidden;
 }
 
-.lively-mascot.is-emotion-15 .lively-face__mouth {
-  visibility: hidden;
+.lively-mascot--face-default.is-emotion-15 .lively-face__eye--l {
+  transform: translate(1.5px, 3px) rotate(9deg) scale(.88);
+}
+
+.lively-mascot--face-default.is-emotion-15 .lively-face__eye--r {
+  transform: translate(-1.5px, 3px) rotate(-9deg) scale(.88);
 }
 
 .lively-mascot.is-emotion-15 .lively-face__happy {
@@ -655,7 +787,7 @@
 }
 
 .lively-mascot.is-emotion-15 .lively-face__happy-mouth {
-  visibility: visible;
+  visibility: hidden;
 }
 
 .lively-mascot.is-emotion-15 .lively-face__blush {
@@ -686,6 +818,14 @@
 }
 
 /* 17 Confused */
+.lively-mascot.is-emotion-17 .lively-face__eye--l {
+  transform: translateY(2px) scale(.72, .68);
+}
+
+.lively-mascot.is-emotion-17 .lively-face__eye--r {
+  transform: translateY(-1px) scale(1.2, 1.16);
+}
+
 .lively-mascot.is-emotion-17 .lively-face__mouth {
   visibility: hidden;
 }
@@ -864,19 +1004,16 @@
 }
 
 /* 32 Grateful */
-.lively-mascot.is-emotion-32 .lively-face__eye>ellipse,
-.lively-mascot.is-emotion-32 .lively-face__pupil,
-.lively-mascot.is-emotion-32 .lively-face__shine,
-.lively-mascot.is-emotion-32 .lively-face__mouth {
-  visibility: hidden;
+.lively-mascot--face-default.is-emotion-32 .lively-face__eye--l {
+  transform: translate(2px, 1.5px) scale(.92, .72);
 }
 
-.lively-mascot.is-emotion-32 .lively-face__happy {
-  visibility: visible;
+.lively-mascot--face-default.is-emotion-32 .lively-face__eye--r {
+  transform: translate(-2px, 1.5px) scale(.92, .72);
 }
 
-.lively-mascot.is-emotion-32 .lively-face__happy-mouth {
-  visibility: visible;
+.lively-mascot--face-default.is-emotion-32 .lively-face__pupil {
+  transform: translateY(2px) scale(.84);
 }
 
 .lively-mascot.is-emotion-32 .lively-face__blush {
@@ -939,12 +1076,23 @@
 
 /* 36 Bored */
 .lively-mascot.is-emotion-36 .lively-face__eye {
-  transform: translateY(4px) scaleY(.5);
+  transform: translateY(2px);
 }
 
-.lively-mascot.is-emotion-36 .lively-face__pupil,
+.lively-mascot.is-emotion-36 .lively-face__eye>ellipse {
+  display: none;
+}
+
+.lively-mascot.is-emotion-36 .lively-face__bored-eye {
+  display: block;
+}
+
+.lively-mascot.is-emotion-36 .lively-face__pupil {
+  transform: translateY(3px) scaleY(.72);
+}
+
 .lively-mascot.is-emotion-36 .lively-face__shine {
-  transform: translateY(2px);
+  visibility: hidden;
 }
 
 .lively-mascot.is-emotion-36 .lively-face__mouth {
@@ -980,10 +1128,6 @@
   visibility: visible;
 }
 
-.lively-mascot.is-emotion-38 .lively-face__happy {
-  visibility: visible;
-}
-
 .lively-mascot.is-emotion-38 .lively-face__happy-mouth {
   visibility: visible;
 }
@@ -1006,6 +1150,671 @@
 }
 
 /* ============================================================
+ * Minimal Face Emotion Poses
+ *
+ * These rules intentionally come after every emotion face rule. Simple and
+ * dot faces always retain their selected primitive, while emotions reshape
+ * and pose it instead of revealing the default replacement artwork.
+ * ============================================================ */
+
+.lively-mascot--face-simple,
+.lively-mascot--face-dot {
+  --lively-minimal-eye-x: 0px;
+  --lively-minimal-eye-y: 0px;
+  --lively-minimal-eye-scale-x: 1;
+  --lively-minimal-eye-scale-y: 1;
+  --lively-minimal-eye-left-turn: 0deg;
+  --lively-minimal-eye-right-turn: 0deg;
+}
+
+.lively-mascot.lively-mascot--face-simple .lively-face__eye,
+.lively-mascot.lively-mascot--face-dot .lively-face__eye {
+  visibility: visible;
+  transform: translate(var(--lively-minimal-eye-x), var(--lively-minimal-eye-y))
+    rotate(var(--lively-minimal-eye-turn, 0deg))
+    scale(var(--lively-minimal-eye-scale-x), var(--lively-minimal-eye-scale-y));
+}
+
+.lively-mascot.lively-mascot--face-simple .lively-face__eye--l,
+.lively-mascot.lively-mascot--face-dot .lively-face__eye--l {
+  --lively-minimal-eye-turn: var(--lively-minimal-eye-left-turn);
+}
+
+.lively-mascot.lively-mascot--face-simple .lively-face__eye--r,
+.lively-mascot.lively-mascot--face-dot .lively-face__eye--r {
+  --lively-minimal-eye-turn: var(--lively-minimal-eye-right-turn);
+}
+
+.lively-mascot.lively-mascot--face-simple .lively-face__capsule,
+.lively-mascot.lively-mascot--face-dot .lively-face__dot-eye {
+  visibility: visible;
+}
+
+/* Emotion rules above can reveal replacement eyes and other facial artwork.
+   Minimal variants suppress those layers with a higher-specificity final rule. */
+.lively-mascot.lively-mascot--face-simple .lively-face__mouth,
+.lively-mascot.lively-mascot--face-simple .lively-face__sad-mouth,
+.lively-mascot.lively-mascot--face-simple .lively-face__open-mouth,
+.lively-mascot.lively-mascot--face-simple .lively-face__flat-mouth,
+.lively-mascot.lively-mascot--face-simple .lively-face__bored-mouth,
+.lively-mascot.lively-mascot--face-simple .lively-face__happy,
+.lively-mascot.lively-mascot--face-simple .lively-face__bored-eye,
+.lively-mascot.lively-mascot--face-simple .lively-face__happy-mouth,
+.lively-mascot.lively-mascot--face-simple .lively-face__blush,
+.lively-mascot.lively-mascot--face-simple .lively-face__pupil,
+.lively-mascot.lively-mascot--face-simple .lively-face__shine,
+.lively-mascot.lively-mascot--face-simple .lively-face__sleep-eye,
+.lively-mascot.lively-mascot--face-simple .lively-face__x-eye,
+.lively-mascot.lively-mascot--face-simple .lively-face__heart-eye,
+.lively-mascot.lively-mascot--face-simple .lively-face__cry-eye,
+.lively-mascot.lively-mascot--face-simple .lively-face__sweat,
+.lively-mascot.lively-mascot--face-simple .lively-face__star-eye,
+.lively-mascot.lively-mascot--face-simple .lively-face__sparkle,
+.lively-mascot.lively-mascot--face-simple .lively-face__waiting-dots,
+.lively-mascot.lively-mascot--face-simple .lively-face__angry-brow,
+.lively-mascot.lively-mascot--face-dot .lively-face__mouth,
+.lively-mascot.lively-mascot--face-dot .lively-face__sad-mouth,
+.lively-mascot.lively-mascot--face-dot .lively-face__open-mouth,
+.lively-mascot.lively-mascot--face-dot .lively-face__flat-mouth,
+.lively-mascot.lively-mascot--face-dot .lively-face__bored-mouth,
+.lively-mascot.lively-mascot--face-dot .lively-face__happy,
+.lively-mascot.lively-mascot--face-dot .lively-face__bored-eye,
+.lively-mascot.lively-mascot--face-dot .lively-face__happy-mouth,
+.lively-mascot.lively-mascot--face-dot .lively-face__blush,
+.lively-mascot.lively-mascot--face-dot .lively-face__pupil,
+.lively-mascot.lively-mascot--face-dot .lively-face__shine,
+.lively-mascot.lively-mascot--face-dot .lively-face__sleep-eye,
+.lively-mascot.lively-mascot--face-dot .lively-face__x-eye,
+.lively-mascot.lively-mascot--face-dot .lively-face__heart-eye,
+.lively-mascot.lively-mascot--face-dot .lively-face__cry-eye,
+.lively-mascot.lively-mascot--face-dot .lively-face__sweat,
+.lively-mascot.lively-mascot--face-dot .lively-face__star-eye,
+.lively-mascot.lively-mascot--face-dot .lively-face__sparkle,
+.lively-mascot.lively-mascot--face-dot .lively-face__waiting-dots,
+.lively-mascot.lively-mascot--face-dot .lively-face__angry-brow {
+  visibility: hidden;
+}
+
+/* Closed and smiling eyes are the selected shape compressed in place. */
+.lively-mascot--face-simple.is-emotion-00,
+.lively-mascot--face-dot.is-emotion-00 {
+  --lively-minimal-eye-y: 2px;
+  --lively-minimal-eye-scale-x: 1.24;
+  --lively-minimal-eye-scale-y: 0.06;
+}
+
+.lively-mascot--face-simple.is-happy,
+.lively-mascot--face-simple.is-emotion-30,
+.lively-mascot--face-dot.is-happy,
+.lively-mascot--face-dot.is-emotion-30 {
+  --lively-minimal-eye-y: 2px;
+  --lively-minimal-eye-scale-x: 1.28;
+  --lively-minimal-eye-scale-y: 0.08;
+  --lively-minimal-eye-left-turn: 14deg;
+  --lively-minimal-eye-right-turn: -14deg;
+}
+
+/* Happy opens the minimal eyes; shy closes and gathers them; grateful keeps a
+   soft, upright gaze. These poses stay distinct even in static thumbnails. */
+.lively-mascot--face-simple.is-emotion-10 {
+  --lively-minimal-eye-y: -1px;
+  --lively-minimal-eye-scale-x: 1.16;
+  --lively-minimal-eye-scale-y: 1.08;
+  --lively-minimal-eye-left-turn: -5deg;
+  --lively-minimal-eye-right-turn: 5deg;
+}
+
+.lively-mascot--face-simple.is-emotion-11 {
+  --lively-minimal-eye-x: 4px;
+  --lively-minimal-eye-y: -3px;
+  --lively-minimal-eye-scale-x: .96;
+  --lively-minimal-eye-scale-y: 1.12;
+  --lively-minimal-eye-left-turn: -5deg;
+  --lively-minimal-eye-right-turn: -5deg;
+}
+
+.lively-mascot--face-simple.is-emotion-11 .lively-face__eye--r {
+  --lively-minimal-eye-scale-y: 1.18;
+}
+
+.lively-mascot--face-simple.is-emotion-11 .lively-face__eye--l {
+  animation: lively-curious-simple-eye-l 3.2s ease-in-out infinite;
+}
+
+.lively-mascot--face-simple.is-emotion-11 .lively-face__eye--r {
+  animation: lively-curious-simple-eye-r 3.2s ease-in-out infinite;
+}
+
+.lively-mascot--face-simple.is-emotion-15 {
+  --lively-minimal-eye-y: 4px;
+  --lively-minimal-eye-scale-x: .78;
+  --lively-minimal-eye-scale-y: .12;
+  --lively-minimal-eye-left-turn: 12deg;
+  --lively-minimal-eye-right-turn: -12deg;
+}
+
+.lively-mascot--face-simple.is-emotion-15 .lively-face__eye--l,
+.lively-mascot--face-simple.is-emotion-32 .lively-face__eye--l {
+  --lively-minimal-eye-x: 2px;
+}
+
+.lively-mascot--face-simple.is-emotion-15 .lively-face__eye--r,
+.lively-mascot--face-simple.is-emotion-32 .lively-face__eye--r {
+  --lively-minimal-eye-x: -2px;
+}
+
+.lively-mascot--face-simple.is-emotion-32 {
+  --lively-minimal-eye-y: 2px;
+  --lively-minimal-eye-scale-x: .78;
+  --lively-minimal-eye-scale-y: .58;
+  --lively-minimal-eye-left-turn: 0deg;
+  --lively-minimal-eye-right-turn: 0deg;
+}
+
+.lively-mascot--face-simple.is-emotion-32 .lively-face__capsule {
+  fill: var(--lively-accent);
+}
+
+/* Energy and attention states change the proportions of the chosen eyes. */
+.lively-mascot--face-simple.is-emotion-04,
+.lively-mascot--face-simple.is-emotion-09,
+.lively-mascot--face-simple.is-emotion-14,
+.lively-mascot--face-simple.is-emotion-21,
+.lively-mascot--face-dot.is-emotion-04,
+.lively-mascot--face-dot.is-emotion-09,
+.lively-mascot--face-dot.is-emotion-14,
+.lively-mascot--face-dot.is-emotion-21 {
+  --lively-minimal-eye-y: -1px;
+  --lively-minimal-eye-scale-x: 1.22;
+  --lively-minimal-eye-scale-y: 1.3;
+}
+
+.lively-mascot--face-simple.is-emotion-05,
+.lively-mascot--face-simple.is-emotion-18,
+.lively-mascot--face-simple.is-emotion-19,
+.lively-mascot--face-simple.is-emotion-26,
+.lively-mascot--face-simple.is-emotion-29,
+.lively-mascot--face-dot.is-emotion-05,
+.lively-mascot--face-dot.is-emotion-18,
+.lively-mascot--face-dot.is-emotion-19,
+.lively-mascot--face-dot.is-emotion-26,
+.lively-mascot--face-dot.is-emotion-29 {
+  --lively-minimal-eye-y: 2px;
+  --lively-minimal-eye-scale-x: 1.14;
+  --lively-minimal-eye-scale-y: 0.34;
+}
+
+.lively-mascot--face-simple.is-emotion-07,
+.lively-mascot--face-dot.is-emotion-07 {
+  --lively-minimal-eye-y: 3px;
+  --lively-minimal-eye-scale-x: 0.92;
+  --lively-minimal-eye-scale-y: 0.48;
+  --lively-minimal-eye-left-turn: -9deg;
+  --lively-minimal-eye-right-turn: 9deg;
+}
+
+/* Aggrieved eyes draw inward and down while staying visibly open. */
+.lively-mascot--face-simple.is-emotion-12 {
+  --lively-minimal-eye-y: 3px;
+  --lively-minimal-eye-scale-x: .82;
+  --lively-minimal-eye-scale-y: .7;
+  --lively-minimal-eye-left-turn: -10deg;
+  --lively-minimal-eye-right-turn: 10deg;
+}
+
+.lively-mascot--face-simple.is-emotion-12 .lively-face__eye--l {
+  --lively-minimal-eye-x: 2px;
+}
+
+.lively-mascot--face-simple.is-emotion-12 .lively-face__eye--r {
+  --lively-minimal-eye-x: -2px;
+}
+
+/* Offline and error retain each selected eye as a single diagonal mark. */
+.lively-mascot--face-simple.is-emotion-08,
+.lively-mascot--face-simple.is-emotion-31,
+.lively-mascot--face-dot.is-emotion-08,
+.lively-mascot--face-dot.is-emotion-31 {
+  --lively-minimal-eye-scale-x: 1.24;
+  --lively-minimal-eye-scale-y: 0.08;
+  --lively-minimal-eye-left-turn: 45deg;
+  --lively-minimal-eye-right-turn: -45deg;
+}
+
+.lively-mascot--face-simple.is-emotion-13,
+.lively-mascot--face-dot.is-emotion-13 {
+  --lively-minimal-eye-scale-x: 1.16;
+  --lively-minimal-eye-scale-y: 0.42;
+  --lively-minimal-eye-left-turn: 18deg;
+  --lively-minimal-eye-right-turn: -18deg;
+}
+
+.lively-mascot--face-simple.is-emotion-24,
+.lively-mascot--face-dot.is-emotion-24 {
+  --lively-minimal-eye-y: 4px;
+  --lively-minimal-eye-scale-x: 1.12;
+  --lively-minimal-eye-scale-y: 0.2;
+}
+
+.lively-mascot--face-simple.is-emotion-16,
+.lively-mascot--face-dot.is-emotion-16,
+.lively-mascot--face-simple.is-emotion-38,
+.lively-mascot--face-dot.is-emotion-38 {
+  --lively-minimal-eye-y: -1px;
+  --lively-minimal-eye-scale-x: 1.36;
+  --lively-minimal-eye-scale-y: 1.28;
+}
+
+.lively-mascot--face-simple.is-emotion-16 .lively-face__capsule,
+.lively-mascot--face-dot.is-emotion-16 .lively-face__dot-eye {
+  fill: var(--lively-accent);
+  animation: lively-minimal-love-eye 0.8s cubic-bezier(.4, 0, .2, 1) infinite;
+}
+
+.lively-mascot--face-simple.is-emotion-38 .lively-face__capsule,
+.lively-mascot--face-dot.is-emotion-38 .lively-face__dot-eye {
+  animation: lively-minimal-eureka-eye 0.6s ease-in-out infinite alternate;
+}
+
+.lively-mascot--face-simple.is-emotion-20,
+.lively-mascot--face-dot.is-emotion-20 {
+  --lively-minimal-eye-x: 3px;
+  --lively-minimal-eye-y: -3px;
+  --lively-minimal-eye-left-turn: -10deg;
+  --lively-minimal-eye-right-turn: -10deg;
+}
+
+.lively-mascot--face-simple.is-emotion-25,
+.lively-mascot--face-dot.is-emotion-25 {
+  --lively-minimal-eye-x: 2px;
+  --lively-minimal-eye-y: 3px;
+  --lively-minimal-eye-scale-y: .72;
+}
+
+.lively-mascot--face-simple.is-emotion-06,
+.lively-mascot--face-dot.is-emotion-06,
+.lively-mascot--face-simple.is-emotion-22,
+.lively-mascot--face-dot.is-emotion-22 {
+  --lively-minimal-eye-scale-x: 1.1;
+  --lively-minimal-eye-scale-y: .78;
+}
+
+.lively-mascot--face-simple.is-emotion-23,
+.lively-mascot--face-dot.is-emotion-23 {
+  --lively-minimal-eye-x: -3px;
+  --lively-minimal-eye-scale-y: .86;
+}
+
+.lively-mascot--face-simple.is-emotion-27,
+.lively-mascot--face-dot.is-emotion-27 {
+  --lively-minimal-eye-x: 2px;
+  --lively-minimal-eye-y: -2px;
+  --lively-minimal-eye-left-turn: 7deg;
+  --lively-minimal-eye-right-turn: 7deg;
+}
+
+.lively-mascot--face-simple.is-emotion-28,
+.lively-mascot--face-dot.is-emotion-28 {
+  --lively-minimal-eye-y: 2px;
+  --lively-minimal-eye-scale-x: 1.14;
+  --lively-minimal-eye-scale-y: .42;
+}
+
+.lively-mascot--face-simple.is-emotion-33,
+.lively-mascot--face-dot.is-emotion-33 {
+  --lively-minimal-eye-scale-y: .58;
+  --lively-minimal-eye-left-turn: -13deg;
+  --lively-minimal-eye-right-turn: 13deg;
+}
+
+.lively-mascot--face-simple.is-emotion-34,
+.lively-mascot--face-dot.is-emotion-34 {
+  --lively-minimal-eye-y: 4px;
+  --lively-minimal-eye-scale-x: 1.18;
+  --lively-minimal-eye-scale-y: 0.1;
+}
+
+.lively-mascot--face-simple.is-emotion-35,
+.lively-mascot--face-dot.is-emotion-35 {
+  --lively-minimal-eye-y: 3px;
+  --lively-minimal-eye-scale-x: 1.18;
+  --lively-minimal-eye-scale-y: 0.12;
+  --lively-minimal-eye-left-turn: -10deg;
+  --lively-minimal-eye-right-turn: 10deg;
+}
+
+.lively-mascot--face-simple.is-emotion-36,
+.lively-mascot--face-dot.is-emotion-36 {
+  --lively-minimal-eye-y: 4px;
+  --lively-minimal-eye-scale-x: 1.24;
+  --lively-minimal-eye-scale-y: 0.08;
+}
+
+.lively-mascot--face-simple.is-emotion-37,
+.lively-mascot--face-dot.is-emotion-37 {
+  --lively-minimal-eye-scale-x: 0.68;
+  --lively-minimal-eye-scale-y: 1.36;
+  --lively-minimal-eye-left-turn: -5deg;
+  --lively-minimal-eye-right-turn: 5deg;
+}
+
+.lively-mascot--face-simple.is-emotion-18,
+.lively-mascot--face-dot.is-emotion-18 {
+  --lively-minimal-eye-scale-y: .28;
+  --lively-minimal-eye-left-turn: -8deg;
+  --lively-minimal-eye-right-turn: -8deg;
+}
+
+.lively-mascot--face-simple.is-emotion-19 .lively-face__eye--l,
+.lively-mascot--face-dot.is-emotion-19 .lively-face__eye--l {
+  --lively-minimal-eye-y: 1px;
+  --lively-minimal-eye-scale-y: .28;
+}
+
+.lively-mascot--face-simple.is-emotion-19 .lively-face__eye--r,
+.lively-mascot--face-dot.is-emotion-19 .lively-face__eye--r {
+  --lively-minimal-eye-y: -1px;
+  --lively-minimal-eye-scale-y: .58;
+}
+
+.lively-mascot--face-simple.is-emotion-39,
+.lively-mascot--face-dot.is-emotion-39 {
+  --lively-minimal-eye-y: 4px;
+  --lively-minimal-eye-scale-y: .62;
+}
+
+/* Confusion is intentionally asymmetric: one eye contracts while the other opens. */
+.lively-mascot--face-simple.is-emotion-17 .lively-face__eye--l,
+.lively-mascot--face-dot.is-emotion-17 .lively-face__eye--l {
+  --lively-minimal-eye-y: 2px;
+  --lively-minimal-eye-scale-x: .68;
+  --lively-minimal-eye-scale-y: .62;
+}
+
+.lively-mascot--face-simple.is-emotion-17 .lively-face__eye--r,
+.lively-mascot--face-dot.is-emotion-17 .lively-face__eye--r {
+  --lively-minimal-eye-y: -1px;
+  --lively-minimal-eye-scale-x: 1.34;
+  --lively-minimal-eye-scale-y: 1.34;
+}
+
+/* Dot eyes stay recognizably circular. They express through size, spacing and
+   asymmetry instead of reusing the pill eye's line-like deformations. */
+.lively-mascot--face-dot {
+  --lively-minimal-eye-scale-x: 1.05;
+  --lively-minimal-eye-scale-y: 1.05;
+}
+
+.lively-mascot--face-dot.is-emotion-00 {
+  --lively-minimal-eye-y: 2px;
+  --lively-minimal-eye-scale-x: 1.28;
+  --lively-minimal-eye-scale-y: .2;
+}
+
+.lively-mascot--face-dot.is-happy,
+.lively-mascot--face-dot.is-emotion-30 {
+  --lively-minimal-eye-y: 3px;
+  --lively-minimal-eye-scale-x: .72;
+  --lively-minimal-eye-scale-y: .72;
+  --lively-minimal-eye-left-turn: 0deg;
+  --lively-minimal-eye-right-turn: 0deg;
+}
+
+.lively-mascot--face-dot.is-happy .lively-face__eye--l,
+.lively-mascot--face-dot.is-emotion-30 .lively-face__eye--l {
+  --lively-minimal-eye-x: 2px;
+}
+
+.lively-mascot--face-dot.is-happy .lively-face__eye--r,
+.lively-mascot--face-dot.is-emotion-30 .lively-face__eye--r {
+  --lively-minimal-eye-x: -2px;
+}
+
+.lively-mascot--face-dot.is-emotion-10 {
+  --lively-minimal-eye-y: -1px;
+  --lively-minimal-eye-scale-x: 1.3;
+  --lively-minimal-eye-scale-y: 1.3;
+  --lively-minimal-eye-left-turn: 0deg;
+  --lively-minimal-eye-right-turn: 0deg;
+}
+
+.lively-mascot--face-dot.is-emotion-10 .lively-face__eye--l {
+  --lively-minimal-eye-x: -1.5px;
+}
+
+.lively-mascot--face-dot.is-emotion-10 .lively-face__eye--r {
+  --lively-minimal-eye-x: 1.5px;
+}
+
+.lively-mascot--face-dot.is-emotion-11 {
+  --lively-minimal-eye-x: 4px;
+  --lively-minimal-eye-y: -3px;
+  --lively-minimal-eye-scale-x: .98;
+  --lively-minimal-eye-scale-y: .98;
+}
+
+.lively-mascot--face-dot.is-emotion-11 .lively-face__eye--r {
+  --lively-minimal-eye-scale-x: 1.12;
+  --lively-minimal-eye-scale-y: 1.12;
+}
+
+.lively-mascot--face-dot.is-emotion-11 .lively-face__eye--l {
+  animation: lively-curious-dot-eye-l 3.2s ease-in-out infinite;
+}
+
+.lively-mascot--face-dot.is-emotion-11 .lively-face__eye--r {
+  animation: lively-curious-dot-eye-r 3.2s ease-in-out infinite;
+}
+
+.lively-mascot--face-dot.is-emotion-32 {
+  --lively-minimal-eye-y: 2px;
+  --lively-minimal-eye-scale-x: .88;
+  --lively-minimal-eye-scale-y: .88;
+  --lively-minimal-eye-left-turn: 0deg;
+  --lively-minimal-eye-right-turn: 0deg;
+}
+
+.lively-mascot--face-dot.is-emotion-32 .lively-face__eye--l {
+  --lively-minimal-eye-x: 2px;
+}
+
+.lively-mascot--face-dot.is-emotion-32 .lively-face__eye--r {
+  --lively-minimal-eye-x: -2px;
+}
+
+.lively-mascot--face-dot.is-emotion-32 .lively-face__dot-eye {
+  fill: var(--lively-accent);
+}
+
+.lively-mascot--face-dot.is-emotion-04,
+.lively-mascot--face-dot.is-emotion-09,
+.lively-mascot--face-dot.is-emotion-14,
+.lively-mascot--face-dot.is-emotion-21 {
+  --lively-minimal-eye-y: -1px;
+  --lively-minimal-eye-scale-x: 1.48;
+  --lively-minimal-eye-scale-y: 1.48;
+}
+
+.lively-mascot--face-dot.is-emotion-07 {
+  --lively-minimal-eye-y: 3px;
+  --lively-minimal-eye-scale-x: .72;
+  --lively-minimal-eye-scale-y: .72;
+}
+
+.lively-mascot--face-dot.is-emotion-12 {
+  --lively-minimal-eye-y: 3px;
+  --lively-minimal-eye-scale-x: .82;
+  --lively-minimal-eye-scale-y: .82;
+}
+
+.lively-mascot--face-dot.is-emotion-07 .lively-face__eye--l,
+.lively-mascot--face-dot.is-emotion-35 .lively-face__eye--l,
+.lively-mascot--face-dot.is-emotion-37 .lively-face__eye--l {
+  --lively-minimal-eye-x: -2px;
+}
+
+.lively-mascot--face-dot.is-emotion-07 .lively-face__eye--r,
+.lively-mascot--face-dot.is-emotion-35 .lively-face__eye--r,
+.lively-mascot--face-dot.is-emotion-37 .lively-face__eye--r {
+  --lively-minimal-eye-x: 2px;
+}
+
+.lively-mascot--face-dot.is-emotion-12 .lively-face__eye--l {
+  --lively-minimal-eye-x: 2px;
+  --lively-minimal-eye-y: 2px;
+}
+
+.lively-mascot--face-dot.is-emotion-12 .lively-face__eye--r {
+  --lively-minimal-eye-x: -2px;
+  --lively-minimal-eye-y: 3.5px;
+  --lively-minimal-eye-scale-x: .76;
+  --lively-minimal-eye-scale-y: .76;
+}
+
+.lively-mascot--face-dot.is-emotion-08,
+.lively-mascot--face-dot.is-emotion-31,
+.lively-mascot--face-dot.is-emotion-34,
+.lively-mascot--face-dot.is-emotion-36 {
+  --lively-minimal-eye-y: 4px;
+  --lively-minimal-eye-scale-x: .5;
+  --lively-minimal-eye-scale-y: .5;
+  --lively-minimal-eye-left-turn: 0deg;
+  --lively-minimal-eye-right-turn: 0deg;
+}
+
+.lively-mascot--face-dot.is-emotion-13 {
+  --lively-minimal-eye-scale-x: 1.08;
+  --lively-minimal-eye-scale-y: .58;
+}
+
+.lively-mascot--face-dot.is-emotion-15 {
+  --lively-minimal-eye-y: 4px;
+  --lively-minimal-eye-scale-x: .56;
+  --lively-minimal-eye-scale-y: .56;
+  --lively-minimal-eye-left-turn: 0deg;
+  --lively-minimal-eye-right-turn: 0deg;
+}
+
+.lively-mascot--face-dot.is-emotion-15 .lively-face__eye--l {
+  --lively-minimal-eye-x: 2px;
+  --lively-minimal-eye-y: 5px;
+  --lively-minimal-eye-scale-x: .46;
+  --lively-minimal-eye-scale-y: .46;
+}
+
+.lively-mascot--face-dot.is-emotion-15 .lively-face__eye--r {
+  --lively-minimal-eye-x: 2px;
+  --lively-minimal-eye-y: 3px;
+  --lively-minimal-eye-scale-x: .66;
+  --lively-minimal-eye-scale-y: .66;
+}
+
+.lively-mascot--face-dot.is-emotion-16,
+.lively-mascot--face-dot.is-emotion-38 {
+  --lively-minimal-eye-y: -1px;
+  --lively-minimal-eye-scale-x: 1.62;
+  --lively-minimal-eye-scale-y: 1.62;
+}
+
+.lively-mascot--face-dot.is-emotion-17 .lively-face__eye--l {
+  --lively-minimal-eye-y: 2px;
+  --lively-minimal-eye-scale-x: .42;
+  --lively-minimal-eye-scale-y: .42;
+}
+
+.lively-mascot--face-dot.is-emotion-17 .lively-face__eye--r {
+  --lively-minimal-eye-y: -1px;
+  --lively-minimal-eye-scale-x: 1.58;
+  --lively-minimal-eye-scale-y: 1.58;
+}
+
+.lively-mascot--face-dot.is-emotion-18 {
+  --lively-minimal-eye-scale-x: 1;
+  --lively-minimal-eye-scale-y: .56;
+}
+
+.lively-mascot--face-dot.is-emotion-19 .lively-face__eye--l {
+  --lively-minimal-eye-y: 2px;
+  --lively-minimal-eye-scale-x: .62;
+  --lively-minimal-eye-scale-y: .62;
+}
+
+.lively-mascot--face-dot.is-emotion-19 .lively-face__eye--r {
+  --lively-minimal-eye-y: -1px;
+  --lively-minimal-eye-scale-x: 1.08;
+  --lively-minimal-eye-scale-y: 1.08;
+}
+
+.lively-mascot--face-dot.is-emotion-24,
+.lively-mascot--face-dot.is-emotion-25,
+.lively-mascot--face-dot.is-emotion-28,
+.lively-mascot--face-dot.is-emotion-33,
+.lively-mascot--face-dot.is-emotion-35,
+.lively-mascot--face-dot.is-emotion-37,
+.lively-mascot--face-dot.is-emotion-39 {
+  --lively-minimal-eye-scale-x: .68;
+  --lively-minimal-eye-scale-y: .68;
+  --lively-minimal-eye-left-turn: 0deg;
+  --lively-minimal-eye-right-turn: 0deg;
+}
+
+.lively-mascot--face-dot.is-emotion-37 {
+  --lively-minimal-eye-y: -1px;
+}
+
+.lively-mascot.lively-mascot--face-simple .lively-face__eye.is-blinking,
+.lively-mascot.lively-mascot--face-dot .lively-face__eye.is-blinking {
+  --lively-minimal-eye-scale-y: 0.06;
+}
+
+@keyframes lively-minimal-love-eye {
+  0%, 100% { transform: scale(0.94); }
+  45% { transform: scale(1.2); }
+  62% { transform: scale(1.04); }
+}
+
+/* Curious eyes pause at each side, then make a quick saccade to the other. */
+@keyframes lively-curious-default-eye-l {
+  0%, 38%, 100% { transform: translate(1px, -1px) scale(1.04, 1.08); }
+  46%, 90% { transform: translate(-2px, -2px) scale(1.14, 1.18); }
+}
+
+@keyframes lively-curious-default-eye-r {
+  0%, 38%, 100% { transform: translate(2px, -2px) scale(1.14, 1.18); }
+  46%, 90% { transform: translate(-1px, -1px) scale(1.04, 1.08); }
+}
+
+@keyframes lively-curious-pupil {
+  0%, 38%, 100% { transform: translate(2px, -2px); }
+  46%, 90% { transform: translate(-2px, -2px); }
+}
+
+@keyframes lively-curious-simple-eye-l {
+  0%, 38%, 100% { transform: translate(4px, -2.5px) rotate(-5deg) scale(.96, 1.12); }
+  46%, 90% { transform: translate(-4.5px, -3.5px) rotate(5deg) scale(.96, 1.18); }
+}
+
+@keyframes lively-curious-simple-eye-r {
+  0%, 38%, 100% { transform: translate(4.5px, -3.5px) rotate(-5deg) scale(.96, 1.18); }
+  46%, 90% { transform: translate(-4px, -2.5px) rotate(5deg) scale(.96, 1.12); }
+}
+
+@keyframes lively-curious-dot-eye-l {
+  0%, 38%, 100% { transform: translate(4px, -2.5px) scale(.98); }
+  46%, 90% { transform: translate(-4.5px, -3.5px) scale(1.12); }
+}
+
+@keyframes lively-curious-dot-eye-r {
+  0%, 38%, 100% { transform: translate(4.5px, -3.5px) scale(1.12); }
+  46%, 90% { transform: translate(-4px, -2.5px) scale(.98); }
+}
+
+@keyframes lively-minimal-eureka-eye {
+  from { transform: scale(0.94); fill: var(--lively-outline); }
+  to { transform: scale(1.18); fill: var(--lively-accent); }
+}
+
+/* ============================================================
  * SVG Element Base Styles
  * ============================================================ */
 
@@ -1013,6 +1822,9 @@
 .lively-face__tear {
   visibility: hidden;
 }
+
+.lively-face__tear--l { --tx: 40px; }
+.lively-face__tear--r { --tx: 60px; }
 
 .lively-mascot.is-emotion-35 .lively-face__tear--l {
   animation: lively-tear-fall 0.8s ease-in infinite;
@@ -1040,7 +1852,15 @@
 }
 
 .lively-mascot.is-emotion-37 .lively-face__sweat {
+  visibility: visible;
   animation: lively-sweat-drip 1.2s ease-in infinite;
+}
+
+/* A gallery thumbnail has no keyframes, so pin the drop for every face variant. */
+.lively-mascot--static.is-emotion-37 .lively-face__sweat {
+  visibility: visible;
+  opacity: 1;
+  transform: translate(82px, 30px);
 }
 
 @keyframes lively-sweat-drip {
@@ -1060,7 +1880,12 @@
   visibility: hidden;
 }
 
-.lively-mascot.is-emotion-38 .lively-face__star-eye {
+.lively-face__star-eye polygon {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.lively-mascot.is-emotion-38 .lively-face__star-eye polygon {
   animation: lively-star-pulse 0.6s ease-in-out infinite;
 }
 
@@ -1081,11 +1906,16 @@
   visibility: hidden;
 }
 
-.lively-mascot.is-emotion-38 .lively-face__sparkle--1 {
+.lively-face__sparkle line {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.lively-mascot.is-emotion-38 .lively-face__sparkle--1 line {
   animation: lively-sparkle-twinkle 0.8s ease-in-out infinite;
 }
 
-.lively-mascot.is-emotion-38 .lively-face__sparkle--2 {
+.lively-mascot.is-emotion-38 .lively-face__sparkle--2 line {
   animation: lively-sparkle-twinkle 0.8s ease-in-out 0.4s infinite;
 }
 
@@ -1222,6 +2052,11 @@
   .lively-cat__whisker,
   .lively__foot,
   .lively__ghost-hem,
+  .lively-face__eye,
+  .lively-face__capsule,
+  .lively-face__dot-eye,
+  .lively-face__happy,
+  .lively-face__tear,
   .lively-face-wrap svg,
   .lively__loading-overlay::before {
     animation: none !important;
@@ -1258,6 +2093,45 @@
 
   100% {
     transform: scale(1, 1);
+  }
+}
+
+@keyframes lively-eye-wake-open {
+  0% {
+    transform: translateY(3px) scaleY(0.06);
+  }
+
+  28% {
+    transform: translateY(2px) scaleY(0.16);
+  }
+
+  58% {
+    transform: translateY(1px) scaleY(0.52);
+  }
+
+  82% {
+    transform: translateY(0) scaleY(1.08);
+  }
+
+  100% {
+    transform: translateY(0) scaleY(1);
+  }
+}
+
+@keyframes lively-happy-eye-arrive {
+  0% {
+    transform: translateY(3px) scale(0.45, 0.12);
+    opacity: 0;
+  }
+
+  62% {
+    transform: translateY(-1px) scale(1.18, 1.12);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1.08, 1.04);
+    opacity: 1;
   }
 }
 
@@ -1486,22 +2360,6 @@
 
   100% {
     transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes lively-excited {
-
-  0%,
-  100% {
-    transform: translateY(0) rotate(0);
-  }
-
-  25% {
-    transform: translateY(-6px) rotate(-4deg);
-  }
-
-  75% {
-    transform: translateY(-6px) rotate(4deg);
   }
 }
 
@@ -2830,8 +3688,8 @@
 }
 
 /* --- Cat-specific ear emotion animations --- */
-.lively-mascot.is-emotion-11 .lively__ears { animation: lively-cat-ear-perk 0.6s ease-in-out infinite; }
 .lively-mascot.is-emotion-13 .lively__ears { animation: lively-cat-ear-flatten 0.3s ease-in-out infinite; }
+.lively-mascot.is-emotion-11 .lively__ears { animation: lively-cat-ear-curious .8s ease-in-out infinite; }
 .lively-mascot.is-emotion-37 .lively__ears { animation: lively-cat-ear-nervous 0.4s ease-in-out infinite; }
 .lively-mascot.is-emotion-00 .lively__ears { animation: lively-cat-ear-relax 4s ease-in-out infinite; }
 
@@ -2847,9 +3705,9 @@
   75% { transform: rotate(4deg) translateY(-2px); }
 }
 
-@keyframes lively-cat-ear-perk {
-  0%, 100% { transform: translateY(0) scaleY(1); }
-  50% { transform: translateY(-3px) scaleY(1.1); }
+@keyframes lively-cat-ear-curious {
+  0%, 100% { transform: rotate(0) translateY(0); }
+  50% { transform: rotate(2deg) translateY(-2px); }
 }
 
 @keyframes lively-cat-ear-flatten {

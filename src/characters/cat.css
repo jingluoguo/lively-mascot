@@ -260,8 +260,8 @@
 }
 
 /* --- Cat-specific ear emotion animations --- */
-.lively-mascot.is-emotion-11 .lively__ears { animation: lively-cat-ear-perk 0.6s ease-in-out infinite; }
 .lively-mascot.is-emotion-13 .lively__ears { animation: lively-cat-ear-flatten 0.3s ease-in-out infinite; }
+.lively-mascot.is-emotion-11 .lively__ears { animation: lively-cat-ear-curious .8s ease-in-out infinite; }
 .lively-mascot.is-emotion-37 .lively__ears { animation: lively-cat-ear-nervous 0.4s ease-in-out infinite; }
 .lively-mascot.is-emotion-00 .lively__ears { animation: lively-cat-ear-relax 4s ease-in-out infinite; }
 
@@ -277,9 +277,9 @@
   75% { transform: rotate(4deg) translateY(-2px); }
 }
 
-@keyframes lively-cat-ear-perk {
-  0%, 100% { transform: translateY(0) scaleY(1); }
-  50% { transform: translateY(-3px) scaleY(1.1); }
+@keyframes lively-cat-ear-curious {
+  0%, 100% { transform: rotate(0) translateY(0); }
+  50% { transform: rotate(2deg) translateY(-2px); }
 }
 
 @keyframes lively-cat-ear-flatten {

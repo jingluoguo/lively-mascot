@@ -18,6 +18,7 @@ An expression system for chatbots, desktop pets, web widgets, and AI assistants.
 - **40 Status Emotions**: Covers lifecycle (sleep/idle), emotional reactions (happy/angry), work states (thinking/searching), and extended states (bored/nervous/eureka/waiting).
 - **Multi-Character**: Ships with five bundled characters — **Sprout** (plant-styled), **Cat** (pet-styled), **Robot** (tech blocky head + antenna), **Ghost** (domed floating translucent with a 3-lobe wavy hem), and **Jelly** (bouncy blob). Swappable via `type` option with zero engine-level changes.
 - **Full-Element Control**: Each emotion controls eyes, mouth, blush, body, accessories (leaf/ears/tail), and limbs — independent animation channels per character anatomy.
+- **Face Variants**: Switch between the expressive default face, a minimal capsule-eye face, and a dot-eye face with `setFaceVariant("default" | "simple" | "dot")`. Each variant adjusts the selected eye shapes in place rather than stacking replacement features.
 - **Configuration Driven**: Each emotion is a pure data combination (animations + filters + behavior params), supporting runtime registration.
 - **Zero Dependencies, Zero Build**: Native JS, no framework, standard `<script>` tag order.
 - **Plug-and-play**: Web Component `<lively-mascot>` and functional API `createMascot`.
@@ -260,11 +261,13 @@ This regenerates `dist/lively-mascot.min.js` and `dist/lively-mascot.min.css`. R
 | `viewMode`     | `string`  | `"3d"`    | Visual mode: `"2d"` or `"3d"` (lightweight depth) |
 | `outlineVisible` | `boolean` | `true` | Show the outer silhouette outline |
 
-**Returns**: `{ el, type, viewMode, setViewMode(mode), outlineVisible, setOutlineVisible(visible), setTheme, setEmotion(id), clearEmotion(), destroy() }`
+**Returns**: `{ el, type, viewMode, setViewMode(mode), outlineVisible, setOutlineVisible(visible), setFaceVariant(variant), setTheme, setEmotion(id), clearEmotion(), destroy() }`
 
 3D is a lightweight CSS depth treatment with no WebGL dependency. Switch a live instance with `setViewMode("2d")` / `setViewMode("3d")`; declarative `<lively-mascot>` also accepts `view-mode="2d"` (with `mode` as an alias).
 
 Set `outlineVisible: false` or call `setOutlineVisible(false)` to hide the outer silhouette ink while keeping facial details visible. The declarative element accepts `show-outline="false"` as well.
+
+Use `setFaceVariant("default")`, `setFaceVariant("simple")`, or `setFaceVariant("dot")` to change the facial style at runtime. The simple and dot variants keep the active emotion's eye movement, position, scale, and tilt while suppressing other face layers.
 
 Character renderers can register interchangeable face decorations through the rig API: `rig.registerFaceAccessory(name, element)` and `rig.setFaceAccessory(name)`. This is useful for optional whiskers, masks, glasses, or other model-specific details.
 
@@ -286,7 +289,7 @@ Each emotion can configure:
 | Group           | ID    | Emotions                                                                                                                     |
 | :-------------- | :---- | :--------------------------------------------------------------------------------------------------------------------------- |
 | **Lifecycle**   | 00-09 | Sleep · Wake · Idle · Breathe · Ready · Pause · Refresh · LowBattery · Offline · Boot                                        |
-| **Reactions**   | 10-19 | Happy · Excited · Sad · Angry · Surprised · Shy · Love · Confused · Cool · Smug                                              |
+| **Reactions**   | 10-19 | Happy · Curious · Aggrieved · Angry · Surprised · Shy · Love · Confused · Cool · Smug                                   |
 | **Work States** | 20-31 | Thinking · Listening · Talking · Searching · Reading · Writing · Coding · Designing · Loading · Processing · Success · Error |
 | **Extended**    | 32-39 | Grateful · Retrying · Cancelled · Crying · Bored · Nervous · Eureka · Waiting                                                |
 

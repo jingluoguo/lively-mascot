@@ -213,6 +213,71 @@
       color: #fff;
     }
 
+    /* ---- Face variant picker (preview cards) ---- */
+    .face-variants {
+      flex-basis: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 2px;
+    }
+
+    .face-variants__label {
+      font-size: 12px;
+      font-weight: 800;
+      color: #777;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      white-space: nowrap;
+    }
+
+    .face-variants__grid {
+      display: flex;
+      gap: 10px;
+    }
+
+    .face-variant {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      width: 72px;
+      padding: 8px 6px 6px;
+      border: 2px solid rgba(8, 8, 8, .12);
+      border-radius: 10px;
+      background: #fafafa;
+      cursor: pointer;
+      transition: border-color .15s, box-shadow .15s, background .15s, transform .15s;
+    }
+
+    .face-variant:hover {
+      border-color: rgba(8, 8, 8, .35);
+    }
+
+    .face-variant.is-active {
+      border-color: #080808;
+      background: #fff;
+      box-shadow: 3px 3px 0 #080808;
+      transform: translate(-1px, -1px);
+    }
+
+    .face-variant__preview {
+      width: 44px;
+      height: 44px;
+      display: block;
+      pointer-events: none;
+    }
+
+    .face-variant__name {
+      font-size: 12px;
+      font-weight: 800;
+      color: #666;
+    }
+
+    .face-variant.is-active .face-variant__name {
+      color: #080808;
+    }
+
     /* ---- Main Tabs (below character switcher) ---- */
     .tabs {
       margin: 36px auto 0;
@@ -272,6 +337,8 @@
     .tabs__panel.parameter-panel.is-active {
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
       min-height: 52px;
     }
 
@@ -614,6 +681,39 @@
               </div>
             </div>
           </div>
+          <div class="face-variants" id="face-variants">
+            <span class="face-variants__label" id="face-label">五官</span>
+            <div class="face-variants__grid" role="group" aria-labelledby="face-label">
+              <button type="button" class="face-variant is-active" data-face="default" aria-pressed="true">
+                <svg class="face-variant__preview" viewBox="0 0 64 64" aria-hidden="true">
+                  <ellipse cx="16" cy="41" rx="5" ry="3" fill="#ff9fb6" />
+                  <ellipse cx="48" cy="41" rx="5" ry="3" fill="#ff9fb6" />
+                  <ellipse cx="22" cy="28" rx="7" ry="8" fill="#fff" stroke="#080808" stroke-width="2.5" />
+                  <circle cx="22" cy="29" r="4" fill="#080808" />
+                  <circle cx="23.6" cy="27" r="1.4" fill="#fff" />
+                  <ellipse cx="42" cy="28" rx="7" ry="8" fill="#fff" stroke="#080808" stroke-width="2.5" />
+                  <circle cx="42" cy="29" r="4" fill="#080808" />
+                  <circle cx="43.6" cy="27" r="1.4" fill="#fff" />
+                  <path d="M26 40 Q32 46 38 40" fill="none" stroke="#080808" stroke-width="2.5" stroke-linecap="round" />
+                </svg>
+                <span class="face-variant__name" data-face-name="default">默认</span>
+              </button>
+              <button type="button" class="face-variant" data-face="simple" aria-pressed="false">
+                <svg class="face-variant__preview" viewBox="0 0 64 64" aria-hidden="true">
+                  <rect x="18.5" y="17" width="7" height="22" rx="3.5" fill="#080808" />
+                  <rect x="38.5" y="17" width="7" height="22" rx="3.5" fill="#080808" />
+                </svg>
+                <span class="face-variant__name" data-face-name="simple">简约</span>
+              </button>
+              <button type="button" class="face-variant" data-face="dot" aria-pressed="false">
+                <svg class="face-variant__preview" viewBox="0 0 64 64" aria-hidden="true">
+                  <circle cx="22" cy="28" r="5.5" fill="#080808" />
+                  <circle cx="42" cy="28" r="5.5" fill="#080808" />
+                </svg>
+                <span class="face-variant__name" data-face-name="dot">圆点</span>
+              </button>
+            </div>
+          </div>
         </div>
         <div class="tabs__panel" id="panel-color"></div>
         <div class="tabs__panel" id="panel-emotion"></div>
@@ -646,6 +746,7 @@
         hint: '把光标移到吉祥物上 · 点击让它开心',
         repoLabel: '在 GitHub 上查看源码',
         viewMode: '视图', outline: '边框', outlineOn: '显示', outlineOff: '隐藏',
+        face: '五官', faceDefault: '默认', faceSimple: '简约', faceDot: '圆点',
         charNames: {
           sprout: '🌱 嫩芽', cat: '🐱 小猫', robot: '🤖 机器人',
           ghost: '👻 幽灵', jelly: '🟢 果冻'
@@ -678,6 +779,7 @@
         hint: 'Hover the mascot · click to make it happy',
         repoLabel: 'View source on GitHub',
         viewMode: 'View', outline: 'Outline', outlineOn: 'On', outlineOff: 'Off',
+        face: 'Face', faceDefault: 'Default', faceSimple: 'Simple', faceDot: 'Dot',
         charNames: {
           sprout: '🌱 Sprout', cat: '🐱 Cat', robot: '🤖 Robot',
           ghost: '👻 Ghost', jelly: '🟢 Jelly'
@@ -720,6 +822,7 @@
     var currentCharType = 'sprout';
     var currentViewMode = '3d';
     var outlineVisible = true;
+    var currentFaceVariant = 'default';
     var currentTheme = null;
     var CHAR_DEFAULT_THEMES = {
       sprout: { body: '#48ff42', outline: '#080808', accent: '#ff9fb6' },
@@ -742,6 +845,7 @@
         hopInterval: [3, 6],
         onClick: function () { say(function () { return T().sayGreeting(T().clickName(type), new Date()); }); },
       });
+      hero.setFaceVariant(currentFaceVariant);
       currentCharType = type;
       hero.setTheme(currentTheme || CHAR_DEFAULT_THEMES[type]);
       if (typeof syncColorInputs === 'function') syncColorInputs();
@@ -801,6 +905,31 @@
         syncOutlineToggle();
         if (hero) hero.setOutlineVisible(outlineVisible);
         previewInstances.forEach(function (pInst) { pInst.setOutlineVisible(outlineVisible); });
+      });
+    });
+
+    // ---- Face variant toggle ----
+    var faceBtns = Array.prototype.slice.call(document.querySelectorAll('.face-variant'));
+    function syncFaceVariant() {
+      faceBtns.forEach(function (btn) {
+        var active = btn.dataset.face === currentFaceVariant;
+        btn.classList.toggle('is-active', active);
+        btn.setAttribute('aria-pressed', String(active));
+        var t = T();
+        var nameEl = btn.querySelector('.face-variant__name');
+        if (nameEl) {
+          if (btn.dataset.face === 'default') nameEl.textContent = t.faceDefault;
+          else if (btn.dataset.face === 'simple') nameEl.textContent = t.faceSimple;
+          else if (btn.dataset.face === 'dot') nameEl.textContent = t.faceDot;
+        }
+      });
+    }
+    faceBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        currentFaceVariant = btn.dataset.face;
+        syncFaceVariant();
+        if (hero) hero.setFaceVariant(currentFaceVariant);
+        previewInstances.forEach(function (pInst) { pInst.setFaceVariant(currentFaceVariant); });
       });
     });
 
@@ -1000,6 +1129,7 @@
           viewMode: currentViewMode,
           outlineVisible: outlineVisible
         });
+        inst.setFaceVariant(currentFaceVariant);
         inst.setEmotion(item.dataset.emotionId);
         inst.setTheme(currentTheme || CHAR_DEFAULT_THEMES[currentCharType]);
         previewInstances.push(inst);
@@ -1015,7 +1145,9 @@
       document.getElementById('repo-label').textContent = t.repoLabel;
       document.getElementById('view-mode-label').textContent = t.viewMode;
       document.getElementById('outline-label').textContent = t.outline;
+      document.getElementById('face-label').textContent = t.face;
       syncOutlineToggle();
+      syncFaceVariant();
       toggleButtons.forEach(function (b) {
         b.classList.toggle('is-active', b.dataset.lang === currentLang);
       });
@@ -1069,7 +1201,7 @@
       "00": "Deep sleep", "01": "Just woke", "02": "Idle", "03": "Calm breathing",
       "04": "Standing by", "05": "Paused", "06": "Refreshing", "07": "Low battery",
       "08": "Offline", "09": "Booting",
-      "10": "Happy", "11": "Excited", "12": "Sad", "13": "Angry", "14": "Surprised",
+      "10": "Happy", "11": "Curious", "12": "Aggrieved", "13": "Angry", "14": "Surprised",
       "15": "Shy", "16": "In love", "17": "Confused", "18": "Cool", "19": "Smug",
       "20": "Thinking", "21": "Listening", "22": "Talking", "23": "Searching",
       "24": "Reading", "25": "Writing", "26": "Coding", "27": "Designing",
@@ -1081,7 +1213,7 @@
     var ZH_NAME = {
       "00": "睡眠", "01": "醒来", "02": "待机", "03": "呼吸", "04": "待命",
       "05": "暂停", "06": "刷新", "07": "低电量", "08": "离线", "09": "启动",
-      "10": "开心", "11": "兴奋", "12": "难过", "13": "生气", "14": "惊讶",
+      "10": "开心", "11": "好奇", "12": "委屈", "13": "生气", "14": "惊讶",
       "15": "害羞", "16": "心动", "17": "困惑", "18": "耍酷", "19": "得意",
       "20": "思考", "21": "倾听", "22": "说话", "23": "搜索", "24": "阅读",
       "25": "写作", "26": "编程", "27": "设计", "28": "加载", "29": "处理",

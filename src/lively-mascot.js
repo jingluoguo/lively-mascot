@@ -83,19 +83,25 @@
   function buildFaceSvg(api) {
     var clipId = "lively-eye-clip-" + Math.random().toString(36).slice(2, 9);
 
-    function buildEye(cx, cy) {
+    function buildEye(cx, cy, side) {
       var wrapper = svg("g", { transform: "translate(" + cx + " " + cy + ")" });
-      var eye = svg("g", { class: "lively-face__eye" });
+      var eye = svg("g", { class: "lively-face__eye lively-face__eye--" + side });
       api.registerEye(eye);
       eye.appendChild(svg("ellipse", { rx: 10, ry: 11.5 }));
+      // Half-lidded bored eye: a flat upper lid with a softly curved lower edge.
+      eye.appendChild(svg("path", { class: "lively-face__bored-eye", d: "M-9 -3 L9 -3 C8 4.5 4 8 0 8 C-4 8 -8 4.5 -9 -3 Z" }));
+      // Minimal variants use distinct primitives so they stay recognizable at thumbnail size.
+      eye.appendChild(svg("rect", { class: "lively-face__capsule", x: -4.5, y: -12, width: 9, height: 24, rx: 4.5, ry: 4.5 }));
+      eye.appendChild(svg("circle", { class: "lively-face__dot-eye", cx: 0, cy: 0, r: 5.5 }));
       var clip = svg("g", { "clip-path": "url(#" + clipId + ")" });
       var pupil = svg("g");
       api.registerPupil(pupil, { maxX: 8, maxY: 6 });
       pupil.appendChild(svg("circle", { class: "lively-face__pupil", r: 6.2 }));
       pupil.appendChild(svg("circle", { class: "lively-face__shine", cx: 2.2, cy: -2.4, r: 2.1 }));
+      pupil.appendChild(svg("circle", { class: "lively-face__shine lively-face__shine--small", cx: -2.2, cy: 2.1, r: 1 }));
       clip.appendChild(pupil);
       eye.appendChild(clip);
-      eye.appendChild(svg("path", { class: "lively-face__happy", d: "M-6.5 1.5 Q0 -6 6.5 1.5" }));
+      eye.appendChild(svg("path", { class: "lively-face__happy", d: "M-8 2.5 Q0 -8.5 8 2.5" }));
       wrapper.appendChild(eye);
       return wrapper;
     }
@@ -108,14 +114,14 @@
     face.appendChild(svg("ellipse", { class: "lively-face__blush", cx: 80, cy: 57, rx: 7, ry: 4 }));
 
     // Eyes
-    face.appendChild(buildEye(34, 43));
-    face.appendChild(buildEye(66, 43));
+    face.appendChild(buildEye(34, 43, "l"));
+    face.appendChild(buildEye(66, 43, "r"));
 
     // Default mouth
     face.appendChild(svg("path", { class: "lively-face__mouth", d: "M42 63 Q50 70 58 63" }));
     // Happy mouth
     face.appendChild(svg("path", { class: "lively-face__happy-mouth", d: "M40 61 Q50 74 60 61 Q50 66 40 61 Z" }));
-    // Sad mouth
+    // Frown mouth, shared by low-battery, aggrieved, and related expressions.
     face.appendChild(svg("path", { class: "lively-face__sad-mouth", d: "M43 67 Q50 62 57 67" }));
     // Open mouth
     face.appendChild(svg("ellipse", { class: "lively-face__open-mouth", cx: 50, cy: 65, rx: 5, ry: 6 }));
@@ -219,7 +225,7 @@
     var viewMode = normalizeViewMode(options.viewMode || options.mode);
     var outlineVisible = normalizeOutlineVisible(options.outlineVisible);
     var root = el("div", {
-      class: "lively-mascot lively-mascot--" + character.id + " lively-mascot--" + viewMode + (!outlineVisible ? " lively-mascot--outline-hidden" : "") + (options.animated === false ? " lively-mascot--static" : ""),
+      class: "lively-mascot lively-mascot--" + character.id + " lively-mascot--" + viewMode + " lively-mascot--face-default" + (!outlineVisible ? " lively-mascot--outline-hidden" : "") + (options.animated === false ? " lively-mascot--static" : ""),
       style: "width:" + (options.size || 106) + "px;height:" + (options.size || 106) + "px",
       "aria-hidden": "true",
     });
@@ -262,6 +268,14 @@
         outlineVisible = normalizeOutlineVisible(visible);
         root.classList.toggle("lively-mascot--outline-hidden", !outlineVisible);
         return outlineVisible;
+      },
+      setFaceVariant: function (variant) {
+        var v = String(variant || "default").toLowerCase();
+        if (v !== "simple" && v !== "dot") v = "default";
+        root.classList.toggle("lively-mascot--face-default", v === "default");
+        root.classList.toggle("lively-mascot--face-simple", v === "simple");
+        root.classList.toggle("lively-mascot--face-dot", v === "dot");
+        return v;
       },
       setTheme: function (p) {
         p = p || {};

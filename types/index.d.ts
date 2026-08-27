@@ -22,6 +22,7 @@ export interface MascotInstance {
   readonly outlineVisible: boolean;
   setViewMode(mode: ViewMode): ViewMode;
   setOutlineVisible(visible: boolean): boolean;
+  setFaceVariant(variant: "default" | "simple" | "dot"): "default" | "simple" | "dot";
   setTheme(theme: { body?: string; outline?: string; accent?: string }): void;
   setEmotion(id: string | number): void;
   clearEmotion(): void;
