@@ -1,0 +1,4 @@
+interface:
+  display_name: "Image to Lively Mascot Model"
+  short_description: "Cartoonize an image and generate a rigged SVG/HTML mascot"
+  default_prompt: "Use $lively-mascot-image-model to cartoonize the provided character image and generate a Lively Mascot-compatible SVG/HTML model."

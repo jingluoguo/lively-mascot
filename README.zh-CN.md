@@ -69,6 +69,56 @@ mascot.setEmotion("10");
 
 > 提示：把 `@master` 换成 `@latest` 可锁定版本，保证构建可复现。
 
+### 使用图片生成自定义角色模型（Codex Skill）
+
+仓库内置了 `lively-mascot-image-model` skill，可以把一张角色图片一键转换成当前项目可导入的 SVG/HTML 模型。它会先将图片卡通化，再参考现有的 Sprout / Cat / Robot / Ghost / Jelly 结构提取可动部件。
+
+技能目录：[`skills/lively-mascot-image-model/`](skills/lively-mascot-image-model/)。将该目录安装到 Codex 的 skills 目录后，在带图片的对话中调用：
+
+```bash
+cp -R skills/lively-mascot-image-model "${CODEX_HOME:-$HOME/.codex}/skills/"
+```
+
+```text
+$lively-mascot-image-model
+请把这张图片生成 lively-mascot 角色模型，名称叫“小狐狸”。
+```
+
+也可以指定结构和输出目录：
+
+```text
+$lively-mascot-image-model
+先把图片卡通化，保留耳朵和尾巴，按 cat 结构提取，输出到 outputs/fox-model。
+```
+
+生成结果包含：
+
+```text
+outputs/lively-mascot-model/<slug>/
+├── model.svg                # 可传给 registerModel 的模型
+├── model.css                # 作用域化样式和表情动画
+├── model.html               # 文件导入与运行示例
+├── model.json               # 结构、标记、表情和限制清单
+└── cartoon-reference.png    # 卡通化中间结果
+```
+
+生成后可以在网页中这样加载：
+
+```js
+const markup = await fetch("./outputs/lively-mascot-model/fox/model.svg")
+  .then((res) => res.text());
+
+LivelyMascot.registerModel("fox", markup);
+const mascot = LivelyMascot.createMascot(document.querySelector("#slot"), {
+  type: "fox",
+  size: 160,
+  viewMode: "2d"
+});
+mascot.setEmotion("10");
+```
+
+技能输出的是 2D SVG/HTML，不处理 GLB、GLTF 或 FBX。图片卡通化能力不可用时，技能会停止并提示原因，不会直接把未经卡通化的原图描摹成模型。
+
 ### 方式 C — 本地 / 模块化（分文件）
 
 如果你更想自己托管源码文件（例如接入自己的构建工具链）：
@@ -271,6 +321,45 @@ npm run build      # 等价于：node scripts/build-dist.mjs
 
 角色渲染器可以通过 rig API 注册和切换可替换的脸部配饰：`rig.registerFaceAccessory(name, element)` 与 `rig.setFaceAccessory(name)`。适合胡须、面罩、眼镜等模型细节。
 
+### 导入 SVG / HTML 模型
+
+如果模型由使用方在运行时提供，可以直接调用 `registerModel` 注册 SVG 或 HTML 字符串。模型会在注册时移除脚本、清理 SVG 内嵌样式表中的外部引用、移除 HTML 内嵌样式表、事件属性和危险的外部 URL，并在每个实例中克隆一份 DOM：
+
+```js
+const markup = await file.text(); // 例如 <svg>...</svg> 或一段 HTML
+
+LivelyMascot.registerModel('user-model', markup, {
+  name: file.name,
+  // 也可以使用自定义选择器；默认使用下面的 data-lively-* 标记
+  bodySelector: '[data-lively-body]',
+  leafSelector: '[data-lively-leaf]',
+  feetSelector: '[data-lively-feet]',
+  eyeSelector: '[data-lively-eye]',
+  pupilSelector: '[data-lively-pupil]',
+  faceSelector: '[data-lively-face]'
+});
+
+LivelyMascot.createMascot(container, {
+  type: 'user-model',
+  size: 160,
+  viewMode: '2d'
+});
+```
+
+在模型内部用 `data-lively-body` 标记身体，用 `data-lively-leaf`、`data-lively-feet` 标记可选的动画部件；眼睛、瞳孔和脸部分别使用 `data-lively-eye`、`data-lively-pupil`、`data-lively-face`。瞳孔还可以设置 `data-max-x` 和 `data-max-y` 控制视线偏移：
+
+```html
+<svg viewBox="0 0 100 100" aria-label="My mascot">
+  <g data-lively-body>
+    <circle cx="50" cy="50" r="42" fill="#48ff42" />
+    <g data-lively-eye><circle cx="35" cy="43" r="9" /></g>
+    <g data-lively-pupil data-max-x="5" data-max-y="4"><circle cx="35" cy="43" r="4" /></g>
+  </g>
+</svg>
+```
+
+`registerModel` 适合 SVG/HTML 资源，不会把任意 HTML 自动转换成共享五官；用户模型的表情动画应由宿主页面的 CSS 提供，选择器可以直接匹配 `.lively-mascot.is-emotion-10` 等状态类。模型文件应限制大小和类型，且不要依赖未经允许的外部资源。
+
 ### 表情行为
 
 每个表情可配置以下行为：
@@ -351,6 +440,8 @@ lively-mascot/
 │   │   └── jelly.js  / .css    # 果冻  （半透明 Q 弹，无叶无脚）
 │   ├── lively-mascot.js        # 核心 SDK（角色注册表 + createMascot）
 │   └── lively-mascot.css       # 引擎层样式（结构 + 情绪选择器）
+├── skills/
+│   └── lively-mascot-image-model/ # 图片卡通化 + SVG/HTML 模型生成 skill
 ├── package.json
 └── README.md
 ```

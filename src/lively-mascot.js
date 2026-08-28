@@ -203,9 +203,127 @@
   // Characters register themselves via LivelyMascot.registerCharacter() from
   // their own script files (e.g. src/characters/sprout.js, src/characters/cat.js).
   var characters = {};
+  var modelInstanceSequence = 0;
 
   function registerCharacter(id, render, name, viewBox) {
     characters[id] = { id: id, name: name || id, viewBox: viewBox || "0 0 100 100", render: render };
+  }
+
+  // Register a user-provided SVG/HTML fragment as a character. The fragment
+  // is sanitized once, then cloned for every mascot instance so instances do
+  // not share mutable DOM. Parts can opt into rig behavior with data markers:
+  // data-lively-body, data-lively-leaf, data-lively-feet, data-lively-eye,
+  // data-lively-pupil, and data-lively-face.
+  function registerModel(id, markup, options) {
+    options = options || {};
+    id = String(id || "").trim();
+    if (!id) throw new Error("registerModel requires a non-empty id");
+    if (typeof markup !== "string" || !markup.trim()) {
+      throw new Error("registerModel requires SVG/HTML markup");
+    }
+    if (typeof document === "undefined" || !document.createElement) {
+      throw new Error("registerModel must run in a browser environment");
+    }
+
+    var template = document.createElement("template");
+    template.innerHTML = markup;
+    var blocked = template.content.querySelectorAll("script, iframe, object, embed, link, meta, base, foreignObject, input, button, textarea, select, option");
+    for (var i = blocked.length - 1; i >= 0; i--) blocked[i].remove();
+    var all = template.content.querySelectorAll("*");
+    for (var j = 0; j < all.length; j++) {
+      var attrs = all[j].attributes;
+      for (var k = attrs.length - 1; k >= 0; k--) {
+        var attr = attrs[k];
+        var name = attr.name.toLowerCase();
+        var value = String(attr.value || "").trim();
+        if (name.indexOf("on") === 0 || name === "srcset" || name === "action" ||
+            name === "formaction" || name === "target" || name === "download" ||
+            ((name === "href" || name === "xlink:href" || name === "src") &&
+              value && value.charAt(0) !== "#" && !/^data:image\/(?:png|gif|jpe?g|webp);/i.test(value))) {
+          all[j].removeAttribute(attr.name);
+        } else if (/url\((?!\s*["']?#)[^)]*\)/i.test(value)) {
+          all[j].setAttribute(attr.name, value.replace(/url\((?!\s*["']?#)[^)]*\)/ig, "none"));
+        }
+      }
+    }
+    var styles = template.content.querySelectorAll("style");
+    var isSvgMarkup = /^\s*<svg(?:\s|>)/i.test(markup);
+    for (var s = 0; s < styles.length; s++) {
+      if (!isSvgMarkup) {
+        styles[s].remove();
+      } else {
+        styles[s].textContent = styles[s].textContent
+          .replace(/@import[^;]+;?/ig, "")
+          .replace(/url\((?!\s*["']?#)[^)]*\)/ig, "none");
+      }
+    }
+    if (!template.content.querySelector("svg, div, span, section, article, canvas, img")) {
+      throw new Error("registerModel markup has no renderable element");
+    }
+
+    var fragment = template.content.cloneNode(true);
+    var bodySelector = options.bodySelector || "[data-lively-body]";
+    var leafSelector = options.leafSelector || "[data-lively-leaf]";
+    var feetSelector = options.feetSelector || "[data-lively-feet]";
+    var eyeSelector = options.eyeSelector || "[data-lively-eye]";
+    var pupilSelector = options.pupilSelector || "[data-lively-pupil]";
+    var faceSelector = options.faceSelector || "[data-lively-face]";
+
+    registerCharacter(id, function (rig, gazeEl) {
+      var body = document.createElement("div");
+      body.className = "lively-body lively-body--custom-model";
+      var content = fragment.cloneNode(true);
+      body.appendChild(content);
+      rig.registerBody(body);
+
+      // SVG fragment identifiers are document-global in some browsers. Give
+      // every clone unique ids and update local references before mounting.
+      var instancePrefix = "lively-model-" + (++modelInstanceSequence) + "-";
+      var idMap = {};
+      var identified = body.querySelectorAll("[id]");
+      for (var n = 0; n < identified.length; n++) {
+        var oldId = identified[n].id;
+        var newId = instancePrefix + oldId;
+        idMap[oldId] = newId;
+        identified[n].id = newId;
+      }
+      var referenced = body.querySelectorAll("*");
+      for (var r = 0; r < referenced.length; r++) {
+        var refAttrs = referenced[r].attributes;
+        for (var a = 0; a < refAttrs.length; a++) {
+          var refValue = refAttrs[a].value;
+          for (var oldRef in idMap) {
+            if (Object.prototype.hasOwnProperty.call(idMap, oldRef)) {
+              refValue = refValue.split("url(#" + oldRef + ")").join("url(#" + idMap[oldRef] + ")");
+              if (refValue === "#" + oldRef) refValue = "#" + idMap[oldRef];
+            }
+          }
+          if (refValue !== refAttrs[a].value) referenced[r].setAttribute(refAttrs[a].name, refValue);
+        }
+      }
+
+      var find = function (query) { return body.querySelector(query); };
+      var findAll = function (query) { return body.querySelectorAll(query); };
+      var markedBody = find(bodySelector);
+      if (markedBody && markedBody !== body) markedBody.classList.add("lively-model__body");
+      var leaf = find(leafSelector);
+      if (leaf) rig.registerLeaf(leaf, { useLeafAnim: options.useLeafAnim !== false });
+      var feet = find(feetSelector);
+      if (feet) rig.registerFeet(feet);
+      var eyes = findAll(eyeSelector);
+      for (var e = 0; e < eyes.length; e++) rig.registerEye(eyes[e]);
+      var pupils = findAll(pupilSelector);
+      for (var p = 0; p < pupils.length; p++) {
+        rig.registerPupil(pupils[p], {
+          maxX: Number(pupils[p].getAttribute("data-max-x")) || 8,
+          maxY: Number(pupils[p].getAttribute("data-max-y")) || 6
+        });
+      }
+      var face = find(faceSelector);
+      if (face) rig.registerFace(face);
+      gazeEl.appendChild(body);
+    }, options.name || id, options.viewBox || "0 0 100 100");
+    return characters[id];
   }
   function getCharacter(type) { return characters[type] || characters.sprout; }
 
@@ -334,6 +452,7 @@
   return {
     createMascot: createMascot,
     registerCharacter: registerCharacter,
+    registerModel: registerModel,
     defineMascotElement: defineMascotElement,
     buildFaceSvg: buildFaceSvg,
     characters: characters,

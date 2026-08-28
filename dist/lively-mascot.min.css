@@ -241,6 +241,28 @@
   animation: lively-sway 3.6s ease-in-out infinite;
 }
 
+/* User-imported SVG/HTML models provide their own visual geometry. Keep the
+   engine body as a transparent animation channel around that content. */
+.lively-body--custom-model {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.lively-mascot--3d .lively-body--custom-model::before,
+.lively-mascot--3d .lively-body--custom-model::after {
+  content: none;
+}
+
+.lively-body--custom-model > svg,
+.lively-body--custom-model > img,
+.lively-body--custom-model > canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 /* These characters read best when their head/body rests upright. They retain
    a quiet idle lift, while their attached ears, leaf, and antenna keep their
    own independent motion. */

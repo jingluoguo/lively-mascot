@@ -69,6 +69,56 @@ The whole engine + all 5 characters ship as a single bundled file on jsDelivr. J
 
 > Tip: pin a version with `@latest` instead of `@master` for reproducible builds.
 
+### Generate a Custom Model from an Image (Codex Skill)
+
+This repository includes the `lively-mascot-image-model` skill. It first cartoonizes a supplied character image, then extracts the closest existing Sprout / Cat / Robot / Ghost / Jelly structure and emits a ready-to-import SVG/HTML model.
+
+Skill source: [`skills/lively-mascot-image-model/`](skills/lively-mascot-image-model/). After installing that directory into your Codex skills directory, invoke it in a conversation with an attached image:
+
+```bash
+cp -R skills/lively-mascot-image-model "${CODEX_HOME:-$HOME/.codex}/skills/"
+```
+
+```text
+$lively-mascot-image-model
+Turn this image into a lively-mascot character named “Fox”.
+```
+
+You can also specify an archetype and output directory:
+
+```text
+$lively-mascot-image-model
+Cartoonize the image first, preserve the ears and tail, use the cat structure, and write the result to outputs/fox-model.
+```
+
+The skill writes:
+
+```text
+outputs/lively-mascot-model/<slug>/
+├── model.svg                # Markup for registerModel
+├── model.css                # Scoped styles and emotion animation
+├── model.html               # Import and usage example
+├── model.json               # Markers, emotions, and limitations
+└── cartoon-reference.png    # Accepted cartoonized reference
+```
+
+Load the generated model in an application:
+
+```js
+const markup = await fetch("./outputs/lively-mascot-model/fox/model.svg")
+  .then((res) => res.text());
+
+LivelyMascot.registerModel("fox", markup);
+const mascot = LivelyMascot.createMascot(document.querySelector("#slot"), {
+  type: "fox",
+  size: 160,
+  viewMode: "2d"
+});
+mascot.setEmotion("10");
+```
+
+The skill produces 2D SVG/HTML, not GLB, GLTF, or FBX. If the image-generation capability is unavailable, it stops with an explanation instead of tracing an uncartoonized source image.
+
 ### Option C — Local / modular (split files)
 
 If you prefer to serve the source files yourself (e.g. bundle via your own toolchain):
@@ -271,6 +321,23 @@ Use `setFaceVariant("default")`, `setFaceVariant("simple")`, or `setFaceVariant(
 
 Character renderers can register interchangeable face decorations through the rig API: `rig.registerFaceAccessory(name, element)` and `rig.setFaceAccessory(name)`. This is useful for optional whiskers, masks, glasses, or other model-specific details.
 
+### Importing SVG / HTML Models
+
+Runtime-provided SVG or HTML can be registered with `registerModel`. The markup is sanitized once (scripts, external stylesheet imports, HTML `<style>` blocks, event attributes, and dangerous external URLs are removed) and cloned for every instance:
+
+```js
+const markup = await file.text();
+LivelyMascot.registerModel('user-model', markup, { name: file.name });
+
+LivelyMascot.createMascot(container, {
+  type: 'user-model',
+  size: 160,
+  viewMode: '2d'
+});
+```
+
+Mark optional rig parts with `data-lively-body`, `data-lively-leaf`, `data-lively-feet`, `data-lively-eye`, `data-lively-pupil`, and `data-lively-face` (or provide equivalent `*Selector` options). Pupils may set `data-max-x` and `data-max-y` to tune cursor tracking. Host-page CSS can target state classes such as `.lively-mascot.is-emotion-10` for custom emotion animation.
+
 ### Emotion Behaviors
 
 Each emotion can configure:
@@ -351,6 +418,8 @@ lively-mascot/
 │   │   └── jelly.js  / .css    # Jelly   (translucent bouncy blob, no leaf/feet)
 │   ├── lively-mascot.js        # Core SDK (character registry + createMascot)
 │   └── lively-mascot.css       # Engine-level styles (structure + emotion selectors)
+├── skills/
+│   └── lively-mascot-image-model/ # Image cartoonization + SVG/HTML model skill
 ├── package.json
 └── README.md
 ```

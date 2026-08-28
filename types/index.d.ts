@@ -46,6 +46,18 @@ export interface EmotionDefinition {
 
 export const createMascot: (target: Element, options?: MascotOptions) => MascotInstance;
 export const registerCharacter: (id: string, render: Function, name?: string, viewBox?: string) => void;
+export interface ModelOptions {
+  name?: string;
+  viewBox?: string;
+  bodySelector?: string;
+  leafSelector?: string;
+  feetSelector?: string;
+  eyeSelector?: string;
+  pupilSelector?: string;
+  faceSelector?: string;
+  useLeafAnim?: boolean;
+}
+export const registerModel: (id: string, markup: string, options?: ModelOptions) => object;
 export const defineMascotElement: (tag?: string) => void;
 export const buildFaceSvg: (api: object) => { wrap: HTMLElement; face: SVGElement };
 export const characters: Record<string, object>;
@@ -56,6 +68,7 @@ export const version: string;
 declare const LivelyMascot: {
   createMascot: typeof createMascot;
   registerCharacter: typeof registerCharacter;
+  registerModel: typeof registerModel;
   defineMascotElement: typeof defineMascotElement;
   buildFaceSvg: typeof buildFaceSvg;
   characters: typeof characters;
