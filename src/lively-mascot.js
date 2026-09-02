@@ -295,6 +295,7 @@
       viewBox: definition.viewBox || "0 0 100 100",
       render: definition.render,
       parts: parts,
+      gaze: { scope: definition.gaze && definition.gaze.scope === "eyes" ? "eyes" : "model" },
       skin: {
         slots: (definition.skin && definition.skin.slots || ["body", "outline", "accent"]).slice(),
         fixed: normalizeFixedSkin(definition.skin && definition.skin.fixed)
@@ -326,7 +327,7 @@
       else if (name === "top") rig.registerLeaf(element, { useLeafAnim: !(options && options.useEmotionAnimation === false) });
       else if (name === "feet") rig.registerFeet(element);
       else if (name === "face") rig.registerFace(element);
-      else if (name === "eyes") rig.registerEye(element);
+      else if (name === "eyes") rig.registerEye(element, options && options.gaze);
       else if (name === "pupils") rig.registerPupil(element, options && options.gaze);
     }
 
@@ -483,6 +484,7 @@
     var runtime;
     var rig = createRig(root, rigEl, {
       followCursor: options.followCursor,
+      gazeScope: model.gaze.scope,
       hopInterval: options.hopInterval,
       animated: options.animated
     }, {
@@ -503,7 +505,7 @@
       el: root,
       type: model.id,
       getCapabilities: function () {
-        return clone({ parts: model.parts, skin: model.skin, accessories: model.accessories, effects: model.effects });
+        return clone({ parts: model.parts, gaze: model.gaze, skin: model.skin, accessories: model.accessories, effects: model.effects });
       },
       getSkin: function () {
         return clone({ slots: theme, fixed: model.skin.fixed });

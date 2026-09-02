@@ -17,6 +17,7 @@ function createRig(root, rigEl, config, handlers) {
   handlers = handlers || {};
   var animated = config.animated !== false;
   var followCursor = config.followCursor !== false;
+  var gazeScope = config.gazeScope === "eyes" ? "eyes" : "model";
   var gazeRadiusX = config.gazeRadiusX || 200;
   var gazeRadiusY = config.gazeRadiusY || 160;
   var currentHopInterval = config.hopInterval === undefined ? [6, 13] : config.hopInterval;
@@ -38,7 +39,12 @@ function createRig(root, rigEl, config, handlers) {
       for (var i = 0; i < pupils.length; i++) { if (pupils[i].el === elm) { pupils[i].spec = spec; return; } }
       pupils.push({ el: elm, spec: spec || { maxX: 8, maxY: 6 } });
     },
-    registerEye: function (elm) { if (eyes.indexOf(elm) === -1) eyes.push(elm); },
+    registerEye: function (elm, spec) {
+      for (var i = 0; i < eyes.length; i++) {
+        if (eyes[i].el === elm) { eyes[i].spec = spec || eyes[i].spec; return; }
+      }
+      eyes.push({ el: elm, spec: spec || { maxX: 0, maxY: 0, scale: 0 } });
+    },
     registerFace: function (elm) { face = elm; },
     registerBody: function (elm) { bodyEl = elm; },
     registerLeaf: function (elm, opts) {
@@ -147,9 +153,28 @@ function createRig(root, rigEl, config, handlers) {
       var p = pupils[i];
       p.el.setAttribute("transform", "translate(" + (curX * p.spec.maxX).toFixed(2) + " " + (curY * p.spec.maxY).toFixed(2) + ")");
     }
+    for (var j = 0; j < eyes.length; j++) {
+      var eye = eyes[j];
+      eye.el.style.setProperty("--lively-gaze-x", (curX * (Number(eye.spec.maxX) || 0)).toFixed(2) + "px");
+      eye.el.style.setProperty("--lively-gaze-y", (curY * (Number(eye.spec.maxY) || 0)).toFixed(2) + "px");
+      var turnCurve = curX * Math.abs(curX);
+      eye.el.style.setProperty("--lively-gaze-rotate", (turnCurve * (Number(eye.spec.rotate) || 0)).toFixed(2) + "deg");
+      eye.el.style.setProperty("--lively-gaze-depth", (1 - Math.abs(curX) * (Number(eye.spec.depth) || 0)).toFixed(3));
+      var baseScale = 1 + Math.max(Math.abs(curX), Math.abs(curY)) * (Number(eye.spec.scale) || 0);
+      var sideScale = Number(eye.spec.sideScale) || 0;
+      if (eye.spec.side === "left" || eye.spec.side === "right") {
+        // The eye nearer the gaze direction narrows slightly; the far eye
+        // opens by the same cue, preserving a lively asymmetric read.
+        var toward = eye.spec.side === "left" ? -curX : curX;
+        baseScale -= toward * sideScale;
+      }
+      eye.el.style.setProperty("--lively-gaze-scale", baseScale.toFixed(3));
+    }
     if (face) face.setAttribute("transform", "rotate(" + (curX * 3).toFixed(2) + " 50 52)");
     var postureEl = gazeEl || rigEl;
-    if (root.classList.contains("lively-mascot--3d")) {
+    if (gazeScope === "eyes") {
+      postureEl.style.transform = "";
+    } else if (root.classList.contains("lively-mascot--3d")) {
       // Keep the character's parts in one shared 3D posture layer. Pointer
       // position steers the turn, while active expressions retain a subtle
       // living tilt after gaze tracking has intentionally paused.
@@ -182,14 +207,14 @@ function createRig(root, rigEl, config, handlers) {
     }
     var blinkDelay = def && def.blink === "fast" ? 800 + Math.random() * 1200 : 2200 + Math.random() * 2600;
     blinkTimer = window.setTimeout(function () {
-      for (var i = 0; i < eyes.length; i++) eyes[i].classList.add("is-blinking");
+      for (var i = 0; i < eyes.length; i++) eyes[i].el.classList.add("is-blinking");
       phaseTimer = window.setTimeout(function () {
-        for (var i = 0; i < eyes.length; i++) eyes[i].classList.remove("is-blinking");
+        for (var i = 0; i < eyes.length; i++) eyes[i].el.classList.remove("is-blinking");
         if (Math.random() < 0.18) {
           phaseTimer = window.setTimeout(function () {
-            for (var i = 0; i < eyes.length; i++) eyes[i].classList.add("is-blinking");
+            for (var i = 0; i < eyes.length; i++) eyes[i].el.classList.add("is-blinking");
             phaseTimer = window.setTimeout(function () {
-              for (var i = 0; i < eyes.length; i++) eyes[i].classList.remove("is-blinking");
+              for (var i = 0; i < eyes.length; i++) eyes[i].el.classList.remove("is-blinking");
               scheduleBlink();
             }, 90);
           }, 160);
@@ -201,7 +226,7 @@ function createRig(root, rigEl, config, handlers) {
   function resetBlinkCycle() {
     clearTimeout(blinkTimer);
     clearTimeout(phaseTimer);
-    for (var i = 0; i < eyes.length; i++) eyes[i].classList.remove("is-blinking");
+    for (var i = 0; i < eyes.length; i++) eyes[i].el.classList.remove("is-blinking");
     if (animated) scheduleBlink();
   }
 

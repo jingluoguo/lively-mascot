@@ -40,6 +40,19 @@ Declare only real anatomy and actions the model can express. The runtime safely 
 
 Models produced from a reference image are maintained by regeneration. When a review reveals a generally reusable extraction rule, update the project image-model skill first, then regenerate the complete `model.js`, `model.css`, and `model.json` for that model. Do not make a visual correction as a one-off patch to only the generated output. Rules that are specific to this repository's workflow belong in this document, not in the reusable skill.
 
+## Cursor Gaze
+
+Models use `gaze: { scope: "model" }` by default, which lets the shared gaze layer steer the model. A body that must stay upright while its visible eyes follow the cursor declares `gaze: { scope: "eyes" }`, then registers its eye group with a movement range:
+
+```js
+gaze: { scope: "eyes" },
+render: function (model, container) {
+  model.registerPart("eyes", eyeGroup, { gaze: { maxX: 4, maxY: 2, scale: 0.3 } });
+}
+```
+
+The rig writes `--lively-gaze-x`, `--lively-gaze-y`, `--lively-gaze-scale`, and `--lively-gaze-depth` on that eye group. Compose them into its existing transform so the group moves, scales, and can add a subtle turn-through-compression cue rather than replacing it. Separate left/right eye nodes may use `gaze: { side: "left"|"right", sideScale: 0.06-0.1 }`; apply the scale variable through CSS `scale` so the eye toward the pointer narrows slightly while the opposite eye opens.
+
 ## Toggleable Accessories
 
 Declare hats, glasses, and similar optional items in `accessories`, then bind the rendered nodes explicitly:

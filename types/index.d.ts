@@ -60,6 +60,7 @@ export interface ModelPartDefinition {
 
 export interface ModelCapabilities {
   parts: Record<string, ModelPartDefinition>;
+  gaze: { scope: "model" | "eyes" };
   skin: { slots: string[]; fixed: Record<string, string> };
   accessories: Record<string, ModelAccessoryDefinition>;
   effects: { supported: string[]; anchors: Record<string, { x: number; y: number }> };
@@ -77,7 +78,7 @@ export interface ModelAccessoryConfig {
 
 export interface ModelRuntime {
   rig: object;
-  registerPart(name: string, element: Element, options?: { gaze?: { maxX?: number; maxY?: number }; useEmotionAnimation?: boolean }): void;
+  registerPart(name: string, element: Element, options?: { gaze?: { maxX?: number; maxY?: number; scale?: number; rotate?: number; depth?: number; side?: "left" | "right"; sideScale?: number }; useEmotionAnimation?: boolean }): void;
   registerAccessory(id: string, element: Element): void;
   setAccessory(id: string, enabled: boolean): boolean;
   getParts(): Record<string, Element[]>;
@@ -89,6 +90,7 @@ export interface ModelDefinition {
   name?: string;
   viewBox?: string;
   parts?: Record<string, ModelPartDefinition | true>;
+  gaze?: { scope?: "model" | "eyes" };
   skin?: { slots?: string[]; fixed?: Record<string, string> | string[] };
   accessories?: Record<string, ModelAccessoryConfig | true>;
   effects?: { supported?: string[]; anchors?: Record<string, { x: number; y: number }> };

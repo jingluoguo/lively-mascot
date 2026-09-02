@@ -41,6 +41,19 @@ LivelyMascot.defineModel({
 
 基于参考图生成的模型应通过重新生成来维护。评审发现可复用的还原规则时，先更新项目内图片模型 skill，再完整重新生成该模型的 `model.js`、`model.css` 和 `model.json`；不要只对已生成的输出做一次性视觉补丁。仅属于本仓库维护流程的规则保留在本文档，不放进可复用 skill。
 
+## 鼠标视线
+
+模型默认使用 `gaze: { scope: "model" }`，由共享视线层带动模型。当身体必须保持正立、但可见眼睛需要跟随鼠标时，声明 `gaze: { scope: "eyes" }`，并为眼睛组注册移动范围：
+
+```js
+gaze: { scope: "eyes" },
+render: function (model, container) {
+  model.registerPart("eyes", eyeGroup, { gaze: { maxX: 4, maxY: 2, scale: 0.3 } });
+}
+```
+
+引擎会将 `--lively-gaze-x`、`--lively-gaze-y`、`--lively-gaze-scale` 和 `--lively-gaze-depth` 写到该眼睛组上。CSS 应把它们组合进原有 `transform`，使眼睛从原始位置移动、放大，并通过轻微横向压缩产生转向感，而不是覆盖原有定位。左右眼是独立节点时，可使用 `gaze: { side: "left"|"right", sideScale: 0.06-0.1 }`，并通过 CSS 独立的 `scale` 属性应用变量，让朝向鼠标的一侧略微变小，另一侧略微变大。
+
 ## 可切换配件
 
 帽子、眼镜等可选物件在模型定义的 `accessories` 中声明，并在渲染时绑定实际节点：
