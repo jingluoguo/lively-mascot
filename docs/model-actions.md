@@ -36,6 +36,10 @@ Declare only real anatomy and actions the model can express. The runtime safely 
 
 `top` covers ears, leaves, antennae, horns, and similar upper anatomy. `accessory` covers permanent non-structural identity details such as whiskers or a fixed badge. Declare it through `parts.accessory` and register it with `model.registerPart("accessory", node)`; it remains visible. Add a custom part only when its semantics are shared by multiple models or required by a defined product need.
 
+## Generated Model Revisions
+
+Models produced from a reference image are maintained by regeneration. When a review reveals a generally reusable extraction rule, update the project image-model skill first, then regenerate the complete `model.js`, `model.css`, and `model.json` for that model. Do not make a visual correction as a one-off patch to only the generated output. Rules that are specific to this repository's workflow belong in this document, not in the reusable skill.
+
 ## Toggleable Accessories
 
 Declare hats, glasses, and similar optional items in `accessories`, then bind the rendered nodes explicitly:
