@@ -71,7 +71,7 @@ mascot.setEmotion("10");
 
 ### 使用图片生成自定义角色模型（Codex Skill）
 
-仓库内置了 `lively-mascot-image-model` skill，可以把一张角色图片一键转换成当前项目可导入的 SVG/HTML 模型。它会先将图片卡通化，再参考现有的 Sprout / Cat / Robot / Ghost / Jelly 结构提取可动部件。
+仓库内置了 `lively-mascot-image-model` skill，可以把一张角色图片一键转换成当前项目可导入的 SVG/HTML 模型。它会直接检查图片，再参考现有的 Sprout / Cat / Robot / Ghost / Jelly 结构提取可动部件，不需要中间图片生成步骤或 `OPENAI_API_KEY`。
 
 技能目录：[`skills/lively-mascot-image-model/`](skills/lively-mascot-image-model/)。将该目录安装到 Codex 的 skills 目录后，在带图片的对话中调用：
 
@@ -88,7 +88,7 @@ $lively-mascot-image-model
 
 ```text
 $lively-mascot-image-model
-先把图片卡通化，保留耳朵和尾巴，按 cat 结构提取，输出到 outputs/fox-model。
+保留耳朵和尾巴，按 cat 结构提取，输出到 outputs/fox-model。
 ```
 
 生成结果包含：
@@ -99,7 +99,6 @@ outputs/lively-mascot-model/<slug>/
 ├── model.css                # 作用域化样式和表情动画
 ├── model.html               # 文件导入与运行示例
 ├── model.json               # 结构、标记、表情和限制清单
-└── cartoon-reference.png    # 卡通化中间结果
 ```
 
 生成后可以在网页中这样加载：
@@ -117,7 +116,7 @@ const mascot = LivelyMascot.createMascot(document.querySelector("#slot"), {
 mascot.setEmotion("10");
 ```
 
-技能输出的是 2D SVG/HTML，不处理 GLB、GLTF 或 FBX。图片卡通化能力不可用时，技能会停止并提示原因，不会直接把未经卡通化的原图描摹成模型。
+技能输出的是 2D SVG/HTML，不处理 GLB、GLTF 或 FBX。它会直接从提供的参考图片提取模型，不需要中间图片生成步骤，也不需要提供 `OPENAI_API_KEY`。
 
 ### 方式 C — 本地 / 模块化（分文件）
 
@@ -441,7 +440,7 @@ lively-mascot/
 │   ├── lively-mascot.js        # 核心 SDK（角色注册表 + createMascot）
 │   └── lively-mascot.css       # 引擎层样式（结构 + 情绪选择器）
 ├── skills/
-│   └── lively-mascot-image-model/ # 图片卡通化 + SVG/HTML 模型生成 skill
+│   └── lively-mascot-image-model/ # 图片检查 + SVG/HTML 模型生成 skill
 ├── package.json
 └── README.md
 ```

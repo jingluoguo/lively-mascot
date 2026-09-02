@@ -71,7 +71,7 @@ The whole engine + all 5 characters ship as a single bundled file on jsDelivr. J
 
 ### Generate a Custom Model from an Image (Codex Skill)
 
-This repository includes the `lively-mascot-image-model` skill. It first cartoonizes a supplied character image, then extracts the closest existing Sprout / Cat / Robot / Ghost / Jelly structure and emits a ready-to-import SVG/HTML model.
+This repository includes the `lively-mascot-image-model` skill. It inspects a supplied character image directly, then extracts the closest existing Sprout / Cat / Robot / Ghost / Jelly structure and emits a ready-to-import SVG/HTML model. No intermediate image generation or `OPENAI_API_KEY` is required.
 
 Skill source: [`skills/lively-mascot-image-model/`](skills/lively-mascot-image-model/). After installing that directory into your Codex skills directory, invoke it in a conversation with an attached image:
 
@@ -88,7 +88,7 @@ You can also specify an archetype and output directory:
 
 ```text
 $lively-mascot-image-model
-Cartoonize the image first, preserve the ears and tail, use the cat structure, and write the result to outputs/fox-model.
+Preserve the ears and tail, use the cat structure, and write the result to outputs/fox-model.
 ```
 
 The skill writes:
@@ -99,7 +99,6 @@ outputs/lively-mascot-model/<slug>/
 ├── model.css                # Scoped styles and emotion animation
 ├── model.html               # Import and usage example
 ├── model.json               # Markers, emotions, and limitations
-└── cartoon-reference.png    # Accepted cartoonized reference
 ```
 
 Load the generated model in an application:
@@ -117,7 +116,7 @@ const mascot = LivelyMascot.createMascot(document.querySelector("#slot"), {
 mascot.setEmotion("10");
 ```
 
-The skill produces 2D SVG/HTML, not GLB, GLTF, or FBX. If the image-generation capability is unavailable, it stops with an explanation instead of tracing an uncartoonized source image.
+The skill produces 2D SVG/HTML, not GLB, GLTF, or FBX. It extracts the model directly from the supplied reference image, with no intermediate image-generation step and no `OPENAI_API_KEY`.
 
 ### Option C — Local / modular (split files)
 
@@ -419,7 +418,7 @@ lively-mascot/
 │   ├── lively-mascot.js        # Core SDK (character registry + createMascot)
 │   └── lively-mascot.css       # Engine-level styles (structure + emotion selectors)
 ├── skills/
-│   └── lively-mascot-image-model/ # Image cartoonization + SVG/HTML model skill
+│   └── lively-mascot-image-model/ # Image inspection + SVG/HTML model skill
 ├── package.json
 └── README.md
 ```
