@@ -108,22 +108,32 @@ instance.destroy();
 
 ## Custom Models
 
-### Runtime SVG and HTML
+See the [model action catalog](model-actions.md) for standard part actions and fixed-skin rules.
 
-`registerModel()` accepts SVG or HTML markup and sanitizes it before cloning it for each instance:
+### Unified Model Definition
+
+New models use `defineModel()` only. One definition declares the renderer, physical parts, skin slots, and effect anchors; runtime SVG/HTML imports and DOM marker scanning are not supported:
 
 ```js
-const markup = await file.text();
-LivelyMascot.registerModel("user-model", markup, { name: file.name });
-
-LivelyMascot.createMascot(container, {
-  type: "user-model",
-  size: 160,
-  viewMode: "2d"
+var actions = LivelyMascot.partActions;
+LivelyMascot.defineModel({
+  id: "my-model",
+  parts: { body: { actions: actions.body }, eyes: { actions: actions.eyes }, mouth: { actions: actions.mouth } },
+  skin: { slots: ["body", "outline", "accent"], fixed: { pupil: "#18222a", "identity-mark": "#f4e7d0" } },
+  effects: { supported: ["hearts", "sparkles", "sleep", "loading"], anchors: { head: { x: 50, y: 12 }, body: { x: 50, y: 58 } } },
+  render: function (model, container) {
+    var body = document.createElement("div");
+    body.className = "lively-body lively-body--my-model";
+    model.registerPart("body", body);
+    body.appendChild(LivelyMascot.buildFaceSvg(model).wrap);
+    container.appendChild(body);
+  }
 });
 ```
 
-Use `data-lively-body`, `data-lively-leaf`, `data-lively-feet`, `data-lively-eye`, `data-lively-pupil`, and `data-lively-face` for rigged parts. Set `data-max-x` and `data-max-y` on pupils to adjust their gaze range. Style user model states through selectors such as `.lively-mascot.is-emotion-10`.
+`setEmotion()` resolves a shared recipe, then dispatches actions only to the parts declared by the current model. Missing parts are skipped. `setTheme()` changes only `skin.slots`; `skin.fixed` is mounted as immutable `--lively-fixed-<name>` CSS variables. Call `getCapabilities()` or `getSkin()` to inspect the contract.
+
+Declare hats, glasses, and other toggleable items in `accessories`, then control them with `setAccessory(id, enabled)`. See the [accessory rules](model-actions.md#toggleable-accessories).
 
 ### Image Model Skill
 
@@ -144,23 +154,23 @@ Read the complete [model skill instructions](../skills/lively-mascot-image-model
 
 ## Extending the Engine
 
-Register a character renderer and add moving layers to the rig:
+Register a model renderer and add moving layers through its runtime:
 
 ```js
-function renderMyCharacter(rig, gazeEl) {
+function renderMyCharacter(model, gazeEl) {
   var body = document.createElement("div");
   body.className = "lively-body lively-body--my-character";
-  rig.registerBody(body);
+  model.registerPart("body", body);
 
-  var face = LivelyMascot.buildFaceSvg(rig);
+  var face = LivelyMascot.buildFaceSvg(model);
   body.appendChild(face.wrap);
   gazeEl.appendChild(body);
 }
 
-LivelyMascot.registerCharacter("my-character", renderMyCharacter, "My Character");
+LivelyMascot.defineModel({ id: "my-character", render: renderMyCharacter, parts: { body: { actions: LivelyMascot.partActions.body } } });
 ```
 
-Optional layers use `rig.registerLeaf(element, options)`, `rig.registerFeet(element)`, and `rig.registerFaceAccessory(name, element)`. Add a custom emotion with:
+Optional layers use `model.registerPart("top", element)`, `model.registerPart("feet", element)`, and `model.registerPart("tail", element)`. Add a custom emotion with:
 
 ```js
 LivelyMascot.emotions["50"] = {
@@ -168,7 +178,11 @@ LivelyMascot.emotions["50"] = {
   name: "Custom",
   group: "custom",
   desc: "Custom",
-  bodyAnim: "my-custom-animation 1s ease-in-out"
+  bodyAnim: "my-custom-animation 1s ease-in-out",
+  recipe: {
+    parts: { body: "bounce", eyes: "happy", mouth: "smile" },
+    effects: [{ type: "sparkles", anchor: "head" }]
+  }
 };
 ```
 

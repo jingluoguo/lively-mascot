@@ -1,10 +1,10 @@
 import mascot from "./lively-mascot.cjs";
 export const createMascot = mascot.createMascot;
-export const registerCharacter = mascot.registerCharacter;
-export const registerModel = mascot.registerModel;
+export const defineModel = mascot.defineModel;
 export const defineMascotElement = mascot.defineMascotElement;
 export const buildFaceSvg = mascot.buildFaceSvg;
-export const characters = mascot.characters;
+export const models = mascot.models;
+export const partActions = mascot.partActions;
 export const emotions = mascot.emotions;
 export const emotionGroups = mascot.emotionGroups;
 export const version = mascot.version;

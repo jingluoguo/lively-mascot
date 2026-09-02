@@ -20,10 +20,14 @@ export interface MascotInstance {
   readonly type: string;
   readonly viewMode: ViewMode;
   readonly outlineVisible: boolean;
+  getCapabilities(): ModelCapabilities;
+  getSkin(): { slots: { body: string; outline: string; accent: string }; fixed: Record<string, string> };
+  getAccessories(): Record<string, { enabled: boolean; default: boolean; actions: string[] }>;
   setViewMode(mode: ViewMode): ViewMode;
   setOutlineVisible(visible: boolean): boolean;
   setFaceVariant(variant: "default" | "simple" | "dot"): "default" | "simple" | "dot";
   setTheme(theme: { body?: string; outline?: string; accent?: string }): void;
+  setAccessory(id: string, enabled: boolean): boolean;
   setEmotion(id: string | number): void;
   clearEmotion(): void;
   destroy(): void;
@@ -41,37 +45,73 @@ export interface EmotionDefinition {
   blink?: boolean | "fast";
   gaze?: boolean;
   hop?: boolean;
+  recipe?: EmotionRecipe;
   [key: string]: unknown;
 }
 
-export const createMascot: (target: Element, options?: MascotOptions) => MascotInstance;
-export const registerCharacter: (id: string, render: Function, name?: string, viewBox?: string) => void;
-export interface ModelOptions {
+export interface EmotionRecipe {
+  parts?: Record<string, string>;
+  effects?: Array<{ type: string; anchor: string; count?: number }>;
+}
+
+export interface ModelPartDefinition {
+  actions: string[];
+}
+
+export interface ModelCapabilities {
+  parts: Record<string, ModelPartDefinition>;
+  skin: { slots: string[]; fixed: Record<string, string> };
+  accessories: Record<string, ModelAccessoryDefinition>;
+  effects: { supported: string[]; anchors: Record<string, { x: number; y: number }> };
+}
+
+export interface ModelAccessoryDefinition {
+  default: boolean;
+  actions: string[];
+}
+
+export interface ModelAccessoryConfig {
+  default?: boolean;
+  actions?: string[];
+}
+
+export interface ModelRuntime {
+  rig: object;
+  registerPart(name: string, element: Element, options?: { gaze?: { maxX?: number; maxY?: number }; useEmotionAnimation?: boolean }): void;
+  registerAccessory(id: string, element: Element): void;
+  setAccessory(id: string, enabled: boolean): boolean;
+  getParts(): Record<string, Element[]>;
+  getAccessories(): Record<string, { enabled: boolean; default: boolean; actions: string[] }>;
+}
+
+export interface ModelDefinition {
+  id: string;
   name?: string;
   viewBox?: string;
-  bodySelector?: string;
-  leafSelector?: string;
-  feetSelector?: string;
-  eyeSelector?: string;
-  pupilSelector?: string;
-  faceSelector?: string;
-  useLeafAnim?: boolean;
+  parts?: Record<string, ModelPartDefinition | true>;
+  skin?: { slots?: string[]; fixed?: Record<string, string> | string[] };
+  accessories?: Record<string, ModelAccessoryConfig | true>;
+  effects?: { supported?: string[]; anchors?: Record<string, { x: number; y: number }> };
+  render(runtime: ModelRuntime, container: Element): void;
 }
-export const registerModel: (id: string, markup: string, options?: ModelOptions) => object;
+
+export const createMascot: (target: Element, options?: MascotOptions) => MascotInstance;
+export const defineModel: (definition: ModelDefinition) => object;
 export const defineMascotElement: (tag?: string) => void;
-export const buildFaceSvg: (api: object) => { wrap: HTMLElement; face: SVGElement };
-export const characters: Record<string, object>;
+export const buildFaceSvg: (runtime: ModelRuntime) => { wrap: HTMLElement; face: SVGElement };
+export const models: Record<string, object>;
+export const partActions: Record<string, string[]>;
 export const emotions: Record<string, EmotionDefinition>;
 export const emotionGroups: Record<string, { name: string; order: number }>;
 export const version: string;
 
 declare const LivelyMascot: {
   createMascot: typeof createMascot;
-  registerCharacter: typeof registerCharacter;
-  registerModel: typeof registerModel;
+  defineModel: typeof defineModel;
   defineMascotElement: typeof defineMascotElement;
   buildFaceSvg: typeof buildFaceSvg;
-  characters: typeof characters;
+  models: typeof models;
+  partActions: typeof partActions;
   emotions: typeof emotions;
   emotionGroups: typeof emotionGroups;
   version: typeof version;

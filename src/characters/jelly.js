@@ -32,24 +32,27 @@
     return node;
   }
 
-  function renderJelly(rig, rigEl) {
+  function renderJelly(model, rigEl) {
     // Body (pure jelly blob)
     var body = hEl("div", { class: "lively-body lively-body--jelly" });
-    rig.registerBody(body);
+    model.registerPart("body", body);
 
     // Shared face
-    var face = LivelyMascot.buildFaceSvg(rig);
+    var face = LivelyMascot.buildFaceSvg(model);
     body.appendChild(face.wrap);
     rigEl.appendChild(body);
   }
 
-  if (typeof LivelyMascot !== "undefined") {
-    LivelyMascot.registerCharacter("jelly", renderJelly, "Jelly", "0 0 100 100");
-  } else {
-    document.addEventListener("DOMContentLoaded", function () {
-      if (typeof LivelyMascot !== "undefined") {
-        LivelyMascot.registerCharacter("jelly", renderJelly, "Jelly", "0 0 100 100");
-      }
+  function register() {
+    if (typeof LivelyMascot === "undefined") return;
+    var actions = LivelyMascot.partActions;
+    LivelyMascot.defineModel({
+      id: "jelly", name: "Jelly", viewBox: "0 0 100 100", render: renderJelly,
+      parts: { body: { actions: actions.body }, eyes: { actions: actions.eyes }, pupils: { actions: [] }, face: { actions: [] }, mouth: { actions: actions.mouth } },
+      skin: { slots: ["body", "outline", "accent"] },
+      effects: { supported: ["hearts", "sparkles", "sleep", "loading"], anchors: { head: { x: 50, y: 24 }, face: { x: 50, y: 49 }, body: { x: 50, y: 60 } } }
     });
   }
+  register();
+  if (typeof LivelyMascot === "undefined") document.addEventListener("DOMContentLoaded", register);
 })();

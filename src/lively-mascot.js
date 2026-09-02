@@ -81,12 +81,20 @@
    * @returns {{ wrap: HTMLElement, face: SVGElement }} wrap = .lively-face-wrap
    */
   function buildFaceSvg(api) {
+    var runtime = api && api.rig ? api : null;
+    var rigApi = runtime ? runtime.rig : api;
+    function registerPart(name, element, options) {
+      if (runtime) runtime.registerPart(name, element, options);
+      else if (name === "eyes") rigApi.registerEye(element);
+      else if (name === "pupils") rigApi.registerPupil(element, options && options.gaze);
+      else if (name === "face") rigApi.registerFace(element);
+    }
     var clipId = "lively-eye-clip-" + Math.random().toString(36).slice(2, 9);
 
     function buildEye(cx, cy, side) {
       var wrapper = svg("g", { transform: "translate(" + cx + " " + cy + ")" });
       var eye = svg("g", { class: "lively-face__eye lively-face__eye--" + side });
-      api.registerEye(eye);
+      registerPart("eyes", eye);
       eye.appendChild(svg("ellipse", { rx: 10, ry: 11.5 }));
       // Half-lidded bored eye: a flat upper lid with a softly curved lower edge.
       eye.appendChild(svg("path", { class: "lively-face__bored-eye", d: "M-9 -3 L9 -3 C8 4.5 4 8 0 8 C-4 8 -8 4.5 -9 -3 Z" }));
@@ -95,7 +103,7 @@
       eye.appendChild(svg("circle", { class: "lively-face__dot-eye", cx: 0, cy: 0, r: 5.5 }));
       var clip = svg("g", { "clip-path": "url(#" + clipId + ")" });
       var pupil = svg("g");
-      api.registerPupil(pupil, { maxX: 8, maxY: 6 });
+      registerPart("pupils", pupil, { gaze: { maxX: 8, maxY: 6 } });
       pupil.appendChild(svg("circle", { class: "lively-face__pupil", r: 6.2 }));
       pupil.appendChild(svg("circle", { class: "lively-face__shine", cx: 2.2, cy: -2.4, r: 2.1 }));
       pupil.appendChild(svg("circle", { class: "lively-face__shine lively-face__shine--small", cx: -2.2, cy: 2.1, r: 1 }));
@@ -107,7 +115,8 @@
     }
 
     var face = svg("g", { class: "lively-face" });
-    api.registerFace(face);
+    registerPart("face", face);
+    if (runtime) runtime.registerPart("mouth", face);
 
     // Blush
     face.appendChild(svg("ellipse", { class: "lively-face__blush", cx: 20, cy: 57, rx: 7, ry: 4 }));
@@ -199,133 +208,240 @@
     return { wrap: wrap, face: face };
   }
 
-  // --- Character Registry ---
-  // Characters register themselves via LivelyMascot.registerCharacter() from
-  // their own script files (e.g. src/characters/sprout.js, src/characters/cat.js).
-  var characters = {};
-  var modelInstanceSequence = 0;
+  // --- Unified Model Registry ---
+  // A model declares its render function, its real parts, skin slots, and
+  // available effect anchors in one place. There is intentionally no markup
+  // importer: imported artwork must become an explicit model definition.
+  var models = {};
+  var STANDARD_ACTIONS = {
+    body: ["idle", "breathe", "wake", "rest", "bounce", "shake", "pulse", "work", "dim", "refresh"],
+    eyes: ["open", "closed", "happy", "wide", "sad", "angry", "love", "thinking", "bored", "cry"],
+    mouth: ["neutral", "smile", "open", "flat", "frown", "talk"],
+    top: ["idle", "perk", "droop", "shake", "listen", "work"],
+    feet: ["rest", "step", "stomp", "happy"],
+    tail: ["idle", "happy", "droop", "puff", "tuck"],
+    accessory: ["idle", "happy", "alert"]
+  };
 
-  function registerCharacter(id, render, name, viewBox) {
-    characters[id] = { id: id, name: name || id, viewBox: viewBox || "0 0 100 100", render: render };
+  function clone(value) { return JSON.parse(JSON.stringify(value)); }
+
+  function normalizePartDefinition(def) {
+    if (def === true) return { actions: [] };
+    def = def || {};
+    return { actions: (def.actions || []).slice() };
   }
 
-  // Register a user-provided SVG/HTML fragment as a character. The fragment
-  // is sanitized once, then cloned for every mascot instance so instances do
-  // not share mutable DOM. Parts can opt into rig behavior with data markers:
-  // data-lively-body, data-lively-leaf, data-lively-feet, data-lively-eye,
-  // data-lively-pupil, and data-lively-face.
-  function registerModel(id, markup, options) {
-    options = options || {};
-    id = String(id || "").trim();
-    if (!id) throw new Error("registerModel requires a non-empty id");
-    if (typeof markup !== "string" || !markup.trim()) {
-      throw new Error("registerModel requires SVG/HTML markup");
-    }
-    if (typeof document === "undefined" || !document.createElement) {
-      throw new Error("registerModel must run in a browser environment");
-    }
-
-    var template = document.createElement("template");
-    template.innerHTML = markup;
-    var blocked = template.content.querySelectorAll("script, iframe, object, embed, link, meta, base, foreignObject, input, button, textarea, select, option");
-    for (var i = blocked.length - 1; i >= 0; i--) blocked[i].remove();
-    var all = template.content.querySelectorAll("*");
-    for (var j = 0; j < all.length; j++) {
-      var attrs = all[j].attributes;
-      for (var k = attrs.length - 1; k >= 0; k--) {
-        var attr = attrs[k];
-        var name = attr.name.toLowerCase();
-        var value = String(attr.value || "").trim();
-        if (name.indexOf("on") === 0 || name === "srcset" || name === "action" ||
-            name === "formaction" || name === "target" || name === "download" ||
-            ((name === "href" || name === "xlink:href" || name === "src") &&
-              value && value.charAt(0) !== "#" && !/^data:image\/(?:png|gif|jpe?g|webp);/i.test(value))) {
-          all[j].removeAttribute(attr.name);
-        } else if (/url\((?!\s*["']?#)[^)]*\)/i.test(value)) {
-          all[j].setAttribute(attr.name, value.replace(/url\((?!\s*["']?#)[^)]*\)/ig, "none"));
+  function normalizeFixedSkin(fixed) {
+    var result = {};
+    if (Array.isArray(fixed)) {
+      for (var i = 0; i < fixed.length; i++) {
+        var legacyName = String(fixed[i]);
+        if (!/^[a-z][a-z0-9-]*$/.test(legacyName)) {
+          throw new Error("skin.fixed names must use lowercase kebab-case");
         }
+        result[legacyName] = "";
+      }
+      return result;
+    }
+    fixed = fixed || {};
+    for (var key in fixed) {
+      if (Object.prototype.hasOwnProperty.call(fixed, key)) {
+        var name = String(key);
+        if (!/^[a-z][a-z0-9-]*$/.test(name)) {
+          throw new Error("skin.fixed names must use lowercase kebab-case");
+        }
+        result[name] = String(fixed[key]);
       }
     }
-    var styles = template.content.querySelectorAll("style");
-    var isSvgMarkup = /^\s*<svg(?:\s|>)/i.test(markup);
-    for (var s = 0; s < styles.length; s++) {
-      if (!isSvgMarkup) {
-        styles[s].remove();
-      } else {
-        styles[s].textContent = styles[s].textContent
-          .replace(/@import[^;]+;?/ig, "")
-          .replace(/url\((?!\s*["']?#)[^)]*\)/ig, "none");
+    return result;
+  }
+
+  function normalizeAccessories(accessories) {
+    var result = {};
+    accessories = accessories || {};
+    for (var key in accessories) {
+      if (Object.prototype.hasOwnProperty.call(accessories, key)) {
+        var id = String(key);
+        if (!/^[a-z][a-z0-9-]*$/.test(id)) {
+          throw new Error("accessory names must use lowercase kebab-case");
+        }
+        var definition = accessories[key] === true ? {} : (accessories[key] || {});
+        result[id] = {
+          default: definition.default === true,
+          actions: (definition.actions || STANDARD_ACTIONS.accessory).slice()
+        };
       }
     }
-    if (!template.content.querySelector("svg, div, span, section, article, canvas, img")) {
-      throw new Error("registerModel markup has no renderable element");
+    return result;
+  }
+
+  function defineModel(definition) {
+    definition = definition || {};
+    var id = String(definition.id || "").trim();
+    if (!id) throw new Error("defineModel requires a non-empty id");
+    if (typeof definition.render !== "function") {
+      throw new Error("defineModel requires a render function");
+    }
+    var parts = {};
+    var declaredParts = definition.parts || {};
+    for (var name in declaredParts) {
+      if (Object.prototype.hasOwnProperty.call(declaredParts, name)) {
+        parts[name] = normalizePartDefinition(declaredParts[name]);
+      }
+    }
+    models[id] = {
+      id: id,
+      name: definition.name || id,
+      viewBox: definition.viewBox || "0 0 100 100",
+      render: definition.render,
+      parts: parts,
+      skin: {
+        slots: (definition.skin && definition.skin.slots || ["body", "outline", "accent"]).slice(),
+        fixed: normalizeFixedSkin(definition.skin && definition.skin.fixed)
+      },
+      accessories: normalizeAccessories(definition.accessories),
+      effects: {
+        supported: (definition.effects && definition.effects.supported || []).slice(),
+        anchors: clone(definition.effects && definition.effects.anchors || {})
+      }
+    };
+    return models[id];
+  }
+
+  function getModel(type) { return models[type] || models.sprout; }
+
+  function createModelRuntime(model, rig, root) {
+    var elements = {};
+    var actionAttributes = {};
+    var accessories = {};
+    var accessoryState = {};
+
+    function registerPart(name, element, options) {
+      if (!element) return;
+      name = String(name);
+      if (!elements[name]) elements[name] = [];
+      elements[name].push(element);
+      element.setAttribute("data-mascot-part", name);
+      if (name === "body") rig.registerBody(element);
+      else if (name === "top") rig.registerLeaf(element, { useLeafAnim: !(options && options.useEmotionAnimation === false) });
+      else if (name === "feet") rig.registerFeet(element);
+      else if (name === "face") rig.registerFace(element);
+      else if (name === "eyes") rig.registerEye(element);
+      else if (name === "pupils") rig.registerPupil(element, options && options.gaze);
     }
 
-    var fragment = template.content.cloneNode(true);
-    var bodySelector = options.bodySelector || "[data-lively-body]";
-    var leafSelector = options.leafSelector || "[data-lively-leaf]";
-    var feetSelector = options.feetSelector || "[data-lively-feet]";
-    var eyeSelector = options.eyeSelector || "[data-lively-eye]";
-    var pupilSelector = options.pupilSelector || "[data-lively-pupil]";
-    var faceSelector = options.faceSelector || "[data-lively-face]";
-
-    registerCharacter(id, function (rig, gazeEl) {
-      var body = document.createElement("div");
-      body.className = "lively-body lively-body--custom-model";
-      var content = fragment.cloneNode(true);
-      body.appendChild(content);
-      rig.registerBody(body);
-
-      // SVG fragment identifiers are document-global in some browsers. Give
-      // every clone unique ids and update local references before mounting.
-      var instancePrefix = "lively-model-" + (++modelInstanceSequence) + "-";
-      var idMap = {};
-      var identified = body.querySelectorAll("[id]");
-      for (var n = 0; n < identified.length; n++) {
-        var oldId = identified[n].id;
-        var newId = instancePrefix + oldId;
-        idMap[oldId] = newId;
-        identified[n].id = newId;
+    function setPartAction(name, action) {
+      var part = model.parts[name];
+      if (!part || !elements[name]) return;
+      var attr = actionAttributes[name] || (actionAttributes[name] = "data-mascot-action-" + name);
+      for (var i = 0; i < elements[name].length; i++) {
+        if (part.actions.indexOf(action) !== -1) elements[name][i].setAttribute(attr, action);
+        else elements[name][i].removeAttribute(attr);
       }
-      var referenced = body.querySelectorAll("*");
-      for (var r = 0; r < referenced.length; r++) {
-        var refAttrs = referenced[r].attributes;
-        for (var a = 0; a < refAttrs.length; a++) {
-          var refValue = refAttrs[a].value;
-          for (var oldRef in idMap) {
-            if (Object.prototype.hasOwnProperty.call(idMap, oldRef)) {
-              refValue = refValue.split("url(#" + oldRef + ")").join("url(#" + idMap[oldRef] + ")");
-              if (refValue === "#" + oldRef) refValue = "#" + idMap[oldRef];
-            }
+    }
+
+    function syncAccessory(id) {
+      var active = accessoryState[id] === true;
+      var items = accessories[id] || [];
+      for (var i = 0; i < items.length; i++) {
+        items[i].toggleAttribute("hidden", !active);
+        items[i].classList.toggle("is-accessory-active", active);
+      }
+    }
+
+    function registerAccessory(id, element) {
+      id = String(id || "");
+      if (!model.accessories[id]) throw new Error("Accessory is not declared by this model: " + id);
+      if (!element) return;
+      if (!accessories[id]) accessories[id] = [];
+      accessories[id].push(element);
+      element.setAttribute("data-mascot-part", "accessory");
+      element.setAttribute("data-mascot-accessory", id);
+      element.classList.add("lively-mascot__accessory");
+      if (accessoryState[id] === undefined) accessoryState[id] = model.accessories[id].default;
+      syncAccessory(id);
+    }
+
+    function setAccessory(id, enabled) {
+      id = String(id || "");
+      if (!model.accessories[id]) throw new Error("Unknown accessory: " + id);
+      accessoryState[id] = enabled !== false;
+      syncAccessory(id);
+      return accessoryState[id];
+    }
+
+    function applyAccessoryAction(action) {
+      for (var id in model.accessories) {
+        if (Object.prototype.hasOwnProperty.call(model.accessories, id)) {
+          var items = accessories[id] || [];
+          var supportsAction = accessoryState[id] && model.accessories[id].actions.indexOf(action) !== -1;
+          for (var i = 0; i < items.length; i++) {
+            if (supportsAction) items[i].setAttribute("data-mascot-action-accessory", action);
+            else items[i].removeAttribute("data-mascot-action-accessory");
           }
-          if (refValue !== refAttrs[a].value) referenced[r].setAttribute(refAttrs[a].name, refValue);
         }
       }
+    }
 
-      var find = function (query) { return body.querySelector(query); };
-      var findAll = function (query) { return body.querySelectorAll(query); };
-      var markedBody = find(bodySelector);
-      if (markedBody && markedBody !== body) markedBody.classList.add("lively-model__body");
-      var leaf = find(leafSelector);
-      if (leaf) rig.registerLeaf(leaf, { useLeafAnim: options.useLeafAnim !== false });
-      var feet = find(feetSelector);
-      if (feet) rig.registerFeet(feet);
-      var eyes = findAll(eyeSelector);
-      for (var e = 0; e < eyes.length; e++) rig.registerEye(eyes[e]);
-      var pupils = findAll(pupilSelector);
-      for (var p = 0; p < pupils.length; p++) {
-        rig.registerPupil(pupils[p], {
-          maxX: Number(pupils[p].getAttribute("data-max-x")) || 8,
-          maxY: Number(pupils[p].getAttribute("data-max-y")) || 6
-        });
+    function applyPose(recipe) {
+      recipe = recipe || {};
+      var pose = recipe.parts || {};
+      for (var name in model.parts) {
+        if (Object.prototype.hasOwnProperty.call(model.parts, name)) {
+          setPartAction(name, pose[name] || ({ eyes: "open", mouth: "neutral", feet: "rest" }[name] || "idle"));
+        }
       }
-      var face = find(faceSelector);
-      if (face) rig.registerFace(face);
-      gazeEl.appendChild(body);
-    }, options.name || id, options.viewBox || "0 0 100 100");
-    return characters[id];
+      applyAccessoryAction(pose.accessory || "idle");
+      renderEffects(root, model, recipe.effects || []);
+    }
+
+    return {
+      rig: rig,
+      registerPart: registerPart,
+      registerAccessory: registerAccessory,
+      setAccessory: setAccessory,
+      applyPose: applyPose,
+      getParts: function () { return elements; },
+      getAccessories: function () {
+        var result = {};
+        for (var id in model.accessories) {
+          if (Object.prototype.hasOwnProperty.call(model.accessories, id)) {
+            result[id] = {
+              enabled: accessoryState[id] === true,
+              default: model.accessories[id].default,
+              actions: model.accessories[id].actions.slice()
+            };
+          }
+        }
+        return result;
+      }
+    };
   }
-  function getCharacter(type) { return characters[type] || characters.sprout; }
+
+  function renderEffects(root, model, requested) {
+    var layer = root.querySelector(".lively-effects");
+    if (!layer) return;
+    layer.textContent = "";
+    for (var i = 0; i < requested.length; i++) {
+      var effect = requested[i];
+      if (model.effects.supported.indexOf(effect.type) === -1) continue;
+      var anchor = model.effects.anchors[effect.anchor] || model.effects.anchors.body || { x: 50, y: 50 };
+      var count = effect.count || (effect.type === "sparkles" ? 3 : 2);
+      for (var n = 0; n < count; n++) {
+        var particle = hEl("span", {
+          class: "lively-effects__particle lively-effects__particle--" + effect.type,
+          "aria-hidden": "true"
+        });
+        particle.style.setProperty("--lively-effect-x", (Number(anchor.x) || 50) + "%");
+        particle.style.setProperty("--lively-effect-y", (Number(anchor.y) || 50) + "%");
+        particle.style.setProperty("--lively-effect-index", n);
+        if (effect.type === "hearts") particle.textContent = "\u2665";
+        else if (effect.type === "sleep") particle.textContent = "z";
+        else if (effect.type === "sparkles") particle.textContent = "*";
+        layer.appendChild(particle);
+      }
+    }
+  }
 
   function normalizeViewMode(mode) {
     return String(mode || "3d").toLowerCase() === "2d" ? "2d" : "3d";
@@ -339,11 +455,11 @@
   function createMascot(target, options) {
     options = options || {};
     var type = options.type || "sprout";
-    var character = getCharacter(type);
+    var model = getModel(type);
     var viewMode = normalizeViewMode(options.viewMode || options.mode);
     var outlineVisible = normalizeOutlineVisible(options.outlineVisible);
     var root = el("div", {
-      class: "lively-mascot lively-mascot--" + character.id + " lively-mascot--" + viewMode + " lively-mascot--face-default" + (!outlineVisible ? " lively-mascot--outline-hidden" : "") + (options.animated === false ? " lively-mascot--static" : ""),
+      class: "lively-mascot lively-mascot--" + model.id + " lively-mascot--" + viewMode + " lively-mascot--face-default" + (!outlineVisible ? " lively-mascot--outline-hidden" : "") + (options.animated === false ? " lively-mascot--static" : ""),
       style: "width:" + (options.size || 106) + "px;height:" + (options.size || 106) + "px",
       "aria-hidden": "true",
     });
@@ -357,23 +473,47 @@
       root.style.setProperty("--lively-body", theme.body || null);
       root.style.setProperty("--lively-outline", theme.outline || null);
       root.style.setProperty("--lively-accent", theme.accent || null);
+      for (var fixedName in model.skin.fixed) {
+        if (Object.prototype.hasOwnProperty.call(model.skin.fixed, fixedName) && model.skin.fixed[fixedName]) {
+          root.style.setProperty("--lively-fixed-" + fixedName, model.skin.fixed[fixedName]);
+        }
+      }
     }
     applyTheme();
+    var runtime;
     var rig = createRig(root, rigEl, {
       followCursor: options.followCursor,
       hopInterval: options.hopInterval,
       animated: options.animated
-    }, { onClick: options.onClick });
-    character.render(rig.api, gazeEl);
+    }, {
+      onClick: options.onClick,
+      onEmotionChange: function (id) {
+        if (runtime) runtime.applyPose((LivelyEmotions[String(id)] || {}).recipe);
+      }
+    });
+    runtime = createModelRuntime(model, rig.api, root);
+    model.render(runtime, gazeEl);
     rig.api.registerGazeWrap(gazeEl);
-    // Loading ring overlay — shared by ALL characters (shown via .is-emotion-28).
-    gazeEl.appendChild(el("div", { class: "lively__loading-overlay", "aria-hidden": "true" }));
+    root.appendChild(el("div", { class: "lively-effects", "aria-hidden": "true" }));
     root.appendChild(rigEl);
     target.appendChild(root);
+    runtime.applyPose((LivelyEmotions["02"] || {}).recipe);
 
     return {
       el: root,
-      type: character.id,
+      type: model.id,
+      getCapabilities: function () {
+        return clone({ parts: model.parts, skin: model.skin, accessories: model.accessories, effects: model.effects });
+      },
+      getSkin: function () {
+        return clone({ slots: theme, fixed: model.skin.fixed });
+      },
+      getAccessories: function () {
+        return clone(runtime.getAccessories());
+      },
+      setAccessory: function (id, enabled) {
+        return runtime.setAccessory(id, enabled);
+      },
       get viewMode() { return viewMode; },
       setViewMode: function (mode) {
         viewMode = normalizeViewMode(mode);
@@ -397,9 +537,9 @@
       },
       setTheme: function (p) {
         p = p || {};
-        if (p.body) theme.body = p.body;
-        if (p.outline) theme.outline = p.outline;
-        if (p.accent) theme.accent = p.accent;
+        if (p.body && model.skin.slots.indexOf("body") !== -1) theme.body = p.body;
+        if (p.outline && model.skin.slots.indexOf("outline") !== -1) theme.outline = p.outline;
+        if (p.accent && model.skin.slots.indexOf("accent") !== -1) theme.accent = p.accent;
         applyTheme();
       },
       setEmotion: function (emotionId) {
@@ -451,11 +591,11 @@
 
   return {
     createMascot: createMascot,
-    registerCharacter: registerCharacter,
-    registerModel: registerModel,
+    defineModel: defineModel,
     defineMascotElement: defineMascotElement,
     buildFaceSvg: buildFaceSvg,
-    characters: characters,
+    models: models,
+    partActions: STANDARD_ACTIONS,
     emotions: LivelyEmotions,
     emotionGroups: LivelyEmotionGroups,
     version: "0.2.0"

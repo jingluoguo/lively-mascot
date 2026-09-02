@@ -32,10 +32,10 @@
     return node;
   }
 
-  function renderSprout(rig, rigEl) {
+  function renderSprout(model, rigEl) {
     // Leaf (top decoration, data-driven by emotion leafAnim)
     var leaf = hEl("span", { class: "lively__leaf", "aria-hidden": "true" });
-    rig.registerLeaf(leaf);
+    model.registerPart("top", leaf);
     leaf.appendChild(svg("svg", { viewBox: "0 0 52 56" }, [
       svg("path", { class: "lively-sprout__stem", d: "M26 52 C26 42, 26 34, 26 27" }),
       svg("path", { class: "lively-sprout__leaf", d: "M26 28 C22 15, 14 9, 6 12 C5 20, 12 29, 26 28 Z" }),
@@ -48,17 +48,17 @@
 
     // Body
     var body = hEl("div", { class: "lively-body" });
-    rig.registerBody(body);
+    model.registerPart("body", body);
 
     // Shared face
-    var face = LivelyMascot.buildFaceSvg(rig);
+    var face = LivelyMascot.buildFaceSvg(model);
     body.appendChild(leaf);
     body.appendChild(face.wrap);
     rigEl.appendChild(body);
 
     // Feet
     var feet = hEl("div", { class: "lively__feet" });
-    rig.registerFeet(feet);
+    model.registerPart("feet", feet);
     var footL = hEl("span", { class: "lively__foot lively__foot--l" });
     footL.appendChild(svg("svg", { viewBox: "0 0 22 16" }, [
       svg("ellipse", { class: "lively-foot__body", cx: 11, cy: 10, rx: 10, ry: 6 }),
@@ -74,14 +74,16 @@
     rigEl.appendChild(feet);
   }
 
-  // Register sprout character when SDK is available
-  if (typeof LivelyMascot !== "undefined") {
-    LivelyMascot.registerCharacter("sprout", renderSprout, "Sprout", "0 0 100 100");
-  } else {
-    document.addEventListener("DOMContentLoaded", function () {
-      if (typeof LivelyMascot !== "undefined") {
-        LivelyMascot.registerCharacter("sprout", renderSprout, "Sprout", "0 0 100 100");
-      }
+  function register() {
+    if (typeof LivelyMascot === "undefined") return;
+    var actions = LivelyMascot.partActions;
+    LivelyMascot.defineModel({
+      id: "sprout", name: "Sprout", viewBox: "0 0 100 100", render: renderSprout,
+      parts: { body: { actions: actions.body }, eyes: { actions: actions.eyes }, pupils: { actions: [] }, face: { actions: [] }, mouth: { actions: actions.mouth }, top: { actions: actions.top }, feet: { actions: actions.feet } },
+      skin: { slots: ["body", "outline", "accent"] },
+      effects: { supported: ["hearts", "sparkles", "sleep", "loading"], anchors: { head: { x: 50, y: 14 }, face: { x: 50, y: 48 }, body: { x: 50, y: 58 } } }
     });
   }
+  register();
+  if (typeof LivelyMascot === "undefined") document.addEventListener("DOMContentLoaded", register);
 })();

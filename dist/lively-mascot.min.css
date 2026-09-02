@@ -160,29 +160,65 @@
   animation: none !important;
 }
 
-/* --- Loading ring overlay (28) — shared by all characters ---
-   A bold, clearly-visible spinner for the live mascot; hidden in static
-   thumbnails so the emotion gallery stays purely iconic. */
-.lively__loading-overlay {
-  display: none;
+/* --- Unified effect layer ---
+   Recipes choose an effect and an anchor; individual models only declare
+   which anchors/effects they support. This keeps particles out of model CSS. */
+.lively-effects {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
 }
 
-.lively-mascot.is-emotion-28 .lively__loading-overlay {
-  display: block;
+.lively-effects__particle {
   position: absolute;
-  top: 50%;
-  left: 50%;
+  left: var(--lively-effect-x);
+  top: var(--lively-effect-y);
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.lively-effects__particle--hearts {
+  color: var(--lively-accent);
+  font-family: Arial, sans-serif;
+  font-size: 19px;
+  line-height: 1;
+  text-shadow: 0 1px 0 var(--lively-outline);
+  animation: lively-effect-heart 1.25s ease-in-out infinite;
+  animation-delay: calc(var(--lively-effect-index) * -0.22s);
+}
+
+.lively-effects__particle--sparkles {
+  color: #ffe066;
+  font-family: Arial, sans-serif;
+  font-size: 26px;
+  font-weight: bold;
+  line-height: 1;
+  text-shadow: 0 1px 2px color-mix(in srgb, var(--lively-outline) 36%, transparent);
+  animation: lively-effect-sparkle 1s ease-in-out infinite;
+  animation-delay: calc(var(--lively-effect-index) * -0.18s);
+}
+
+.lively-effects__particle--sleep {
+  color: var(--lively-outline);
+  font: 700 14px/1 Arial, sans-serif;
+  text-transform: uppercase;
+  opacity: .72;
+  animation: lively-effect-sleep 2.4s ease-in-out infinite;
+  animation-delay: calc(var(--lively-effect-index) * -1.15s);
+}
+
+.lively-effects__particle--loading {
   width: 50%;
   height: 50%;
-  transform: translate(-50%, -50%);
   box-sizing: border-box;
-  border-radius: 50%;
   border: 2.5px solid color-mix(in srgb, var(--lively-outline) 22%, transparent);
-  pointer-events: none;
-  z-index: 10;
+  border-radius: 50%;
 }
 
-.lively-mascot.is-emotion-28 .lively__loading-overlay::before {
+.lively-effects__particle--loading::before {
   content: "";
   position: absolute;
   inset: -5px;
@@ -195,20 +231,35 @@
   animation: lively-loading-orbit 1s linear infinite;
 }
 
-/* Static thumbnails (emotion gallery) keep the same loading ring but frozen */
-.lively-mascot--static.is-emotion-28 .lively__loading-overlay {
-  display: block;
+/* Static thumbnails keep a frozen, readable loading signal. */
+.lively-mascot--static .lively-effects__particle--loading {
   width: 44%;
   height: 44%;
   border-width: 2px;
 }
 
-.lively-mascot--static.is-emotion-28 .lively__loading-overlay::before {
+.lively-mascot--static .lively-effects__particle--loading::before {
   animation: none;
   inset: -4px;
   border-width: 3px;
-  /* freeze the arc at about 2 o'clock so it still reads as "loading" */
   transform: rotate(45deg);
+}
+
+@keyframes lively-effect-heart {
+  0%, 100% { transform: translate(-50%, -40%) translateX(0) scale(.72); opacity: 0; }
+  28%, 72% { opacity: 1; }
+  50% { transform: translate(-50%, -145%) translateX(calc((var(--lively-effect-index) - 1) * 12px)) scale(1); }
+}
+
+@keyframes lively-effect-sparkle {
+  0%, 100% { transform: translate(-50%, -50%) rotate(0deg) scale(.45); opacity: .1; }
+  50% { transform: translate(-50%, -50%) rotate(45deg) scale(1.15); opacity: 1; }
+}
+
+@keyframes lively-effect-sleep {
+  0%, 100% { transform: translate(-50%, -20%) scale(.72); opacity: 0; }
+  38%, 78% { opacity: .75; }
+  68% { transform: translate(8px, -150%) scale(1); }
 }
 
 /* Rig layer: outer posture layer (hop / refresh rotation) */
@@ -311,12 +362,8 @@
   inset: 4px;
 }
 
-.lively-face-accessory {
-  visibility: hidden;
-}
-
-.lively-face-accessory.is-active {
-  visibility: visible;
+.lively-mascot__accessory[hidden] {
+  display: none !important;
 }
 
 .lively-face-wrap svg {
@@ -351,7 +398,7 @@
 }
 
 .lively-face__pupil {
-  fill: var(--lively-outline);
+  fill: var(--lively-fixed-pupil, var(--lively-outline));
 }
 
 .lively-face__shine {
@@ -2080,7 +2127,8 @@
   .lively-face__happy,
   .lively-face__tear,
   .lively-face-wrap svg,
-  .lively__loading-overlay::before {
+  .lively-effects__particle,
+  .lively-effects__particle::before {
     animation: none !important;
   }
 }
@@ -3505,7 +3553,7 @@
 }
 
 .lively-cat__muzzle {
-  fill: #eee5d9;
+  fill: var(--lively-fixed-muzzle, #eee5d9);
   opacity: .82;
 }
 
@@ -3805,7 +3853,7 @@
 
 /* Keep robot cheeks warmer and quieter than the cyan antenna accent. */
 .lively-mascot--robot .lively-face__blush {
-  fill: #e7ad76;
+  fill: var(--lively-fixed-cheek, #e7ad76);
   fill-opacity: .58;
   filter: drop-shadow(0 1px 1px rgba(0,0,0,.12));
 }

@@ -32,8 +32,6 @@ function createRig(root, rigEl, config, handlers) {
   var leafUseLeafAnim = true;
   var feetEl = null;
   var gazeEl = null;
-  var faceAccessories = {};
-  var activeFaceAccessory = null;
 
   var api = {
     registerPupil: function (elm, spec) {
@@ -50,26 +48,11 @@ function createRig(root, rigEl, config, handlers) {
     },
     registerFeet: function (elm) { feetEl = elm; },
     registerGazeWrap: function (elm) { gazeEl = elm; },
-    registerFaceAccessory: function (name, elm) {
-      if (!name || !elm) return;
-      faceAccessories[String(name)] = elm;
-      elm.classList.add("lively-face-accessory");
-      if (activeFaceAccessory === null) activeFaceAccessory = String(name);
-      elm.classList.toggle("is-active", activeFaceAccessory === String(name));
-    },
-    setFaceAccessory: function (name) {
-      var key = name == null ? null : String(name);
-      activeFaceAccessory = key;
-      for (var accessoryName in faceAccessories) {
-        if (Object.prototype.hasOwnProperty.call(faceAccessories, accessoryName)) {
-          faceAccessories[accessoryName].classList.toggle("is-active", accessoryName === key);
-        }
-      }
-    },
     setEmotionState: function (id) {
       currentEmotionId = String(id);
       resetBlinkCycle();
       applyEmotionBehavior(currentEmotionId);
+      if (handlers.onEmotionChange) handlers.onEmotionChange(currentEmotionId);
       syncHop();
     }
   };

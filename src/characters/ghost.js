@@ -33,13 +33,13 @@
     return node;
   }
 
-  function renderGhost(rig, gazeEl) {
+  function renderGhost(model, gazeEl) {
     // Body (floating blob, no hard shadow)
     var body = hEl("div", { class: "lively-body lively-body--ghost" });
-    rig.registerBody(body);
+    model.registerPart("body", body);
 
     // Shared face
-    var face = LivelyMascot.buildFaceSvg(rig);
+    var face = LivelyMascot.buildFaceSvg(model);
     body.appendChild(face.wrap);
 
     // The body CSS owns the filled wavy silhouette. This SVG adds only the
@@ -56,13 +56,16 @@
     gazeEl.appendChild(body);
   }
 
-  if (typeof LivelyMascot !== "undefined") {
-    LivelyMascot.registerCharacter("ghost", renderGhost, "Ghost", "0 0 100 100");
-  } else {
-    document.addEventListener("DOMContentLoaded", function () {
-      if (typeof LivelyMascot !== "undefined") {
-        LivelyMascot.registerCharacter("ghost", renderGhost, "Ghost", "0 0 100 100");
-      }
+  function register() {
+    if (typeof LivelyMascot === "undefined") return;
+    var actions = LivelyMascot.partActions;
+    LivelyMascot.defineModel({
+      id: "ghost", name: "Ghost", viewBox: "0 0 100 100", render: renderGhost,
+      parts: { body: { actions: actions.body }, eyes: { actions: actions.eyes }, pupils: { actions: [] }, face: { actions: [] }, mouth: { actions: actions.mouth } },
+      skin: { slots: ["body", "outline", "accent"] },
+      effects: { supported: ["hearts", "sparkles", "sleep", "loading"], anchors: { head: { x: 50, y: 20 }, face: { x: 50, y: 49 }, body: { x: 50, y: 58 } } }
     });
   }
+  register();
+  if (typeof LivelyMascot === "undefined") document.addEventListener("DOMContentLoaded", register);
 })();

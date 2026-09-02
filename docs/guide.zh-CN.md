@@ -108,22 +108,43 @@ instance.destroy();
 
 ## 自定义模型
 
-### 运行时 SVG 和 HTML
+标准部件、动作语义和换皮固定色规则见 [模型动作目录](model-actions.zh-CN.md)。
 
-`registerModel()` 接受 SVG 或 HTML 字符串，在注册时清理危险内容，并为每个实例克隆一份 DOM：
+### 统一模型定义
+
+新增模型只使用 `defineModel()`。一份定义同时声明渲染、可动部件、可换皮槽位和特效锚点；不再支持运行时 SVG/HTML 字符串导入或 DOM 标记扫描：
 
 ```js
-const markup = await file.text();
-LivelyMascot.registerModel("user-model", markup, { name: file.name });
+var actions = LivelyMascot.partActions;
 
-LivelyMascot.createMascot(container, {
-  type: "user-model",
-  size: 160,
-  viewMode: "2d"
+LivelyMascot.defineModel({
+  id: "my-model",
+  name: "My Model",
+  parts: {
+    body: { actions: actions.body },
+    eyes: { actions: actions.eyes },
+    mouth: { actions: actions.mouth },
+    top: { actions: actions.top }
+  },
+  skin: { slots: ["body", "outline", "accent"], fixed: { pupil: "#18222a", "identity-mark": "#f4e7d0" } },
+  effects: {
+    supported: ["hearts", "sparkles", "sleep", "loading"],
+    anchors: { head: { x: 50, y: 12 }, body: { x: 50, y: 58 } }
+  },
+  render: function (model, container) {
+    var body = document.createElement("div");
+    body.className = "lively-body lively-body--my-model";
+    model.registerPart("body", body);
+    var face = LivelyMascot.buildFaceSvg(model);
+    body.appendChild(face.wrap);
+    container.appendChild(body);
+  }
 });
 ```
 
-使用 `data-lively-body`、`data-lively-leaf`、`data-lively-feet`、`data-lively-eye`、`data-lively-pupil` 和 `data-lively-face` 标记需要接入 rig 的部件。给瞳孔添加 `data-max-x` / `data-max-y` 可调整视线范围。用户模型可通过 `.lively-mascot.is-emotion-10` 等状态选择器添加表情样式。
+`setEmotion()` 先读取统一的情绪配方，再将眼睛、嘴、身体等动作只分派给模型实际声明的部件；没有的部件会自动跳过。`getCapabilities()` 可读取当前模型的部件、皮肤槽位和特效能力。`setTheme()` 只能修改 `skin.slots`，而 `skin.fixed` 会写入 `--lively-fixed-<名称>` CSS 变量并保持不变；可通过 `getSkin()` 读取两者。
+
+帽子、眼镜等可切换物件使用模型的 `accessories` 声明，并由实例的 `setAccessory(id, enabled)` 单独控制；完整规则见[模型动作目录](model-actions.zh-CN.md#可切换配件)。
 
 ### 图片模型 Skill
 
@@ -144,23 +165,23 @@ Skill 会优先选择相近的原生 archetype，保留项目既有的面部、2
 
 ## 扩展引擎
 
-通过 renderer 注册角色，并将可动层交给 rig：
+通过模型定义注册角色，并将可动层交给运行时：
 
 ```js
-function renderMyCharacter(rig, gazeEl) {
+function renderMyCharacter(model, gazeEl) {
   var body = document.createElement("div");
   body.className = "lively-body lively-body--my-character";
-  rig.registerBody(body);
+  model.registerPart("body", body);
 
-  var face = LivelyMascot.buildFaceSvg(rig);
+  var face = LivelyMascot.buildFaceSvg(model);
   body.appendChild(face.wrap);
   gazeEl.appendChild(body);
 }
 
-LivelyMascot.registerCharacter("my-character", renderMyCharacter, "My Character");
+LivelyMascot.defineModel({ id: "my-character", render: renderMyCharacter, parts: { body: { actions: LivelyMascot.partActions.body } } });
 ```
 
-可选层使用 `rig.registerLeaf(element, options)`、`rig.registerFeet(element)` 和 `rig.registerFaceAccessory(name, element)`。添加自定义表情：
+可选层使用 `model.registerPart("top", element)`、`model.registerPart("feet", element)` 或 `model.registerPart("tail", element)`。添加自定义情绪：
 
 ```js
 LivelyMascot.emotions["50"] = {
@@ -168,7 +189,11 @@ LivelyMascot.emotions["50"] = {
   name: "Custom",
   group: "custom",
   desc: "自定义",
-  bodyAnim: "my-custom-animation 1s ease-in-out"
+  bodyAnim: "my-custom-animation 1s ease-in-out",
+  recipe: {
+    parts: { body: "bounce", eyes: "happy", mouth: "smile" },
+    effects: [{ type: "sparkles", anchor: "head" }]
+  }
 };
 ```
 

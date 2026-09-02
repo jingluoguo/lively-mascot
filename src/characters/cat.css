@@ -55,7 +55,7 @@
 }
 
 .lively-cat__muzzle {
-  fill: #eee5d9;
+  fill: var(--lively-fixed-muzzle, #eee5d9);
   opacity: .82;
 }
 

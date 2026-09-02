@@ -194,6 +194,58 @@ var LivelyEmotionGroups = {
   "work":      { name: "工作状态", order: 2 }
 };
 
+// The recipe is the model-independent intent behind each visual state. The
+// rig still owns its proven motion values above; a model only receives actions
+// for parts it explicitly declared, and unsupported effects are skipped.
+var LivelyEmotionRecipes = {
+  "00": { parts: { body: "rest", eyes: "closed", mouth: "flat", top: "droop", feet: "rest" }, effects: [{ type: "sleep", anchor: "head", count: 2 }] },
+  "01": { parts: { body: "wake", eyes: "wide", mouth: "open", top: "perk", feet: "rest" } },
+  "02": { parts: { body: "idle", eyes: "open", mouth: "neutral", top: "idle", feet: "rest", tail: "idle" } },
+  "03": { parts: { body: "breathe", eyes: "open", mouth: "neutral", top: "idle", feet: "rest" } },
+  "04": { parts: { body: "breathe", eyes: "open", mouth: "neutral", top: "perk", feet: "rest" } },
+  "05": { parts: { body: "rest", eyes: "sad", mouth: "flat", top: "droop", feet: "rest" } },
+  "06": { parts: { body: "refresh", eyes: "open", mouth: "neutral", top: "work", feet: "rest" } },
+  "07": { parts: { body: "dim", eyes: "sad", mouth: "frown", top: "droop", feet: "rest" } },
+  "08": { parts: { body: "dim", eyes: "closed", mouth: "flat", top: "droop", feet: "rest" } },
+  "09": { parts: { body: "wake", eyes: "wide", mouth: "open", top: "perk", feet: "step" } },
+  "10": { parts: { body: "bounce", eyes: "happy", mouth: "smile", top: "perk", feet: "happy", tail: "happy", accessory: "happy" }, effects: [{ type: "sparkles", anchor: "head" }] },
+  "11": { parts: { body: "work", eyes: "wide", mouth: "open", top: "perk", tail: "idle" } },
+  "12": { parts: { body: "dim", eyes: "sad", mouth: "frown", top: "droop", feet: "rest", tail: "droop" } },
+  "13": { parts: { body: "shake", eyes: "angry", mouth: "frown", top: "shake", feet: "stomp", tail: "puff" } },
+  "14": { parts: { body: "wake", eyes: "wide", mouth: "open", top: "perk", accessory: "alert" } },
+  "15": { parts: { body: "work", eyes: "sad", mouth: "smile", top: "droop" } },
+  "16": { parts: { body: "pulse", eyes: "love", mouth: "smile", top: "perk", tail: "happy" }, effects: [{ type: "hearts", anchor: "head", count: 3 }] },
+  "17": { parts: { body: "work", eyes: "sad", mouth: "frown", top: "work" } },
+  "18": { parts: { body: "idle", eyes: "open", mouth: "smile", top: "perk" } },
+  "19": { parts: { body: "work", eyes: "open", mouth: "smile", top: "perk" } },
+  "20": { parts: { body: "work", eyes: "thinking", mouth: "flat", top: "work" } },
+  "21": { parts: { body: "work", eyes: "open", mouth: "neutral", top: "listen", accessory: "alert" } },
+  "22": { parts: { body: "work", eyes: "open", mouth: "talk", top: "work" } },
+  "23": { parts: { body: "work", eyes: "open", mouth: "neutral", top: "work", feet: "step" } },
+  "24": { parts: { body: "work", eyes: "thinking", mouth: "smile", top: "work" } },
+  "25": { parts: { body: "work", eyes: "thinking", mouth: "neutral", top: "work", feet: "step" } },
+  "26": { parts: { body: "work", eyes: "thinking", mouth: "flat", top: "work" } },
+  "27": { parts: { body: "work", eyes: "happy", mouth: "smile", top: "work" } },
+  "28": { parts: { body: "bounce", eyes: "thinking", mouth: "flat", feet: "rest" }, effects: [{ type: "loading", anchor: "body", count: 1 }] },
+  "29": { parts: { body: "work", eyes: "thinking", mouth: "flat", top: "work" } },
+  "30": { parts: { body: "bounce", eyes: "happy", mouth: "smile", top: "perk", feet: "happy" }, effects: [{ type: "sparkles", anchor: "head" }] },
+  "31": { parts: { body: "shake", eyes: "closed", mouth: "frown", top: "shake", feet: "stomp" } },
+  "32": { parts: { body: "pulse", eyes: "happy", mouth: "smile", top: "perk" }, effects: [{ type: "hearts", anchor: "head", count: 2 }] },
+  "33": { parts: { body: "work", eyes: "thinking", mouth: "neutral", top: "work", feet: "step" } },
+  "34": { parts: { body: "rest", eyes: "sad", mouth: "frown", top: "droop", feet: "rest" } },
+  "35": { parts: { body: "dim", eyes: "cry", mouth: "frown", top: "droop", feet: "rest", tail: "droop" } },
+  "36": { parts: { body: "rest", eyes: "bored", mouth: "flat", top: "droop", feet: "rest" } },
+  "37": { parts: { body: "shake", eyes: "sad", mouth: "neutral", top: "shake", feet: "step", tail: "tuck" } },
+  "38": { parts: { body: "bounce", eyes: "wide", mouth: "smile", top: "perk", feet: "happy", accessory: "alert" }, effects: [{ type: "sparkles", anchor: "head", count: 4 }] },
+  "39": { parts: { body: "work", eyes: "open", mouth: "flat", top: "idle", feet: "step" } }
+};
+
+for (var emotionId in LivelyEmotionRecipes) {
+  if (Object.prototype.hasOwnProperty.call(LivelyEmotionRecipes, emotionId) && LivelyEmotions[emotionId]) {
+    LivelyEmotions[emotionId].recipe = LivelyEmotionRecipes[emotionId];
+  }
+}
+
 // Keep the no-build browser global while making the data consumable from
 // Node/CommonJS when the source SDK is used as an npm entry point.
 if (typeof module === "object" && module.exports) {

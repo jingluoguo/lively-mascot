@@ -24,7 +24,7 @@
 
 /* Keep robot cheeks warmer and quieter than the cyan antenna accent. */
 .lively-mascot--robot .lively-face__blush {
-  fill: #e7ad76;
+  fill: var(--lively-fixed-cheek, #e7ad76);
   fill-opacity: .58;
   filter: drop-shadow(0 1px 1px rgba(0,0,0,.12));
 }
