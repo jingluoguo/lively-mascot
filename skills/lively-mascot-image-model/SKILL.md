@@ -18,21 +18,27 @@ Every output uses `LivelyMascot.defineModel()`. Do not use SVG/HTML string impor
 
 Read [the model contract](references/model-contract.md) before writing output.
 
-Use the closest native structure where appropriate:
+## Reference Confirmation
+
+Before creating any output files, identify the pet or character and present a compact reference inventory to the user: visible anatomy and identity details, plus standard anatomy for that identified subject which is obscured or absent from the image. Ask whether a missing or obscured structural part should be added only when a stylized addition can remain visually consistent with the reference and the selected native structure. For example, ask whether a cat with no visible tail should have a stylized tail.
+
+Do not ask about unrelated invented features. Ask only about plausible anatomy for the identified subject or structure selected for the model. When adding a missing part would require a large visual departure from the reference, omit it directly and state that choice in the inventory; do not ask the user to choose a poor-fitting addition. If the user has already said to use only the visible reference, treat that as an instruction to omit all unobserved anatomy. Otherwise, pause generation only for viable additions until the user confirms whether to add or omit them. Record the user's decision, and any automatically omitted high-variance anatomy, in the generated `model.json` limitations.
+
+Use the closest native structure as a source of behavior, not as a required anatomy list:
 
 | Source anatomy | Native structure |
 | --- | --- |
-| bilateral animal with ears/paws | cat body, ears, shared face, optional tail, feet |
+| bilateral animal with ears/paws | cat body, ears, shared face, user-confirmed tail, visible paws only |
 | plant or botanical character | rounded body, leaf, shared face, feet |
 | mechanical or appliance character | blocky body, antenna, shared face, feet |
 | floating or sheet-like character | floating body and hem, no invented feet |
 | rounded minimal subject | blob body and shared face, no invented appendages |
 
-Do not add ears, tails, antennae, leaves, hands, paws, or feet that the reference does not support. Keep the neutral mass centered, vertically upright, and recognizable at 96 px.
+Do not automatically add ears, tails, antennae, leaves, hands, paws, or feet that the reference does not support. A user-confirmed addition may be included; otherwise omit it. When a generated model calls a native renderer, remove every omitted visual layer before the renderer returns and omit that part from `parts`, its manifest, and model-specific CSS. Never retain an absent feature merely to preserve the native silhouette or motion contract. Keep the neutral mass centered, vertically upright, and recognizable at 96 px.
 
 ## Parts, Expressions, And Effects
 
-Use the standard structural part names `body`, `eyes`, `mouth`, `top`, `feet`, and `tail`. The shared `LivelyMascot.buildFaceSvg(model)` registers `face`, `eyes`, `pupils`, and `mouth` itself. Use `parts.accessory` with `model.registerPart("accessory", node)` for permanent details such as whiskers or a fixed badge. Use `accessories` and `model.registerAccessory(id, node)` only for optional, toggleable items such as glasses or hats. Declare only anatomy that exists; the core emotion recipe will safely omit missing parts.
+Use the standard structural part names `body`, `eyes`, `mouth`, `top`, `feet`, and `tail`. The shared `LivelyMascot.buildFaceSvg(model)` registers `face`, `eyes`, `pupils`, and `mouth` itself. Use `parts.accessory` with `model.registerPart("accessory", node)` for permanent details such as whiskers or a fixed badge. Use `accessories` and `model.registerAccessory(id, node)` only for optional, toggleable items such as glasses or hats. Declare only anatomy that exists: every `parts` entry must have a matching rendered node, and every rendered movable layer must be supported by the reference. The core emotion recipe safely omits missing parts.
 
 Give eyed models the shared face unless their anatomy requires a custom face. For a custom face, register each eye and pupil through `model.registerPart()` and keep pupils clipped inside the visible eye opening.
 
@@ -52,4 +58,4 @@ Write these files under `outputs/lively-mascot-model/<slug>/` unless another pat
 - `model.css` for reference-specific artwork only.
 - `model.json` with the declared parts, skin slots, effect anchors, all 40 emotion IDs, and actual limitations.
 
-Add the generated CSS and renderer script to the project demo when the user asks to inspect the model. Run `node --check model.js`, build the project, and compare 2D/3D frames with `followCursor:false`. Verify all 40 states, face variants, outline visibility, independent theme slots, cursor gaze extremes, and the applicable shared particles.
+Add the generated CSS and renderer script to the project demo when the user asks to inspect the model. Run `node --check model.js`, build the project, and compare 2D/3D frames with `followCursor:false`. Verify all 40 states, face variants, outline visibility, independent theme slots, cursor gaze extremes, and the applicable shared particles. Confirm the mounted DOM and `parts` definition both omit unconfirmed anatomy and include any user-confirmed additions.

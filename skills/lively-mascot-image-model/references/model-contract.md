@@ -36,7 +36,7 @@ LivelyMascot.defineModel({
 
 ## Parts
 
-`body`, `eyes`, `mouth`, `top`, `feet`, and `tail` are standard structural part names. The renderer calls `model.registerPart(name, element, options)` for every structural DOM layer it creates. `buildFaceSvg(model)` registers the shared face, eyes, pupils, and mouth automatically.
+`body`, `eyes`, `mouth`, `top`, `feet`, and `tail` are standard structural part names. The renderer calls `model.registerPart(name, element, options)` for every structural DOM layer it creates. `buildFaceSvg(model)` registers the shared face, eyes, pupils, and mouth automatically. Declare only visible reference anatomy or structural additions explicitly confirmed by the user. Omit missing anatomy directly when a plausible reconstruction would visibly depart from the reference. When reusing a native renderer, remove those omitted DOM layers rather than declaring them for compatibility, and record every decision in the generated manifest.
 
 Use `parts.accessory` and `model.registerPart("accessory", element)` for permanent non-structural details such as whiskers, a fixed badge, or an always-worn item. These remain visible and receive shared `accessory` actions from emotion recipes.
 
