@@ -52,7 +52,7 @@ render: function (model, container) {
 }
 ```
 
-引擎会将 `--lively-gaze-x`、`--lively-gaze-y`、`--lively-gaze-scale` 和 `--lively-gaze-depth` 写到该眼睛组上。CSS 应把它们组合进原有 `transform`，使眼睛从原始位置移动、放大，并通过轻微横向压缩产生转向感，而不是覆盖原有定位。左右眼是独立节点时，可使用 `gaze: { side: "left"|"right", sideScale: 0.06-0.1 }`，并通过 CSS 独立的 `scale` 属性应用变量，让朝向鼠标的一侧略微变小，另一侧略微变大。
+引擎会将 `--lively-gaze-x`、`--lively-gaze-y`、`--lively-gaze-scale`、`--lively-gaze-depth` 和 `--lively-gaze-height` 写到该眼睛组上。CSS 应把它们组合进原有 `transform`，使眼睛从原始位置移动、缩放，并通过轻微横向压缩和纵向开合产生转向感，而不是覆盖原有定位。左右眼是独立节点时，可使用 `gaze: { side: "left"|"right", sideScale: 0.06-0.1, verticalScale: 0.05-0.1 }`；`depth` 控制横向压缩，`verticalScale` 控制上/下看的开合，`scale` 则保留近远侧的细微大小差。
 
 ## 可切换配件
 

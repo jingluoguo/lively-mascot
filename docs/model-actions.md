@@ -51,7 +51,7 @@ render: function (model, container) {
 }
 ```
 
-The rig writes `--lively-gaze-x`, `--lively-gaze-y`, `--lively-gaze-scale`, and `--lively-gaze-depth` on that eye group. Compose them into its existing transform so the group moves, scales, and can add a subtle turn-through-compression cue rather than replacing it. Separate left/right eye nodes may use `gaze: { side: "left"|"right", sideScale: 0.06-0.1 }`; apply the scale variable through CSS `scale` so the eye toward the pointer narrows slightly while the opposite eye opens.
+The rig writes `--lively-gaze-x`, `--lively-gaze-y`, `--lively-gaze-scale`, `--lively-gaze-depth`, and `--lively-gaze-height` on that eye group. Compose them into its existing transform so the group moves, scales, and gets a subtle directional compression cue rather than replacing it. Separate left/right eye nodes may use `gaze: { side: "left"|"right", sideScale: 0.06-0.1, verticalScale: 0.05-0.1 }`; use `depth` for horizontal compression, `verticalScale` for upward/downward opening, and the scale variable for a small near/far size difference.
 
 ## Toggleable Accessories
 
