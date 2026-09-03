@@ -181,6 +181,12 @@
     tail: ["idle", "happy", "droop", "puff", "tuck"],
     accessory: ["idle", "happy", "alert"]
   };
+  var DEFAULT_RIG_CAPABILITIES = {
+    blink: true,
+    gaze: true,
+    hop: true,
+    spin: true
+  };
 
   function clone(value) { return JSON.parse(JSON.stringify(value)); }
 
@@ -257,6 +263,15 @@
     };
   }
 
+  function normalizeRigCapabilities(rig) {
+    var result = clone(DEFAULT_RIG_CAPABILITIES);
+    rig = rig || {};
+    for (var key in rig) {
+      if (Object.prototype.hasOwnProperty.call(rig, key)) result[String(key)] = rig[key] !== false;
+    }
+    return result;
+  }
+
   function defineModel(definition) {
     definition = definition || {};
     var id = String(definition.id || "").trim();
@@ -275,6 +290,7 @@
       id: id,
       name: definition.name || id,
       presentation: normalizePresentation(definition.presentation, definition.name || id),
+      rig: normalizeRigCapabilities(definition.rig),
       viewBox: definition.viewBox || "0 0 100 100",
       render: definition.render,
       parts: parts,
@@ -467,6 +483,9 @@
       currentEmotionClass = "is-emotion-" + id;
       root.classList.add(currentEmotionClass);
       root.setAttribute("data-mascot-emotion", id);
+      var emotion = LivelyEmotions[id];
+      var behaviorTags = emotion && Array.isArray(emotion.behaviors) ? emotion.behaviors : [];
+      root.setAttribute("data-mascot-behaviors", behaviorTags.join(" "));
     }
     function applyTheme() {
       root.style.setProperty("--lively-body", theme.body || null);
@@ -484,7 +503,8 @@
       followCursor: options.followCursor,
       gazeScope: model.gaze.scope,
       hopInterval: options.hopInterval,
-      animated: options.animated
+      animated: options.animated,
+      rig: model.rig
     }, {
       onClick: options.onClick,
       onEmotionChange: function (id) {
@@ -497,13 +517,14 @@
     root.appendChild(el("div", { class: "lively-effects", "aria-hidden": "true" }));
     root.appendChild(rigEl);
     target.appendChild(root);
+    setEmotionClass("02");
     runtime.applyPose((LivelyEmotions["02"] || {}).recipe);
 
     return {
       el: root,
       type: model.id,
       getCapabilities: function () {
-        return clone({ parts: model.parts, gaze: model.gaze, skin: model.skin, accessories: model.accessories, effects: model.effects, presentation: model.presentation });
+        return clone({ parts: model.parts, gaze: model.gaze, rig: model.rig, skin: model.skin, accessories: model.accessories, effects: model.effects, presentation: model.presentation });
       },
       getSkin: function () {
         return clone({ slots: theme, fixed: model.skin.fixed });

@@ -43,6 +43,7 @@
     LivelyMascot.defineModel({
       id: "ghost", name: "Ghost", viewBox: "0 0 100 100", render: renderGhost,
       presentation: { icon: "\u{1F47B}", labels: { zh: "幽灵", en: "Ghost" }, greeting: { zh: "呜~", en: "Boo!" }, order: 3, theme: { body: "#bdeef2", outline: "#23434d", accent: "#a9d9ff" } },
+      rig: { hop: false },
       parts: { body: { actions: actions.body }, eyes: { actions: actions.eyes }, pupils: { actions: [] }, face: { actions: [] }, mouth: { actions: actions.mouth } },
       skin: { slots: ["body", "outline", "accent"] },
       effects: { supported: ["hearts", "sparkles", "sleep", "loading"], anchors: { head: { x: 50, y: 20 }, face: { x: 50, y: 49 }, body: { x: 50, y: 58 } } }

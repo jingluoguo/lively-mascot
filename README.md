@@ -85,6 +85,11 @@ mascot.destroy();
 
 Available characters: `sprout`, `cat`, `robot`, `ghost`, and `jelly`.
 
+Emotion behavior tags are shared across all models and are exposed through
+`data-mascot-behaviors`; models do not need to opt into individual emotions.
+Model definitions use `rig` only for physical rig capability overrides such as
+`rig: { hop: false }`.
+
 ## Project Layout
 
 ```text

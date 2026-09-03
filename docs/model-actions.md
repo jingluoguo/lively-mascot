@@ -76,6 +76,26 @@ Do not declare inherent whiskers or always-worn items in `accessories`. Use `par
 
 The runtime writes actions to the rendered element, for example `[data-mascot-part="top"][data-mascot-action-top="perk"]`. Accessories use `[data-mascot-accessory="glasses"][data-mascot-action-accessory="alert"]`. Put model-specific local motion behind those selectors. Put shared emotion intent in `src/core/emotions.js`, not in model-scoped `.is-emotion-XX` rules.
 
+## Semantic Behaviors And Rig Capabilities
+
+An emotion exposes semantic tags such as `angry`, `sad`, `loading`, or `eureka`. The runtime always writes them to `data-mascot-behaviors`, so every built-in model receives the same expression intent. A model can add a local reaction in CSS, or simply ignore a tag that has no special treatment.
+
+`rig` is separate: it describes physical capabilities of the shared animation rig:
+
+```js
+rig: { hop: false }
+```
+
+`blink`, `gaze`, `hop`, and `spin` default to `true`; set one to `false` only when the model cannot physically support it. Model CSS can react without coupling to a particular emotion ID:
+
+```css
+.lively-mascot[data-mascot-behaviors~="angry"] .my-model__antenna {
+  animation: my-model-antenna-alert .3s ease-in-out infinite;
+}
+```
+
+For a custom emotion, provide its own `behaviors` array. Shared face CSS currently uses the canonical built-in emotion classes for detailed facial geometry; model-specific motion should use semantic tags.
+
 `skin.slots` can be changed through `setTheme()`. Put pupil colors, markings, badges, and other identity colors in `skin.fixed`, which maps a name to a fixed color. Each value is exposed as `--lively-fixed-<name>` and cannot be overridden through `setTheme()`.
 
 Reuse an existing action before adding one. Add a new standard action only for reusable semantics, then update this catalog, the type contract, the emotion recipe, and an in-project model verification.

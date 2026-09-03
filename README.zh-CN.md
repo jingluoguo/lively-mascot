@@ -85,6 +85,8 @@ mascot.destroy();
 
 内置角色：`sprout`、`cat`、`robot`、`ghost`、`jelly`。
 
+情绪行为标签对所有模型统一，并通过 `data-mascot-behaviors` 暴露；模型不需要逐个声明支持哪些情绪。模型定义中的 `rig` 只用于覆盖物理动画能力，例如 `rig: { hop: false }`。
+
 ## 项目结构
 
 ```text

@@ -18,6 +18,7 @@ function createRig(root, rigEl, config, handlers) {
   var animated = config.animated !== false;
   var followCursor = config.followCursor !== false;
   var gazeScope = config.gazeScope === "eyes" ? "eyes" : "model";
+  var rigCapabilities = config.rig || { blink: true, gaze: true, hop: true, spin: true };
   var gazeRadiusX = config.gazeRadiusX || 200;
   var gazeRadiusY = config.gazeRadiusY || 160;
   var currentHopInterval = config.hopInterval === undefined ? [6, 13] : config.hopInterval;
@@ -69,6 +70,13 @@ function createRig(root, rigEl, config, handlers) {
   // --- Emotion Behavior ---
   function getEmotionDef(id) { return LivelyEmotions[String(id)]; }
 
+  function emotionSeed(id) {
+    id = String(id || "");
+    var seed = 0;
+    for (var i = 0; i < id.length; i++) seed = (seed * 31 + id.charCodeAt(i)) % 1009;
+    return seed;
+  }
+
   function clearEmotionBehavior() {
     if (bodyEl) { bodyEl.style.animation = ""; bodyEl.style.filter = ""; }
     rigEl.style.animation = "";
@@ -113,9 +121,9 @@ function createRig(root, rigEl, config, handlers) {
     }
     // Refresh (06) + Loading (28): drive the entire rig (whole mascot
     // bounces / rotates with feet attached) instead of just the body.
-    if (id === "06" || id === "28") {
+    if (def.motionTarget === "rig") {
       if (bodyEl) bodyEl.style.animation = "";
-      rigEl.style.animation = def.bodyAnim || "";
+      rigEl.style.animation = rigCapabilities.spin !== false ? (def.bodyAnim || "") : "";
     } else {
       // Everything else: keep the rig stationary so overlays line up.
       rigEl.style.animation = "";
@@ -127,6 +135,7 @@ function createRig(root, rigEl, config, handlers) {
   var targetX = 0, targetY = 0, curX = 0, curY = 0;
 
   function shouldGaze() {
+    if (rigCapabilities.gaze === false) return false;
     // Explicit gaze:false emotions
     var def = getEmotionDef(currentEmotionId);
     if (def && def.gaze === false) return false;
@@ -178,7 +187,7 @@ function createRig(root, rigEl, config, handlers) {
       // Keep the character's parts in one shared 3D posture layer. Pointer
       // position steers the turn, while active expressions retain a subtle
       // living tilt after gaze tracking has intentionally paused.
-      var emotionPhase = performance.now() / 720 + Number(currentEmotionId || 0) * 0.67;
+      var emotionPhase = performance.now() / 720 + emotionSeed(currentEmotionId) * 0.67;
       var emotionPitch = currentEmotionId === "02" ? 0 : Math.sin(emotionPhase) * 1.2;
       var emotionYaw = currentEmotionId === "02" ? 0 : Math.cos(emotionPhase * 0.82) * 1.7;
       var pitch = 3.2 - curY * 7.2 + emotionPitch;
@@ -199,6 +208,7 @@ function createRig(root, rigEl, config, handlers) {
   // --- Blink ---
   var blinkTimer = 0, phaseTimer = 0;
   function scheduleBlink() {
+    if (rigCapabilities.blink === false) return;
     var def = getEmotionDef(currentEmotionId);
     // No blink if disabled
     if (def && def.blink === false) {
@@ -236,7 +246,7 @@ function createRig(root, rigEl, config, handlers) {
   // A hop is an expression-specific action, never a background interruption.
   function canHop() {
     var def = getEmotionDef(currentEmotionId);
-    return animated && !!currentHopInterval && !!(def && def.hop);
+    return animated && rigCapabilities.hop !== false && !!currentHopInterval && !!(def && def.hop);
   }
 
   function stopHop() {

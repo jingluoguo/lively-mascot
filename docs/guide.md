@@ -110,6 +110,7 @@ LivelyMascot.defineModel({
     order: 100,
     theme: { body: "#67d9ff", outline: "#17202a", accent: "#ffd6a5" }
   },
+  rig: { hop: false },
   parts: { body: { actions: actions.body }, eyes: { actions: actions.eyes }, mouth: { actions: actions.mouth } },
   skin: { slots: ["body", "outline", "accent"], fixed: { pupil: "#18222a", "identity-mark": "#f4e7d0" } },
   effects: { supported: ["hearts", "sparkles", "sleep", "loading"], anchors: { head: { x: 50, y: 12 }, body: { x: 50, y: 58 } } },

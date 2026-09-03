@@ -94,19 +94,19 @@
 .lively-cat__whisker--r1 { animation: lively-cat-whisker-drift-c 3.5s ease-in-out .5s infinite; }
 
 /* Whiskers are a face accessory, so emotions can pose them independently. */
-.lively-mascot.is-emotion-00 .lively-cat__whiskers,
-.lively-mascot.is-emotion-12 .lively-cat__whiskers {
+.lively-mascot[data-mascot-behaviors~="sleep"] .lively-cat__whiskers,
+.lively-mascot[data-mascot-behaviors~="sad"] .lively-cat__whiskers {
   animation: lively-cat-whiskers-droop 2.5s ease-in-out infinite;
 }
-.lively-mascot.is-emotion-10 .lively-cat__whiskers,
-.lively-mascot.is-emotion-11 .lively-cat__whiskers {
+.lively-mascot[data-mascot-behaviors~="happy"] .lively-cat__whiskers,
+.lively-mascot[data-mascot-behaviors~="curious"] .lively-cat__whiskers {
   animation: lively-cat-whiskers-alert .5s ease-in-out infinite alternate;
 }
-.lively-mascot.is-emotion-13 .lively-cat__whiskers {
+.lively-mascot[data-mascot-behaviors~="angry"] .lively-cat__whiskers {
   animation: lively-cat-whiskers-puff .34s ease-in-out infinite alternate;
 }
-.lively-mascot.is-emotion-14 .lively-cat__whiskers,
-.lively-mascot.is-emotion-37 .lively-cat__whiskers {
+.lively-mascot[data-mascot-behaviors~="surprised"] .lively-cat__whiskers,
+.lively-mascot[data-mascot-behaviors~="nervous"] .lively-cat__whiskers {
   animation: lively-cat-whiskers-twitch .42s ease-in-out infinite;
 }
 
@@ -260,15 +260,15 @@
 }
 
 /* --- Cat-specific ear emotion animations --- */
-.lively-mascot.is-emotion-13 .lively__ears { animation: lively-cat-ear-flatten 0.3s ease-in-out infinite; }
-.lively-mascot.is-emotion-11 .lively__ears { animation: lively-cat-ear-curious .8s ease-in-out infinite; }
-.lively-mascot.is-emotion-37 .lively__ears { animation: lively-cat-ear-nervous 0.4s ease-in-out infinite; }
-.lively-mascot.is-emotion-00 .lively__ears { animation: lively-cat-ear-relax 4s ease-in-out infinite; }
+.lively-mascot[data-mascot-behaviors~="angry"] .lively__ears { animation: lively-cat-ear-flatten 0.3s ease-in-out infinite; }
+.lively-mascot[data-mascot-behaviors~="curious"] .lively__ears { animation: lively-cat-ear-curious .8s ease-in-out infinite; }
+.lively-mascot[data-mascot-behaviors~="nervous"] .lively__ears { animation: lively-cat-ear-nervous 0.4s ease-in-out infinite; }
+.lively-mascot[data-mascot-behaviors~="sleep"] .lively__ears { animation: lively-cat-ear-relax 4s ease-in-out infinite; }
 
 /* --- Cat-specific tail emotion animations --- */
-.lively-mascot.is-emotion-12 .lively__tail { animation: lively-cat-tail-droop 3s ease-in-out infinite; }
-.lively-mascot.is-emotion-13 .lively__tail { animation: lively-cat-tail-puff 0.5s ease-in-out infinite; }
-.lively-mascot.is-emotion-37 .lively__tail { animation: lively-cat-tail-tuck 0.6s ease-in-out infinite; }
+.lively-mascot[data-mascot-behaviors~="sad"] .lively__tail { animation: lively-cat-tail-droop 3s ease-in-out infinite; }
+.lively-mascot[data-mascot-behaviors~="angry"] .lively__tail { animation: lively-cat-tail-puff 0.5s ease-in-out infinite; }
+.lively-mascot[data-mascot-behaviors~="nervous"] .lively__tail { animation: lively-cat-tail-tuck 0.6s ease-in-out infinite; }
 
 /* --- Cat ear keyframes --- */
 @keyframes lively-cat-ear-wiggle {

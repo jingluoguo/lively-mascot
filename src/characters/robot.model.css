@@ -73,10 +73,10 @@
 .lively-robot__foot-line { fill: rgba(255,255,255,0.5); }
 
 /* Antenna emotion reactions (top decoration reacts to state) */
-.lively-mascot.is-emotion-13 .lively__antenna { animation: lively-robot-antenna-fast 0.3s ease-in-out infinite; }
-.lively-mascot.is-emotion-13 .lively-robot__antenna-ball { fill: #ff6b6b; }
-.lively-mascot.is-emotion-31 .lively-robot__antenna-ball { fill: #ff6b6b; }
-.lively-mascot.is-emotion-38 .lively-robot__antenna-ball { fill: #ffd23f; }
+.lively-mascot[data-mascot-behaviors~="angry"] .lively__antenna { animation: lively-robot-antenna-fast 0.3s ease-in-out infinite; }
+.lively-mascot[data-mascot-behaviors~="angry"] .lively-robot__antenna-ball,
+.lively-mascot[data-mascot-behaviors~="error"] .lively-robot__antenna-ball { fill: #ff6b6b; }
+.lively-mascot[data-mascot-behaviors~="eureka"] .lively-robot__antenna-ball { fill: #ffd23f; }
 @keyframes lively-robot-antenna-fast {
   0%, 100% { transform: rotate(-3deg); }
   50% { transform: rotate(-14deg); }

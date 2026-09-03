@@ -150,7 +150,7 @@
 
 /* --- Static mode: no cursor-follow, no idle / loop animations ---
    Used for thumbnail previews (e.g. the emotion gallery). The visible face is
-   still driven by the `is-emotion-XX` class; only motion is disabled. */
+   still driven by the emotion class; only motion is disabled. */
 .lively-mascot--static {
   cursor: default;
   pointer-events: none;

@@ -95,6 +95,26 @@ mascot.setAccessory("hat", false);
 
 不要用 CSS 自行判断 `.is-emotion-XX` 来实现新的通用动作。情绪意图应先写入 `src/core/emotions.js` 的 `recipe`，模型 CSS 只实现本模型的部件外观和局部动作。
 
+## 情绪语义与 Rig 能力
+
+情绪会提供 `angry`、`sad`、`loading`、`eureka` 等语义标签。运行时总会把它们写入 `data-mascot-behaviors`，因此每个内置模型都会接收到同一份表情意图。模型 CSS 可以为某个标签添加局部反应，也可以忽略不需要特殊处理的标签。
+
+`rig` 独立描述共享动画骨架的物理能力：
+
+```js
+rig: { hop: false }
+```
+
+`blink`、`gaze`、`hop`、`spin` 默认均为 `true`；仅当模型在物理上无法完成时才设为 `false`。模型 CSS 因此不再绑定某个表情 ID：
+
+```css
+.lively-mascot[data-mascot-behaviors~="angry"] .my-model__antenna {
+  animation: my-model-antenna-alert .3s ease-in-out infinite;
+}
+```
+
+自定义情绪可直接提供自己的 `behaviors` 数组。共享脸部样式目前仍使用内置表情 class 来表达细致五官形状；模型特有动作应优先使用语义标签。
+
 ## 换皮与固定身份色
 
 `skin.slots` 允许 `setTheme()` 修改 `body`、`outline`、`accent`。瞳色、斑纹、脸颊、徽记等身份元素放在 `skin.fixed`：

@@ -111,6 +111,7 @@ LivelyMascot.defineModel({
     order: 100,
     theme: { body: "#67d9ff", outline: "#17202a", accent: "#ffd6a5" }
   },
+  rig: { hop: false },
   parts: {
     body: { actions: actions.body },
     eyes: { actions: actions.eyes },

@@ -45,6 +45,8 @@ export interface EmotionDefinition {
   blink?: boolean | "fast";
   gaze?: boolean;
   hop?: boolean;
+  behaviors?: string[];
+  motionTarget?: "body" | "rig";
   recipe?: EmotionRecipe;
   [key: string]: unknown;
 }
@@ -74,9 +76,13 @@ export interface ModelPresentationInput {
   theme?: Partial<ModelPresentation["theme"]>;
 }
 
+export type RigCapabilityName = "blink" | "gaze" | "hop" | "spin";
+export type RigCapabilities = Partial<Record<RigCapabilityName, boolean>>;
+
 export interface ModelCapabilities {
   parts: Record<string, ModelPartDefinition>;
   gaze: { scope: "model" | "eyes" };
+  rig: Record<RigCapabilityName, boolean>;
   skin: { slots: string[]; fixed: Record<string, string> };
   accessories: Record<string, ModelAccessoryDefinition>;
   effects: { supported: string[]; anchors: Record<string, { x: number; y: number }> };
@@ -124,6 +130,7 @@ export interface ModelDefinition {
   accessories?: Record<string, ModelAccessoryConfig | true>;
   effects?: { supported?: string[]; anchors?: Record<string, { x: number; y: number }> };
   presentation?: ModelPresentationInput;
+  rig?: RigCapabilities;
   render(runtime: ModelRuntime, container: Element): void;
 }
 
@@ -137,6 +144,7 @@ export interface RegisteredModel {
   accessories: Record<string, ModelAccessoryDefinition>;
   effects: { supported: string[]; anchors: Record<string, { x: number; y: number }> };
   presentation: ModelPresentation;
+  rig: Record<RigCapabilityName, boolean>;
   render(runtime: ModelRuntime, container: Element): void;
 }
 

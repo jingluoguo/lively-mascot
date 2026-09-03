@@ -18,6 +18,10 @@ const cssSources = await Promise.all([
   readFile(new URL('../src/lively-mascot.css', import.meta.url), 'utf8'),
   ...modelCssIds.map((id) => readFile(new URL('../src/characters/' + id + '.model.css', import.meta.url), 'utf8')),
 ]);
+const modelCssSource = cssSources.slice(1).join('\n');
+if (/\.is-emotion-[a-z0-9-]+/i.test(modelCssSource)) {
+  throw new Error('Model CSS must use semantic data-mascot-behaviors selectors instead of emotion IDs');
+}
 const browserBundle = await readFile(new URL('../dist/lively-mascot.min.js', import.meta.url), 'utf8');
 
 class FakeClassList {
@@ -81,6 +85,7 @@ function testStringEmotionIds() {
     const host = new FakeElement('div');
     mascot.defineModel({
       id: 'test-string-emotion',
+      rig: { hop: false },
       parts: { body: { actions: [] } },
       render(runtime, container) {
         const body = document.createElement('div');
@@ -88,12 +93,13 @@ function testStringEmotionIds() {
         container.appendChild(body);
       },
     });
-    mascot.emotions['custom-ready'] = { id: 'custom-ready', name: 'Custom ready', group: 'custom' };
+    mascot.emotions['custom-ready'] = { id: 'custom-ready', name: 'Custom ready', group: 'custom', behaviors: ['custom-ready'] };
     const instance = mascot.createMascot(host, { type: 'test-string-emotion', animated: false });
     instance.setEmotion('custom-ready');
-    if (!instance.el.classList.contains('is-emotion-custom-ready') || instance.el.getAttribute('data-mascot-emotion') !== 'custom-ready') {
+    if (!instance.el.classList.contains('is-emotion-custom-ready') || instance.el.getAttribute('data-mascot-emotion') !== 'custom-ready' || instance.el.getAttribute('data-mascot-behaviors') !== 'custom-ready') {
       throw new Error('String emotion ID was not applied');
     }
+    if (instance.getCapabilities().rig.hop !== false) throw new Error('Model rig capability was not exposed');
     instance.setEmotion('02');
     if (instance.el.classList.contains('is-emotion-custom-ready') || !instance.el.classList.contains('is-emotion-02')) {
       throw new Error('Previous string emotion class was not removed');
@@ -117,7 +123,7 @@ const emotionIds = Object.keys(mascot.emotions);
 if (!emotionIds.length) throw new Error('No emotions were registered');
 emotionIds.forEach((id) => {
   const emotion = mascot.emotions[id];
-  if (!emotion || emotion.id !== id || !emotion.name) {
+  if (!emotion || emotion.id !== id || !emotion.name || !Array.isArray(emotion.behaviors)) {
     throw new Error(`Invalid emotion definition: ${id}`);
   }
 });

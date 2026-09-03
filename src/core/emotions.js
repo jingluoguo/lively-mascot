@@ -7,6 +7,7 @@
  * - Work States (20-31): What the bot/agent is doing (thinking, searching, etc.).
  *
  * Each emotion can define:
+ * - behaviors: semantic behavior tags for model-specific presentation
  * - bodyAnim:   CSS animation override for .lively-body
  * - bodyFilter: CSS filter override for .lively-body
  * - blink:      false = force eyes closed/locked (default true)
@@ -41,6 +42,7 @@ var LivelyEmotions = {
           leafAnim: "lively-leaf-pause 6s ease-in-out infinite",
           footAnim: "lively-foot-rest 4s ease-in-out infinite" },
   "06": { id: "06", name: "Refresh",    group: "lifecycle", desc: "正在刷新",
+          motionTarget: "rig",
           bodyAnim: "lively-refresh 0.8s ease-in-out infinite",
           leafAnim: "lively-leaf-refresh 0.6s ease-in-out infinite" },
   "07": { id: "07", name: "LowBattery", group: "lifecycle", desc: "电量不足",
@@ -132,6 +134,7 @@ var LivelyEmotions = {
           leafAnim: "lively-leaf-designing 2.5s ease-in-out infinite" },
   "28": { id: "28", name: "Loading",    group: "work", desc: "加载中",
           gaze: false,
+          motionTarget: "rig",
           // Loading state is communicated by the rotated ring (CSS).
           // Disable the base body sway so the ring stays concentric; the
           // whole rig bounces instead to make the live mascot feel alive.
@@ -240,9 +243,30 @@ var LivelyEmotionRecipes = {
   "39": { parts: { body: "work", eyes: "open", mouth: "flat", top: "idle", feet: "step" } }
 };
 
+// Semantic behavior tags are intentionally separate from numeric IDs. Models
+// can react to "angry" or "loading" without knowing which registry ID maps
+// to that intent, and custom emotions can provide their own tags.
+var LivelyEmotionBehaviors = {
+  "00": ["sleep"], "01": ["wake"], "02": ["idle"], "03": ["breathe"],
+  "04": ["ready"], "05": ["pause"], "06": ["refresh", "spin"], "07": ["low-battery"],
+  "08": ["offline"], "09": ["boot"], "10": ["happy"], "11": ["curious"],
+  "12": ["sad"], "13": ["angry"], "14": ["surprised"], "15": ["shy"],
+  "16": ["love"], "17": ["confused"], "18": ["cool"], "19": ["smug"],
+  "20": ["thinking"], "21": ["listening"], "22": ["talking"], "23": ["searching"],
+  "24": ["reading"], "25": ["writing"], "26": ["coding"], "27": ["designing"],
+  "28": ["loading", "spin"], "29": ["processing"], "30": ["success"], "31": ["error"],
+  "32": ["grateful"], "33": ["retrying"], "34": ["cancelled"], "35": ["crying"],
+  "36": ["bored"], "37": ["nervous"], "38": ["eureka"], "39": ["waiting"]
+};
+
 for (var emotionId in LivelyEmotionRecipes) {
   if (Object.prototype.hasOwnProperty.call(LivelyEmotionRecipes, emotionId) && LivelyEmotions[emotionId]) {
     LivelyEmotions[emotionId].recipe = LivelyEmotionRecipes[emotionId];
+  }
+}
+for (var behaviorId in LivelyEmotionBehaviors) {
+  if (Object.prototype.hasOwnProperty.call(LivelyEmotionBehaviors, behaviorId) && LivelyEmotions[behaviorId]) {
+    LivelyEmotions[behaviorId].behaviors = LivelyEmotionBehaviors[behaviorId].slice();
   }
 }
 
