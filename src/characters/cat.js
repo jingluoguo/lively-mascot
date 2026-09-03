@@ -4,33 +4,14 @@
  * A round cat with triangular ears, a curved tail, and whiskers.
  * Registers itself with the global LivelyMascot SDK.
  *
- * Requires: lively-mascot.js (loaded before this script)
+ * Requires: core/dom.js and lively-mascot.js (loaded before this script)
  */
 (function () {
   "use strict";
 
-  var SVG_NS = "http://www.w3.org/2000/svg";
-
-  function svg(tag, attrs, children) {
-    var el = document.createElementNS(SVG_NS, tag);
-    if (attrs) for (var k in attrs) if (Object.prototype.hasOwnProperty.call(attrs, k)) el.setAttribute(k, String(attrs[k]));
-    if (children) for (var i = 0; i < children.length; i++) el.appendChild(children[i]);
-    return el;
-  }
-  function hEl(tag, attrs, children) {
-    var node = document.createElement(tag);
-    if (attrs) for (var k in attrs) {
-      if (Object.prototype.hasOwnProperty.call(attrs, k)) {
-        var v = attrs[k];
-        if (v === undefined || v === null || v === "") continue;
-        if (k === "class") node.className = String(v);
-        else if (k === "text") node.textContent = String(v);
-        else node.setAttribute(k, String(v));
-      }
-    }
-    if (children) for (var i = 0; i < children.length; i++) node.appendChild(children[i]);
-    return node;
-  }
+  var dom = typeof LivelyDom !== "undefined" ? LivelyDom : {};
+  var svg = dom.svg;
+  var hEl = dom.hEl;
 
   function renderCat(model, rigEl) {
     // --- Ears: tall, pointed cat ears ---
@@ -121,6 +102,7 @@
     var actions = LivelyMascot.partActions;
     LivelyMascot.defineModel({
       id: "cat", name: "Cat", viewBox: "0 0 100 100", render: renderCat,
+      presentation: { icon: "\u{1F431}", labels: { zh: "小猫", en: "Cat" }, greeting: { zh: "喵！", en: "Meow!" }, order: 1, theme: { body: "#3d4852", outline: "#131a20", accent: "#eeb3c1" } },
       parts: { body: { actions: actions.body }, eyes: { actions: actions.eyes }, pupils: { actions: [] }, face: { actions: [] }, mouth: { actions: actions.mouth }, top: { actions: actions.top }, feet: { actions: actions.feet }, tail: { actions: actions.tail }, accessory: { actions: actions.accessory } },
       skin: { slots: ["body", "outline", "accent"], fixed: { pupil: "#17212a", muzzle: "#eee5d9" } },
       effects: { supported: ["hearts", "sparkles", "sleep", "loading"], anchors: { head: { x: 50, y: 9 }, face: { x: 50, y: 47 }, body: { x: 50, y: 58 }, feet: { x: 50, y: 88 } } }

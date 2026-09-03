@@ -21,7 +21,7 @@ export interface MascotInstance {
   readonly viewMode: ViewMode;
   readonly outlineVisible: boolean;
   getCapabilities(): ModelCapabilities;
-  getSkin(): { slots: { body: string; outline: string; accent: string }; fixed: Record<string, string> };
+  getSkin(): { slots: Record<string, string>; fixed: Record<string, string> };
   getAccessories(): Record<string, { enabled: boolean; default: boolean; actions: string[] }>;
   setViewMode(mode: ViewMode): ViewMode;
   setOutlineVisible(visible: boolean): boolean;
@@ -58,12 +58,29 @@ export interface ModelPartDefinition {
   actions: string[];
 }
 
+export interface ModelPresentation {
+  icon: string;
+  labels: { zh: string; en: string };
+  greeting: { zh: string; en: string };
+  order: number;
+  theme: { body: string; outline: string; accent: string };
+}
+
+export interface ModelPresentationInput {
+  icon?: string;
+  labels?: Partial<ModelPresentation["labels"]>;
+  greeting?: Partial<ModelPresentation["greeting"]>;
+  order?: number;
+  theme?: Partial<ModelPresentation["theme"]>;
+}
+
 export interface ModelCapabilities {
   parts: Record<string, ModelPartDefinition>;
   gaze: { scope: "model" | "eyes" };
   skin: { slots: string[]; fixed: Record<string, string> };
   accessories: Record<string, ModelAccessoryDefinition>;
   effects: { supported: string[]; anchors: Record<string, { x: number; y: number }> };
+  presentation: ModelPresentation;
 }
 
 export interface ModelAccessoryDefinition {
@@ -76,11 +93,23 @@ export interface ModelAccessoryConfig {
   actions?: string[];
 }
 
+export interface RigApi {
+  registerPupil(element: Element, options?: { maxX?: number; maxY?: number }): void;
+  registerEye(element: Element, options?: { maxX?: number; maxY?: number; scale?: number; rotate?: number; depth?: number; side?: "left" | "right"; sideScale?: number }): void;
+  registerFace(element: Element): void;
+  registerBody(element: Element): void;
+  registerLeaf(element: Element, options?: { useLeafAnim?: boolean }): void;
+  registerFeet(element: Element): void;
+  registerGazeWrap(element: Element): void;
+  setEmotionState(id: string): void;
+}
+
 export interface ModelRuntime {
-  rig: object;
+  rig: RigApi;
   registerPart(name: string, element: Element, options?: { gaze?: { maxX?: number; maxY?: number; scale?: number; rotate?: number; depth?: number; side?: "left" | "right"; sideScale?: number }; useEmotionAnimation?: boolean }): void;
   registerAccessory(id: string, element: Element): void;
   setAccessory(id: string, enabled: boolean): boolean;
+  applyPose(recipe?: EmotionRecipe): void;
   getParts(): Record<string, Element[]>;
   getAccessories(): Record<string, { enabled: boolean; default: boolean; actions: string[] }>;
 }
@@ -94,14 +123,28 @@ export interface ModelDefinition {
   skin?: { slots?: string[]; fixed?: Record<string, string> | string[] };
   accessories?: Record<string, ModelAccessoryConfig | true>;
   effects?: { supported?: string[]; anchors?: Record<string, { x: number; y: number }> };
+  presentation?: ModelPresentationInput;
+  render(runtime: ModelRuntime, container: Element): void;
+}
+
+export interface RegisteredModel {
+  id: string;
+  name: string;
+  viewBox: string;
+  parts: Record<string, ModelPartDefinition>;
+  gaze: { scope: "model" | "eyes" };
+  skin: { slots: string[]; fixed: Record<string, string> };
+  accessories: Record<string, ModelAccessoryDefinition>;
+  effects: { supported: string[]; anchors: Record<string, { x: number; y: number }> };
+  presentation: ModelPresentation;
   render(runtime: ModelRuntime, container: Element): void;
 }
 
 export const createMascot: (target: Element, options?: MascotOptions) => MascotInstance;
-export const defineModel: (definition: ModelDefinition) => object;
+export const defineModel: (definition: ModelDefinition) => RegisteredModel;
 export const defineMascotElement: (tag?: string) => void;
 export const buildFaceSvg: (runtime: ModelRuntime) => { wrap: HTMLElement; face: SVGElement };
-export const models: Record<string, object>;
+export const models: Record<string, RegisteredModel>;
 export const partActions: Record<string, string[]>;
 export const emotions: Record<string, EmotionDefinition>;
 export const emotionGroups: Record<string, { name: string; order: number }>;

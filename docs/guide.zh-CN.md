@@ -43,27 +43,16 @@ Vue 中在 `onMounted` 创建实例、`onBeforeUnmount` 销毁实例，并在 `t
 
 元素会响应 `type`、`color`、`size`、`view-mode`（或 `mode`）和 `show-outline` 的变化并重建。它不暴露实例；需要调用 `setEmotion` 等方法时，请使用 `createMascot`。
 
-### 源码模块化加载
+### 浏览器和源码加载
 
-自行托管源码时，先加载核心，再加载角色：
+浏览器直接使用时，加载自包含的发行文件：
 
 ```html
-<link rel="stylesheet" href="src/lively-mascot.css" />
-<link rel="stylesheet" href="src/characters/sprout.css" />
-<link rel="stylesheet" href="src/characters/cat.css" />
-<link rel="stylesheet" href="src/characters/robot.css" />
-<link rel="stylesheet" href="src/characters/ghost.css" />
-<link rel="stylesheet" href="src/characters/jelly.css" />
-
-<script src="src/core/emotions.js"></script>
-<script src="src/core/rig.js"></script>
-<script src="src/lively-mascot.js"></script>
-<script src="src/characters/sprout.js"></script>
-<script src="src/characters/cat.js"></script>
-<script src="src/characters/robot.js"></script>
-<script src="src/characters/ghost.js"></script>
-<script src="src/characters/jelly.js"></script>
+<link rel="stylesheet" href="dist/lively-mascot.min.css" />
+<script src="dist/lively-mascot.min.js"></script>
 ```
+
+自行托管源码时，依次加载 `src/core/emotions.js`、`src/core/dom.js`、`src/core/rig.js` 和 `src/lively-mascot.js`，然后按需加载各模型对应的 CSS 与 JavaScript 文件。
 
 ## API 参考
 
@@ -97,14 +86,9 @@ instance.clearEmotion();
 instance.destroy();
 ```
 
-### 表情 ID
+### 表情注册表
 
-| 分组 | ID | 状态 |
-| --- | --- | --- |
-| 生命周期 | `00-09` | Sleep、Wake、Idle、Breathe、Ready、Pause、Refresh、LowBattery、Offline、Boot |
-| 情绪反应 | `10-19` | Happy、Curious、Aggrieved、Angry、Surprised、Shy、Love、Confused、Cool、Smug |
-| 工作状态 | `20-31` | Thinking、Listening、Talking、Searching、Reading、Writing、Coding、Designing、Loading、Processing、Success、Error |
-| 扩展状态 | `32-39` | Grateful、Retrying、Cancelled、Crying、Bored、Nervous、Eureka、Waiting |
+通过 `LivelyMascot.emotions` 和 `LivelyMascot.emotionGroups` 获取当前可用的 ID、名称、分组和配方。界面或业务代码应以它们为准，这样新增表情后无需同步维护固定范围或清单。
 
 ## 自定义模型
 
@@ -120,6 +104,13 @@ var actions = LivelyMascot.partActions;
 LivelyMascot.defineModel({
   id: "my-model",
   name: "My Model",
+  presentation: {
+    icon: "M",
+    labels: { zh: "我的模型", en: "My Model" },
+    greeting: { zh: "你好！", en: "Hello!" },
+    order: 100,
+    theme: { body: "#67d9ff", outline: "#17202a", accent: "#ffd6a5" }
+  },
   parts: {
     body: { actions: actions.body },
     eyes: { actions: actions.eyes },
@@ -143,6 +134,8 @@ LivelyMascot.defineModel({
 ```
 
 `setEmotion()` 先读取统一的情绪配方，再将眼睛、嘴、身体等动作只分派给模型实际声明的部件；没有的部件会自动跳过。`getCapabilities()` 可读取当前模型的部件、皮肤槽位和特效能力。`setTheme()` 只能修改 `skin.slots`，而 `skin.fixed` 会写入 `--lively-fixed-<名称>` CSS 变量并保持不变；可通过 `getSkin()` 读取两者。
+
+`presentation` 为可选字段；填入后，仓库演示页会自动使用其中的本地化名称、问候语、排序、图标和默认配色，无需再维护演示页侧的映射表。
 
 帽子、眼镜等可切换物件使用模型的 `accessories` 声明，并由实例的 `setAccessory(id, enabled)` 单独控制；完整规则见[模型动作目录](model-actions.zh-CN.md#可切换配件)。
 

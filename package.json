@@ -1,7 +1,7 @@
 {
   "name": "lively-mascot",
   "version": "0.2.0",
-  "description": "Universal Animated Mascot Engine: 40 Emotions · 5 Characters · Pure SVG · Zero Dependencies · Data-Driven · Drop-in.",
+  "description": "Universal animated mascot engine with pure SVG, zero dependencies, and a data-driven model registry.",
   "license": "MIT",
   "main": "./dist/lively-mascot.cjs",
   "module": "./dist/lively-mascot.mjs",
@@ -36,7 +36,8 @@
     "robot"
   ],
   "scripts": {
-    "build": "node scripts/build-dist.mjs"
+    "build": "node scripts/build-dist.mjs",
+    "test": "npm run build && node scripts/test.mjs"
   },
   "files": [
     "dist/lively-mascot.min.js",
@@ -48,18 +49,8 @@
     "CHANGELOG.zh-CN.md",
     "src/lively-mascot.js",
     "src/lively-mascot.css",
-    "src/core/emotions.js",
-    "src/core/rig.js",
-    "src/characters/sprout.js",
-    "src/characters/sprout.css",
-    "src/characters/cat.js",
-    "src/characters/cat.css",
-    "src/characters/robot.js",
-    "src/characters/robot.css",
-    "src/characters/ghost.js",
-    "src/characters/ghost.css",
-    "src/characters/jelly.js",
-    "src/characters/jelly.css",
+    "src/core",
+    "src/characters",
     "README.zh-CN.md"
   ],
   "repository": {

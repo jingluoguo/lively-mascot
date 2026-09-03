@@ -444,49 +444,27 @@
   display: block;
 }
 
-.lively-mascot--face-simple .lively-face__mouth,
-.lively-mascot--face-simple .lively-face__sad-mouth,
-.lively-mascot--face-simple .lively-face__open-mouth,
-.lively-mascot--face-simple .lively-face__flat-mouth,
-.lively-mascot--face-simple .lively-face__bored-mouth,
-.lively-mascot--face-simple .lively-face__happy,
-.lively-mascot--face-simple .lively-face__bored-eye,
-.lively-mascot--face-simple .lively-face__happy-mouth,
-.lively-mascot--face-simple .lively-face__blush,
-.lively-mascot--face-simple .lively-face__pupil,
-.lively-mascot--face-simple .lively-face__shine,
-.lively-mascot--face-simple .lively-face__sleep-eye,
-.lively-mascot--face-simple .lively-face__x-eye,
-.lively-mascot--face-simple .lively-face__heart-eye,
-.lively-mascot--face-simple .lively-face__cry-eye,
-.lively-mascot--face-simple .lively-face__tear,
-.lively-mascot--face-simple .lively-face__sweat,
-.lively-mascot--face-simple .lively-face__star-eye,
-.lively-mascot--face-simple .lively-face__sparkle,
-.lively-mascot--face-simple .lively-face__waiting-dots,
-.lively-mascot--face-simple .lively-face__angry-brow,
-
-.lively-mascot--face-dot .lively-face__mouth,
-.lively-mascot--face-dot .lively-face__sad-mouth,
-.lively-mascot--face-dot .lively-face__open-mouth,
-.lively-mascot--face-dot .lively-face__flat-mouth,
-.lively-mascot--face-dot .lively-face__bored-mouth,
-.lively-mascot--face-dot .lively-face__happy,
-.lively-mascot--face-dot .lively-face__bored-eye,
-.lively-mascot--face-dot .lively-face__happy-mouth,
-.lively-mascot--face-dot .lively-face__blush,
-.lively-mascot--face-dot .lively-face__pupil,
-.lively-mascot--face-dot .lively-face__shine,
-.lively-mascot--face-dot .lively-face__sleep-eye,
-.lively-mascot--face-dot .lively-face__x-eye,
-.lively-mascot--face-dot .lively-face__heart-eye,
-.lively-mascot--face-dot .lively-face__cry-eye,
-.lively-mascot--face-dot .lively-face__tear,
-.lively-mascot--face-dot .lively-face__sweat,
-.lively-mascot--face-dot .lively-face__star-eye,
-.lively-mascot--face-dot .lively-face__sparkle,
-.lively-mascot--face-dot .lively-face__waiting-dots,
-.lively-mascot--face-dot .lively-face__angry-brow {
+:is(.lively-mascot--face-simple, .lively-mascot--face-dot) .lively-face__mouth,
+:is(.lively-mascot--face-simple, .lively-mascot--face-dot) .lively-face__sad-mouth,
+:is(.lively-mascot--face-simple, .lively-mascot--face-dot) .lively-face__open-mouth,
+:is(.lively-mascot--face-simple, .lively-mascot--face-dot) .lively-face__flat-mouth,
+:is(.lively-mascot--face-simple, .lively-mascot--face-dot) .lively-face__bored-mouth,
+:is(.lively-mascot--face-simple, .lively-mascot--face-dot) .lively-face__happy,
+:is(.lively-mascot--face-simple, .lively-mascot--face-dot) .lively-face__bored-eye,
+:is(.lively-mascot--face-simple, .lively-mascot--face-dot) .lively-face__happy-mouth,
+:is(.lively-mascot--face-simple, .lively-mascot--face-dot) .lively-face__blush,
+:is(.lively-mascot--face-simple, .lively-mascot--face-dot) .lively-face__pupil,
+:is(.lively-mascot--face-simple, .lively-mascot--face-dot) .lively-face__shine,
+:is(.lively-mascot--face-simple, .lively-mascot--face-dot) .lively-face__sleep-eye,
+:is(.lively-mascot--face-simple, .lively-mascot--face-dot) .lively-face__x-eye,
+:is(.lively-mascot--face-simple, .lively-mascot--face-dot) .lively-face__heart-eye,
+:is(.lively-mascot--face-simple, .lively-mascot--face-dot) .lively-face__cry-eye,
+:is(.lively-mascot--face-simple, .lively-mascot--face-dot) .lively-face__tear,
+:is(.lively-mascot--face-simple, .lively-mascot--face-dot) .lively-face__sweat,
+:is(.lively-mascot--face-simple, .lively-mascot--face-dot) .lively-face__star-eye,
+:is(.lively-mascot--face-simple, .lively-mascot--face-dot) .lively-face__sparkle,
+:is(.lively-mascot--face-simple, .lively-mascot--face-dot) .lively-face__waiting-dots,
+:is(.lively-mascot--face-simple, .lively-mascot--face-dot) .lively-face__angry-brow {
   visibility: hidden;
 }
 
@@ -591,7 +569,7 @@
 }
 
 /* ============================================================
- * Emotion Face Behaviors (40 emotions)
+ * Emotion Face Behaviors
  * ============================================================ */
 
 /* 00 Sleep */
@@ -2515,6 +2493,12 @@
   }
 }
 
+@keyframes lively-angry {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
 @keyframes lively-shy {
 
   0%,
@@ -2682,6 +2666,12 @@
   100% {
     transform: scale(1);
   }
+}
+
+@keyframes lively-error {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px) rotate(-1deg); }
+  75% { transform: translateX(4px) rotate(1deg); }
 }
 
 /* --- Loading keyframes --- */
@@ -2958,7 +2948,7 @@
   }
 }
 
-@keyframes lively-leaf-think {
+@keyframes lively-leaf-thinking {
 
   0%,
   100% {
@@ -2982,7 +2972,7 @@
   }
 }
 
-@keyframes lively-leaf-talk {
+@keyframes lively-leaf-talking {
 
   0%,
   100% {
@@ -2994,7 +2984,7 @@
   }
 }
 
-@keyframes lively-leaf-search {
+@keyframes lively-leaf-searching {
 
   0%,
   100% {
@@ -3010,7 +3000,7 @@
   }
 }
 
-@keyframes lively-leaf-read {
+@keyframes lively-leaf-reading {
 
   0%,
   100% {
@@ -3022,7 +3012,7 @@
   }
 }
 
-@keyframes lively-leaf-write {
+@keyframes lively-leaf-writing {
 
   0%,
   100% {
@@ -3038,7 +3028,7 @@
   }
 }
 
-@keyframes lively-leaf-code {
+@keyframes lively-leaf-coding {
 
   0%,
   100% {
@@ -3050,7 +3040,7 @@
   }
 }
 
-@keyframes lively-leaf-design {
+@keyframes lively-leaf-designing {
 
   0%,
   100% {
@@ -3108,6 +3098,28 @@
     transform: rotate(-3deg);
     opacity: 0.5;
   }
+}
+
+@keyframes lively-leaf-happy {
+  0%, 100% { transform: rotate(8deg) scale(1); }
+  35% { transform: rotate(26deg) scale(1.12); }
+  70% { transform: rotate(-4deg) scale(1.04); }
+}
+
+@keyframes lively-leaf-listen {
+  0%, 100% { transform: rotate(8deg); }
+  50% { transform: rotate(3deg) translateY(-2px); }
+}
+
+@keyframes lively-foot-happy {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  40% { transform: rotate(-16deg) translateY(-4px); }
+  70% { transform: rotate(10deg) translateY(-1px); }
+}
+
+@keyframes lively-foot-writing {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-2px) rotate(5deg); }
 }
 
 /* ============================================================

@@ -43,27 +43,16 @@ For declarative, idle-only use, register the element once:
 
 The element rebuilds when `type`, `color`, `size`, `view-mode` (or `mode`), and `show-outline` change. It does not expose an instance; use `createMascot` for runtime emotion control.
 
-### Modular Source Files
+### Browser and Source Files
 
-When serving source files directly, load the core before the characters:
+Use the distribution files for a self-contained browser build:
 
 ```html
-<link rel="stylesheet" href="src/lively-mascot.css" />
-<link rel="stylesheet" href="src/characters/sprout.css" />
-<link rel="stylesheet" href="src/characters/cat.css" />
-<link rel="stylesheet" href="src/characters/robot.css" />
-<link rel="stylesheet" href="src/characters/ghost.css" />
-<link rel="stylesheet" href="src/characters/jelly.css" />
-
-<script src="src/core/emotions.js"></script>
-<script src="src/core/rig.js"></script>
-<script src="src/lively-mascot.js"></script>
-<script src="src/characters/sprout.js"></script>
-<script src="src/characters/cat.js"></script>
-<script src="src/characters/robot.js"></script>
-<script src="src/characters/ghost.js"></script>
-<script src="src/characters/jelly.js"></script>
+<link rel="stylesheet" href="dist/lively-mascot.min.css" />
+<script src="dist/lively-mascot.min.js"></script>
 ```
+
+For source loading, load `src/core/emotions.js`, `src/core/dom.js`, `src/core/rig.js`, and `src/lively-mascot.js` in that order, then load the CSS and JavaScript file for each model you want to register.
 
 ## API Reference
 
@@ -97,14 +86,9 @@ instance.clearEmotion();
 instance.destroy();
 ```
 
-### Emotion IDs
+### Emotion Registry
 
-| Group | IDs | States |
-| --- | --- | --- |
-| Lifecycle | `00-09` | Sleep, Wake, Idle, Breathe, Ready, Pause, Refresh, LowBattery, Offline, Boot |
-| Reactions | `10-19` | Happy, Curious, Aggrieved, Angry, Surprised, Shy, Love, Confused, Cool, Smug |
-| Work | `20-31` | Thinking, Listening, Talking, Searching, Reading, Writing, Coding, Designing, Loading, Processing, Success, Error |
-| Extended | `32-39` | Grateful, Retrying, Cancelled, Crying, Bored, Nervous, Eureka, Waiting |
+Use `LivelyMascot.emotions` and `LivelyMascot.emotionGroups` as the source of truth for available IDs, labels, groups, and recipes. This keeps UI or integration code compatible when emotions are added.
 
 ## Custom Models
 
@@ -118,6 +102,14 @@ New models use `defineModel()` only. One definition declares the renderer, physi
 var actions = LivelyMascot.partActions;
 LivelyMascot.defineModel({
   id: "my-model",
+  name: "My Model",
+  presentation: {
+    icon: "M",
+    labels: { zh: "我的模型", en: "My Model" },
+    greeting: { zh: "你好！", en: "Hello!" },
+    order: 100,
+    theme: { body: "#67d9ff", outline: "#17202a", accent: "#ffd6a5" }
+  },
   parts: { body: { actions: actions.body }, eyes: { actions: actions.eyes }, mouth: { actions: actions.mouth } },
   skin: { slots: ["body", "outline", "accent"], fixed: { pupil: "#18222a", "identity-mark": "#f4e7d0" } },
   effects: { supported: ["hearts", "sparkles", "sleep", "loading"], anchors: { head: { x: 50, y: 12 }, body: { x: 50, y: 58 } } },
@@ -132,6 +124,8 @@ LivelyMascot.defineModel({
 ```
 
 `setEmotion()` resolves a shared recipe, then dispatches actions only to the parts declared by the current model. Missing parts are skipped. `setTheme()` changes only `skin.slots`; `skin.fixed` is mounted as immutable `--lively-fixed-<name>` CSS variables. Call `getCapabilities()` or `getSkin()` to inspect the contract.
+
+`presentation` is optional, but supplying it gives the repository demo a localized label, greeting, sort order, icon, and default theme without adding another demo-side registry entry.
 
 Declare hats, glasses, and other toggleable items in `accessories`, then control them with `setAccessory(id, enabled)`. See the [accessory rules](model-actions.md#toggleable-accessories).
 

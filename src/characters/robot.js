@@ -4,33 +4,14 @@
  * A square-headed robot with an antenna and a glowing tip.
  * Tech vibe: hard corners, segmented body, mechanical feet.
  *
- * Requires: lively-mascot.js (loaded before this script)
+ * Requires: core/dom.js and lively-mascot.js (loaded before this script)
  */
 (function () {
   "use strict";
 
-  var SVG_NS = "http://www.w3.org/2000/svg";
-
-  function svg(tag, attrs, children) {
-    var el = document.createElementNS(SVG_NS, tag);
-    if (attrs) for (var k in attrs) if (Object.prototype.hasOwnProperty.call(attrs, k)) el.setAttribute(k, String(attrs[k]));
-    if (children) for (var i = 0; i < children.length; i++) el.appendChild(children[i]);
-    return el;
-  }
-  function hEl(tag, attrs, children) {
-    var node = document.createElement(tag);
-    if (attrs) for (var k in attrs) {
-      if (Object.prototype.hasOwnProperty.call(attrs, k)) {
-        var v = attrs[k];
-        if (v === undefined || v === null || v === "") continue;
-        if (k === "class") node.className = String(v);
-        else if (k === "text") node.textContent = String(v);
-        else node.setAttribute(k, String(v));
-      }
-    }
-    if (children) for (var i = 0; i < children.length; i++) node.appendChild(children[i]);
-    return node;
-  }
+  var dom = typeof LivelyDom !== "undefined" ? LivelyDom : {};
+  var svg = dom.svg;
+  var hEl = dom.hEl;
 
   function renderRobot(model, rigEl) {
     // Antenna: reuse the "leaf" channel so it follows the body posture.
@@ -75,6 +56,7 @@
     var actions = LivelyMascot.partActions;
     LivelyMascot.defineModel({
       id: "robot", name: "Robot", viewBox: "0 0 100 100", render: renderRobot,
+      presentation: { icon: "\u{1F916}", labels: { zh: "机器人", en: "Robot" }, greeting: { zh: "哔哔！", en: "Beep!" }, order: 2, theme: { body: "#6f879b", outline: "#162332", accent: "#74e5ff" } },
       parts: { body: { actions: actions.body }, eyes: { actions: actions.eyes }, pupils: { actions: [] }, face: { actions: [] }, mouth: { actions: actions.mouth }, top: { actions: actions.top }, feet: { actions: actions.feet } },
       skin: { slots: ["body", "outline", "accent"], fixed: { cheek: "#e7ad76" } },
       effects: { supported: ["hearts", "sparkles", "sleep", "loading"], anchors: { head: { x: 50, y: 9 }, face: { x: 50, y: 45 }, body: { x: 50, y: 57 } } }

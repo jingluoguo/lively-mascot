@@ -1,7 +1,8 @@
 /**
  * lively-mascot · core SDK (v0.2.0)
  *
- * Requires: src/core/emotions.js, src/core/rig.js (loaded before this script)
+ * Requires: src/core/emotions.js, src/core/dom.js, src/core/rig.js
+ * (loaded before this script)
  * Character files (src/characters/*.js) register themselves after this script.
  *
  * @license MIT
@@ -9,69 +10,27 @@
 (function (root, factory) {
   if (typeof module === "object" && typeof module.exports === "object") {
     var emo = require("./core/emotions.js");
-    var api = factory(emo.groups, emo.emotions);
-    // Character modules are optional in the browser, where callers choose
-    // which scripts to include. The npm entry loads all bundled characters.
+    var dom = require("./core/dom.js");
+    var api = factory(emo.groups, emo.emotions, dom);
+    // Character modules are optional in direct source usage. Distribution
+    // bundles discover and register every built-in character at build time.
     if (typeof globalThis !== "undefined") globalThis.LivelyMascot = api;
     require("./core/rig.js");
-    require("./characters/sprout.js");
-    require("./characters/cat.js");
-    require("./characters/robot.js");
-    require("./characters/ghost.js");
-    require("./characters/jelly.js");
     module.exports = api;
   } else {
     root.LivelyMascot = factory(
       root.LivelyEmotionGroups || {},
-      root.LivelyEmotions || {}
+      root.LivelyEmotions || {},
+      root.LivelyDom || {}
     );
   }
-})(typeof self !== "undefined" ? self : this, function (LivelyEmotionGroups, LivelyEmotions) {
+})(typeof self !== "undefined" ? self : this, function (LivelyEmotionGroups, LivelyEmotions, LivelyDom) {
   "use strict";
 
   // --- DOM Helpers ---
-  function el(tag, attrs, children) {
-    var node = document.createElement(tag);
-    if (attrs) for (var k in attrs) {
-      if (Object.prototype.hasOwnProperty.call(attrs, k)) {
-        var v = attrs[k];
-        if (v === undefined || v === null || v === "") continue;
-        if (k === "class") node.className = String(v);
-        else if (k === "text") node.textContent = String(v);
-        else node.setAttribute(k, String(v));
-      }
-    }
-    if (children) for (var i = 0; i < children.length; i++) node.appendChild(children[i]);
-    return node;
-  }
-
-  var SVG_NS = "http://www.w3.org/2000/svg";
-  function svg(tag, attrs, children) {
-    var node = document.createElementNS(SVG_NS, tag);
-    if (attrs) for (var k in attrs) {
-      if (Object.prototype.hasOwnProperty.call(attrs, k)) {
-        var v = attrs[k];
-        if (v === undefined || v === null || v === "") continue;
-        node.setAttribute(k, String(v));
-      }
-    }
-    if (children) for (var i = 0; i < children.length; i++) node.appendChild(children[i]);
-    return node;
-  }
-  function hEl(tag, attrs, children) {
-    var node = document.createElement(tag);
-    if (attrs) for (var k in attrs) {
-      if (Object.prototype.hasOwnProperty.call(attrs, k)) {
-        var v = attrs[k];
-        if (v === undefined || v === null || v === "") continue;
-        if (k === "class") node.className = String(v);
-        else if (k === "text") node.textContent = String(v);
-        else node.setAttribute(k, String(v));
-      }
-    }
-    if (children) for (var i = 0; i < children.length; i++) node.appendChild(children[i]);
-    return node;
-  }
+  var el = LivelyDom.hEl;
+  var hEl = LivelyDom.hEl;
+  var svg = LivelyDom.svg;
 
   /**
    * Shared face builder. Every character reuses the same eye/pupil/mouth
@@ -275,6 +234,29 @@
     return result;
   }
 
+  function normalizePresentation(presentation, name) {
+    presentation = presentation || {};
+    var labels = presentation.labels || {};
+    var theme = presentation.theme || {};
+    return {
+      icon: presentation.icon ? String(presentation.icon) : "",
+      labels: {
+        zh: labels.zh ? String(labels.zh) : String(name),
+        en: labels.en ? String(labels.en) : String(name)
+      },
+      greeting: {
+        zh: presentation.greeting && presentation.greeting.zh ? String(presentation.greeting.zh) : "",
+        en: presentation.greeting && presentation.greeting.en ? String(presentation.greeting.en) : ""
+      },
+      order: Number.isFinite(Number(presentation.order)) ? Number(presentation.order) : 1000,
+      theme: {
+        body: theme.body ? String(theme.body) : "",
+        outline: theme.outline ? String(theme.outline) : "",
+        accent: theme.accent ? String(theme.accent) : ""
+      }
+    };
+  }
+
   function defineModel(definition) {
     definition = definition || {};
     var id = String(definition.id || "").trim();
@@ -292,6 +274,7 @@
     models[id] = {
       id: id,
       name: definition.name || id,
+      presentation: normalizePresentation(definition.presentation, definition.name || id),
       viewBox: definition.viewBox || "0 0 100 100",
       render: definition.render,
       parts: parts,
@@ -505,7 +488,7 @@
       el: root,
       type: model.id,
       getCapabilities: function () {
-        return clone({ parts: model.parts, gaze: model.gaze, skin: model.skin, accessories: model.accessories, effects: model.effects });
+        return clone({ parts: model.parts, gaze: model.gaze, skin: model.skin, accessories: model.accessories, effects: model.effects, presentation: model.presentation });
       },
       getSkin: function () {
         return clone({ slots: theme, fixed: model.skin.fixed });

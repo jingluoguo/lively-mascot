@@ -4,33 +4,14 @@
  * The classic leafy sprout: round body with a small plant
  * growing from the top of its head.
  *
- * Requires: lively-mascot.js (loaded before this script)
+ * Requires: core/dom.js and lively-mascot.js (loaded before this script)
  */
 (function () {
   "use strict";
 
-  var SVG_NS = "http://www.w3.org/2000/svg";
-
-  function svg(tag, attrs, children) {
-    var el = document.createElementNS(SVG_NS, tag);
-    if (attrs) for (var k in attrs) if (Object.prototype.hasOwnProperty.call(attrs, k)) el.setAttribute(k, String(attrs[k]));
-    if (children) for (var i = 0; i < children.length; i++) el.appendChild(children[i]);
-    return el;
-  }
-  function hEl(tag, attrs, children) {
-    var node = document.createElement(tag);
-    if (attrs) for (var k in attrs) {
-      if (Object.prototype.hasOwnProperty.call(attrs, k)) {
-        var v = attrs[k];
-        if (v === undefined || v === null || v === "") continue;
-        if (k === "class") node.className = String(v);
-        else if (k === "text") node.textContent = String(v);
-        else node.setAttribute(k, String(v));
-      }
-    }
-    if (children) for (var i = 0; i < children.length; i++) node.appendChild(children[i]);
-    return node;
-  }
+  var dom = typeof LivelyDom !== "undefined" ? LivelyDom : {};
+  var svg = dom.svg;
+  var hEl = dom.hEl;
 
   function renderSprout(model, rigEl) {
     // Leaf (top decoration, data-driven by emotion leafAnim)
@@ -79,6 +60,7 @@
     var actions = LivelyMascot.partActions;
     LivelyMascot.defineModel({
       id: "sprout", name: "Sprout", viewBox: "0 0 100 100", render: renderSprout,
+      presentation: { icon: "\u{1F331}", labels: { zh: "嫩芽", en: "Sprout" }, greeting: { zh: "嫩芽", en: "Sprout" }, order: 0, theme: { body: "#48ff42", outline: "#080808", accent: "#ff9fb6" } },
       parts: { body: { actions: actions.body }, eyes: { actions: actions.eyes }, pupils: { actions: [] }, face: { actions: [] }, mouth: { actions: actions.mouth }, top: { actions: actions.top }, feet: { actions: actions.feet } },
       skin: { slots: ["body", "outline", "accent"] },
       effects: { supported: ["hearts", "sparkles", "sleep", "loading"], anchors: { head: { x: 50, y: 14 }, face: { x: 50, y: 48 }, body: { x: 50, y: 58 } } }

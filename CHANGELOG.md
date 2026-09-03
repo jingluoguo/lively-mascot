@@ -29,7 +29,7 @@ All notable changes to this project are documented here.
 ### Fixed
 
 - Fixed source CommonJS loading so emotion definitions are available instead of an empty registry.
-- Fixed the npm entry to register all five bundled characters when loaded from Node/CommonJS.
+- Fixed the npm entry to register bundled characters when loaded from Node/CommonJS.
 
 ### Packaging
 
