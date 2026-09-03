@@ -492,6 +492,103 @@
       margin-top: 1px;
     }
 
+    /* ---- Custom emotion composer ---- */
+    .emotion-composer {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: end;
+      gap: 12px 16px;
+      margin: 0 0 20px;
+      padding: 0 0 18px;
+      border-bottom: 2px dashed rgba(8, 8, 8, .15);
+    }
+
+    .emotion-composer__title {
+      grid-column: 1 / -1;
+      margin: 0;
+      font-size: 12px;
+      font-weight: 900;
+      color: #1d1d1f;
+    }
+
+    .emotion-composer__field { min-width: 0; }
+    .emotion-composer__label {
+      display: block;
+      margin: 0 0 7px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #777;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .emotion-composer__select {
+      width: 100%;
+      min-height: 36px;
+      padding: 0 9px;
+      border: 2px solid #080808;
+      border-radius: 6px;
+      background: #fff;
+      color: #1d1d1f;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .emotion-composer__chips {
+      display: flex;
+      min-height: 36px;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .emotion-composer__chip {
+      min-width: 34px;
+      height: 34px;
+      padding: 0 9px;
+      border: 2px solid rgba(8, 8, 8, .2);
+      border-radius: 6px;
+      background: #fafafa;
+      color: #444;
+      cursor: pointer;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .emotion-composer__chip:hover,
+    .emotion-composer__chip:focus-visible { border-color: #080808; outline: none; }
+    .emotion-composer__chip.is-active {
+      border-color: #080808;
+      background: #48ff42;
+      color: #080808;
+      box-shadow: 2px 2px 0 #080808;
+      transform: translate(-1px, -1px);
+    }
+
+    .emotion-composer__apply {
+      grid-column: 1 / -1;
+      justify-self: end;
+      height: 36px;
+      padding: 0 14px;
+      border: 2px solid #080808;
+      border-radius: 6px;
+      background: #080808;
+      color: #fff;
+      cursor: pointer;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .emotion-composer__apply:hover,
+    .emotion-composer__apply:focus-visible {
+      box-shadow: 3px 3px 0 #48ff42;
+      outline: none;
+      transform: translate(-1px, -1px);
+    }
+
     /* ---- Footer: GitHub repo link (theme-matched) ---- */
     .footer {
       text-align: center;
@@ -632,6 +729,10 @@
         grid-template-columns: repeat(3, 1fr);
       }
 
+      .emotion-composer { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .emotion-composer__title,
+      .emotion-composer__apply { grid-column: 1 / -1; }
+
       .lang-switch {
         top: 14px;
         right: 14px;
@@ -717,6 +818,7 @@
         </div>
         <div class="tabs__panel" id="panel-color"></div>
         <div class="tabs__panel" id="panel-emotion"></div>
+        <div class="tabs__panel" id="panel-composer"></div>
       </div>
     </div>
 
@@ -740,12 +842,15 @@
         repoLabel: '在 GitHub 上查看源码',
         viewMode: '视图', outline: '边框', outlineOn: '显示', outlineOff: '隐藏',
         face: '五官', faceDefault: '默认', faceSimple: '简约', faceDot: '圆点',
-        tabs: ['参数', '颜色', '表情'],
+        tabs: ['参数', '颜色', '表情', '动作编排'],
         colorFields: { body: '身体', outline: '描边', accent: '点缀' },
         presetTitle: '预设配色',
         palette: ['薄荷绿', '天空蓝', '蜜桃橙', '薰衣草紫', '玫瑰粉', '柠檬黄'],
         groupNames: {
           lifecycle: '生命周期', reaction: '情绪反应', work: '工作状态'
+        },
+        emotionComposer: {
+          title: '动作编排', apply: '应用编排', customName: '自定义动作', blink: '快速眨眼'
         },
         sayGreeting: function (name, time) {
           return name + ' 说：你好！（点击于 ' + (time || new Date()).toLocaleTimeString() + '）';
@@ -760,12 +865,15 @@
         repoLabel: 'View source on GitHub',
         viewMode: 'View', outline: 'Outline', outlineOn: 'On', outlineOff: 'Off',
         face: 'Face', faceDefault: 'Default', faceSimple: 'Simple', faceDot: 'Dot',
-        tabs: ['Parameters', 'Color', 'Emotion'],
+        tabs: ['Parameters', 'Color', 'Emotion', 'Actions'],
         colorFields: { body: 'Body', outline: 'Outline', accent: 'Accent' },
         presetTitle: 'Presets',
         palette: ['Mint', 'Sky Blue', 'Peach', 'Lavender', 'Rose', 'Lemon'],
         groupNames: {
           lifecycle: 'Lifecycle', reaction: 'Reactions', work: 'Work states'
+        },
+        emotionComposer: {
+          title: 'Action composer', apply: 'Apply actions', customName: 'Custom action', blink: 'Fast blink'
         },
         sayGreeting: function (name, time) {
           return name + ' says: hello! (clicked at ' + (time || new Date()).toLocaleTimeString() + ')';
@@ -791,6 +899,7 @@
     var outlineVisible = true;
     var currentFaceVariant = 'default';
     var currentTheme = null;
+    var currentEmotionId = '02';
     var previewInstances = []; // static thumbnails in the emotion gallery
 
     function getPresentation(type) {
@@ -834,10 +943,7 @@
       currentCharType = type;
       applyModelTheme(hero, type);
       if (typeof syncColorInputs === 'function') syncColorInputs();
-      var activeEmotion = document.querySelector('.emotion-item.is-active');
-      if (activeEmotion) {
-        hero.setEmotion(activeEmotion.dataset.emotionId);
-      }
+      if (LivelyMascot.emotions[currentEmotionId]) hero.setEmotion(currentEmotionId);
     }
 
     // ---- Character Bar ----
@@ -857,7 +963,9 @@
       btn.addEventListener('click', function () {
         charBtns.forEach(function (b) { b.classList.remove('is-active'); });
         btn.classList.add('is-active');
+        currentEmotionId = '02';
         createHero(type);
+        renderActionFields();
         renderEmotionPreviews();
       });
       charBar.appendChild(btn);
@@ -1042,6 +1150,7 @@
 
     // ---- Emotion Panel (Sub Tabs) ----
     var emotionPanel = document.getElementById('panel-emotion');
+    var composerPanel = document.getElementById('panel-composer');
     var groups = LivelyMascot.emotionGroups;
     var emotions = LivelyMascot.emotions;
     var groupKeys = Object.keys(groups);
@@ -1054,6 +1163,90 @@
     var subBtns = [];
     var subPanels = [];
     var subCaptions = [];
+
+    var composer = document.createElement('section');
+    composer.className = 'emotion-composer';
+    var composerTitle = document.createElement('h2');
+    composerTitle.className = 'emotion-composer__title';
+    composer.appendChild(composerTitle);
+
+    var actionFields = document.createElement('div');
+    actionFields.className = 'emotion-composer__field emotion-composer__field--actions';
+    var selectedActions = {};
+    var actionFieldsByPart = {};
+    function renderActionFields() {
+      actionFields.textContent = '';
+      selectedActions = {};
+      actionFieldsByPart = {};
+      var model = LivelyMascot.models[currentCharType];
+      Object.keys(model.parts || {}).forEach(function (part) {
+        var actions = model.parts[part].actions || [];
+        if (!actions.length || part === 'pupils' || part === 'face') return;
+        var field = document.createElement('div');
+        field.className = 'emotion-composer__field';
+        var label = document.createElement('div');
+        label.className = 'emotion-composer__label';
+        label.textContent = part;
+        var select = document.createElement('select');
+        select.className = 'emotion-composer__select';
+        var empty = document.createElement('option');
+        empty.value = '';
+        empty.textContent = '-';
+        select.appendChild(empty);
+        actions.forEach(function (action) {
+          var option = document.createElement('option');
+          option.value = action;
+          option.textContent = action;
+          select.appendChild(option);
+        });
+        select.addEventListener('change', function () {
+          if (select.value) selectedActions[part] = select.value;
+          else delete selectedActions[part];
+        });
+        field.appendChild(label);
+        field.appendChild(select);
+        actionFields.appendChild(field);
+        actionFieldsByPart[part] = select;
+      });
+      var blinkField = document.createElement('label');
+      blinkField.className = 'emotion-composer__field';
+      var blinkLabel = document.createElement('span');
+      blinkLabel.className = 'emotion-composer__label';
+      var blink = document.createElement('input');
+      blink.type = 'checkbox';
+      blink.className = 'emotion-composer__blink';
+      blinkLabel.appendChild(blink);
+      blinkLabel.appendChild(document.createTextNode(' ' + T().emotionComposer.blink));
+      blinkField.appendChild(blinkLabel);
+      actionFields.appendChild(blinkField);
+      actionFieldsByPart.__blink = blink;
+    }
+    renderActionFields();
+    composer.appendChild(actionFields);
+
+    var applyCustomEmotion = document.createElement('button');
+    applyCustomEmotion.type = 'button';
+    applyCustomEmotion.className = 'emotion-composer__apply';
+    applyCustomEmotion.addEventListener('click', function () {
+      var behaviors = Object.keys(selectedActions).filter(function (key) { return key !== '__blink'; }).map(function (part) { return part + '-' + selectedActions[part]; });
+      if (!behaviors.length) behaviors = ['idle'];
+      var custom = {
+        recipe: { parts: Object.assign({}, selectedActions) },
+        blink: actionFieldsByPart.__blink.checked ? 'fast' : true
+      };
+      delete custom.recipe.parts.__blink;
+      custom.id = 'demo-custom-mix';
+      custom.name = T().emotionComposer.customName;
+      custom.group = 'custom';
+      custom.desc = behaviors.join(' + ');
+      custom.behaviors = behaviors;
+      LivelyMascot.defineEmotion(custom);
+      currentEmotionId = custom.id;
+      hero.setEmotion(custom.id);
+      emotionPanel.querySelectorAll('.emotion-item.is-active').forEach(function (item) { item.classList.remove('is-active'); });
+      say(function () { return T().sayEmotion(T().emotionComposer.customName + ' · ' + behaviors.join(' + ')); });
+    });
+    composer.appendChild(applyCustomEmotion);
 
     groupOrder.forEach(function (key, i) {
       var btn = document.createElement('button');
@@ -1087,6 +1280,7 @@
         item.appendChild(nameEl);
         item.appendChild(descEl);
         item.addEventListener('click', function () {
+          currentEmotionId = e.id;
           hero.setEmotion(e.id);
           emotionPanel.querySelectorAll('.emotion-item.is-active').forEach(function (a) { a.classList.remove('is-active'); });
           item.classList.add('is-active');
@@ -1099,6 +1293,7 @@
       subPanels.push(panel);
     });
 
+    composerPanel.appendChild(composer);
     emotionPanel.appendChild(subBar);
     subPanels.forEach(function (p) { emotionPanel.appendChild(p); });
 
@@ -1175,6 +1370,10 @@
         var key = groupOrder[i];
         cap.textContent = (t.groupNames[key] || groups[key].name || key) + ' (' + subCounts[i] + ')';
       });
+
+      composerTitle.textContent = t.emotionComposer.title;
+      applyCustomEmotion.textContent = t.emotionComposer.apply;
+      if (actionFieldsByPart.__blink) actionFieldsByPart.__blink.nextSibling.textContent = ' ' + t.emotionComposer.blink;
 
       // Emotion item names + descriptions
       document.querySelectorAll('.emotion-item').forEach(function (item) {

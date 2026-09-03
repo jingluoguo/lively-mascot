@@ -32,7 +32,8 @@ npm install lively-mascot
 
 ```js
 import { createMascot } from "lively-mascot";
-import "lively-mascot/dist/lively-mascot.min.css";
+import "lively-mascot/styles/core";
+import "lively-mascot/styles/sprout"; // only the characters you use
 
 const mascot = createMascot(document.querySelector("#slot"), {
   type: "sprout",
@@ -41,6 +42,8 @@ const mascot = createMascot(document.querySelector("#slot"), {
 
 mascot.setEmotion("10"); // Happy
 ```
+
+The complete `dist/lively-mascot.min.css` file is still available for CDN use. For package builds, import the shared core stylesheet and one stylesheet per character (`styles/cat`, `styles/robot`, and so on) to avoid shipping unused character rules.
 
 Or load the browser bundle from jsDelivr:
 
@@ -89,6 +92,32 @@ Emotion behavior tags are shared across all models and are exposed through
 `data-mascot-behaviors`; models do not need to opt into individual emotions.
 Model definitions use `rig` only for physical rig capability overrides such as
 `rig: { hop: false }`.
+
+Custom emotions must be registered before calling `setEmotion()`. Give each one a unique ID and at least one semantic behavior tag so model styles can react without depending on numeric IDs:
+
+```js
+import { defineEmotion } from "lively-mascot";
+
+defineEmotion({
+  id: "celebrating",
+  name: "Celebrating",
+  group: "reaction",
+  behaviors: ["celebrating"],
+  recipe: {
+    parts: {
+      body: "bounce",
+      eyes: "happy",
+      mouth: "smile",
+      top: "perk",
+      feet: "happy"
+    }
+  }
+});
+
+mascot.setEmotion("celebrating");
+```
+
+The live demo has a separate **Actions** tab. Its composer discovers the selected character's declared `parts.*.actions` at runtime, lets you combine those standard actions into a recipe, and applies the registered result immediately. New model parts and actions appear there automatically.
 
 ## Project Layout
 

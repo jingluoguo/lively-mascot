@@ -13,6 +13,7 @@ export interface MascotOptions {
   animated?: boolean;
   hopInterval?: [number, number] | null;
   onClick?: () => void;
+  ariaLabel?: string;
 }
 
 export interface MascotInstance {
@@ -26,7 +27,7 @@ export interface MascotInstance {
   setViewMode(mode: ViewMode): ViewMode;
   setOutlineVisible(visible: boolean): boolean;
   setFaceVariant(variant: "default" | "simple" | "dot"): "default" | "simple" | "dot";
-  setTheme(theme: { body?: string; outline?: string; accent?: string }): void;
+  setTheme(theme: ThemeInput): void;
   setAccessory(id: string, enabled: boolean): boolean;
   setEmotion(id: string | number): void;
   clearEmotion(): void;
@@ -49,6 +50,17 @@ export interface EmotionDefinition {
   motionTarget?: "body" | "rig";
   recipe?: EmotionRecipe;
   [key: string]: unknown;
+}
+
+export interface EmotionDefinitionInput extends Omit<Partial<EmotionDefinition>, "id" | "behaviors"> {
+  id: string;
+  behaviors: string[];
+}
+
+export interface ThemeInput {
+  body?: string | null;
+  outline?: string | null;
+  accent?: string | null;
 }
 
 export interface EmotionRecipe {
@@ -150,6 +162,7 @@ export interface RegisteredModel {
 
 export const createMascot: (target: Element, options?: MascotOptions) => MascotInstance;
 export const defineModel: (definition: ModelDefinition) => RegisteredModel;
+export const defineEmotion: (definition: EmotionDefinitionInput) => EmotionDefinition;
 export const defineMascotElement: (tag?: string) => void;
 export const buildFaceSvg: (runtime: ModelRuntime) => { wrap: HTMLElement; face: SVGElement };
 export const models: Record<string, RegisteredModel>;
@@ -161,6 +174,7 @@ export const version: string;
 declare const LivelyMascot: {
   createMascot: typeof createMascot;
   defineModel: typeof defineModel;
+  defineEmotion: typeof defineEmotion;
   defineMascotElement: typeof defineMascotElement;
   buildFaceSvg: typeof buildFaceSvg;
   models: typeof models;

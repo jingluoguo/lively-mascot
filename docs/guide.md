@@ -67,8 +67,11 @@ For source loading, load `src/core/emotions.js`, `src/core/dom.js`, `src/core/ri
 | `viewMode` / `mode` | `"2d" \| "3d"` | `"3d"` | Presentation mode |
 | `outlineVisible` | `boolean` | `true` | Show outer silhouette ink |
 | `animated` | `boolean` | `true` | Enable motion |
-| `hopInterval` | `[number, number] \| null` | `[6, 13]` | Random-hop interval in seconds |
-| `onClick` | `() => void` | - | Click handler |
+| `hopInterval` | `[number, number] \| null` | `[6, 13]` | Random-hop interval in seconds; numbers must be finite and non-negative with `min <= max` |
+| `onClick` | `() => void` | - | Click handler; makes the mascot a keyboard-accessible button |
+| `ariaLabel` | `string` | Model name | Accessible name used when `onClick` is set |
+
+`size` must be a finite positive number and is capped at `4096`. Invalid `size` or `hopInterval` values throw an error. Calling `destroy()` more than once is safe.
 
 The returned instance exposes:
 
@@ -81,6 +84,7 @@ instance.setViewMode("2d");
 instance.setOutlineVisible(false);
 instance.setFaceVariant("default"); // "default" | "simple" | "dot"
 instance.setTheme({ body: "#67d9ff", outline: "#17202a", accent: "#ffd6a5" });
+instance.setTheme({ body: null, accent: "" }); // clear slots and restore model CSS defaults
 instance.setEmotion("10");
 instance.clearEmotion();
 instance.destroy();
@@ -88,7 +92,27 @@ instance.destroy();
 
 ### Emotion Registry
 
-Use `LivelyMascot.emotions` and `LivelyMascot.emotionGroups` as the source of truth for available IDs, labels, groups, and recipes. This keeps UI or integration code compatible when emotions are added.
+Use `LivelyMascot.emotions` and `LivelyMascot.emotionGroups` as the source of truth for available IDs, labels, groups, and recipes. `setEmotion()` rejects unregistered IDs. Register custom IDs explicitly, with at least one semantic behavior tag for model CSS:
+
+```js
+LivelyMascot.defineEmotion({
+  id: "celebrating",
+  name: "Celebrating",
+  group: "reaction",
+  behaviors: ["celebrating", "happy"]
+});
+```
+
+Models should select those tags with `[data-mascot-behaviors~="celebrating"]`, rather than numeric emotion classes.
+
+## CSS Imports
+
+`dist/lively-mascot.min.css` remains the complete CDN stylesheet. Package consumers can reduce character styling by importing the shared core and only the characters they use:
+
+```js
+import "lively-mascot/styles/core";
+import "lively-mascot/styles/cat";
+```
 
 ## Custom Models
 

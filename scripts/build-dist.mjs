@@ -41,6 +41,25 @@ function createBundleEntry(characterFiles) {
   ].join('\n');
 }
 
+function createEsmBundleEntry(characterFiles) {
+  const imports = characterFiles.map((file) => `import ${JSON.stringify('./' + file)};`);
+  return [
+    'import mascot from "./src/lively-mascot.js";',
+    ...imports,
+    'export const createMascot = mascot.createMascot;',
+    'export const defineModel = mascot.defineModel;',
+    'export const defineEmotion = mascot.defineEmotion;',
+    'export const defineMascotElement = mascot.defineMascotElement;',
+    'export const buildFaceSvg = mascot.buildFaceSvg;',
+    'export const models = mascot.models;',
+    'export const partActions = mascot.partActions;',
+    'export const emotions = mascot.emotions;',
+    'export const emotionGroups = mascot.emotionGroups;',
+    'export const version = mascot.version;',
+    'export default mascot;',
+  ].join('\n');
+}
+
 function getAnimationName(value) {
   return String(value).trim().split(/\s+/, 1)[0];
 }
@@ -64,42 +83,50 @@ async function main() {
   validateEmotionAnimations(emotionSource, css);
 
   const entry = createBundleEntry(modelFiles.scripts);
+  const esmEntry = createEsmBundleEntry(modelFiles.scripts);
   const sharedBuildOptions = {
     stdin: { contents: entry, resolveDir: root, sourcefile: 'lively-mascot-entry.js' },
     bundle: true,
     minify: true,
     write: false,
   };
-  const [jsResult, cjsResult] = await Promise.all([
+  const [jsResult, cjsResult, esmResult, coreCssResult, characterCssResults] = await Promise.all([
     esbuild.build({ ...sharedBuildOptions, format: 'iife', globalName: 'LivelyMascot', platform: 'browser' }),
     esbuild.build({ ...sharedBuildOptions, format: 'cjs', platform: 'node' }),
+    esbuild.build({
+      ...sharedBuildOptions,
+      stdin: { contents: esmEntry, resolveDir: root, sourcefile: 'lively-mascot-esm-entry.js' },
+      format: 'esm',
+      platform: 'browser',
+      treeShaking: true,
+    }),
+    esbuild.transform(await readFile(join(root, 'src/lively-mascot.css'), 'utf8'), { loader: 'css', minify: true }),
+    Promise.all(modelFiles.styles.map(async (file) => ({
+      id: file.slice(file.lastIndexOf('/') + 1, -'.model.css'.length),
+      css: (await esbuild.transform(await readFile(join(root, file), 'utf8'), { loader: 'css', minify: true })).code,
+    }))),
   ]);
   const jsOut = jsResult.outputFiles[0].text;
   const cjsOut = cjsResult.outputFiles[0].text;
+  const esmOut = esmResult.outputFiles[0].text;
   const cssOut = (await esbuild.transform(css, { loader: 'css', minify: true })).code;
+  const coreCssOut = coreCssResult.code;
 
   const outDir = join(root, 'dist');
+  const characterOutDir = join(outDir, 'characters');
   await mkdir(outDir, { recursive: true });
+  await mkdir(characterOutDir, { recursive: true });
   await writeFile(join(outDir, 'lively-mascot.min.js'), jsOut);
   await writeFile(join(outDir, 'lively-mascot.min.css'), cssOut);
   await writeFile(join(outDir, 'lively-mascot.cjs'), cjsOut);
-  await writeFile(join(outDir, 'lively-mascot.mjs'), [
-    'import mascot from "./lively-mascot.cjs";',
-    'export const createMascot = mascot.createMascot;',
-    'export const defineModel = mascot.defineModel;',
-    'export const defineMascotElement = mascot.defineMascotElement;',
-    'export const buildFaceSvg = mascot.buildFaceSvg;',
-    'export const models = mascot.models;',
-    'export const partActions = mascot.partActions;',
-    'export const emotions = mascot.emotions;',
-    'export const emotionGroups = mascot.emotionGroups;',
-    'export const version = mascot.version;',
-    'export default mascot;',
-    ''
-  ].join('\n'));
+  await writeFile(join(outDir, 'lively-mascot.mjs'), esmOut);
+  await writeFile(join(outDir, 'lively-mascot.core.min.css'), coreCssOut);
+  await Promise.all(characterCssResults.map(({ id, css }) => writeFile(join(characterOutDir, id + '.min.css'), css)));
   console.log('Built dist/lively-mascot.min.js (' + jsOut.length + ' bytes)');
   console.log('Built dist/lively-mascot.min.css (' + cssOut.length + ' bytes)');
   console.log('Built dist/lively-mascot.cjs (' + cjsOut.length + ' bytes)');
+  console.log('Built dist/lively-mascot.mjs (' + esmOut.length + ' bytes)');
+  console.log('Built dist/lively-mascot.core.min.css (' + coreCssOut.length + ' bytes)');
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });

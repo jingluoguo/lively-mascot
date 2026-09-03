@@ -52,6 +52,8 @@ Optional hats, glasses, and similar visual layers belong in `accessories`. Decla
 
 The engine evaluates each emotion recipe against `parts`. An action is applied only when the model declares both that part and the requested action. This is how a floating model can omit feet while a feline model uses ears and tail without requiring model-specific emotion code.
 
+Actions are composable primitives, not emotion names. Reuse `LivelyMascot.partActions.<part>` when declaring supported actions and combine them in a custom emotion's `recipe.parts` with at most one action per part. Model CSS receives the selected action through `data-mascot-action-<part>`; selectors for alternative visual states must hide non-selected alternatives so replacements do not stack. Do not create a parallel action list or use numeric emotion IDs as the action contract.
+
 ## Semantic Behaviors And Rig Capabilities
 
 Emotion definitions own semantic `behaviors` such as `happy`, `angry`, `loading`, or `eureka`. The runtime exposes the active tags uniformly through `data-mascot-behaviors` for every model. A model does not whitelist individual emotion tags; model CSS may react to any relevant tag or ignore it when no model-specific treatment is needed.

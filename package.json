@@ -18,6 +18,8 @@
     },
     "./dist/lively-mascot.min.js": "./dist/lively-mascot.min.js",
     "./dist/lively-mascot.min.css": "./dist/lively-mascot.min.css",
+    "./styles/core": "./dist/lively-mascot.core.min.css",
+    "./styles/*": "./dist/characters/*.min.css",
     "./package.json": "./package.json"
   },
   "keywords": [
@@ -42,6 +44,8 @@
   "files": [
     "dist/lively-mascot.min.js",
     "dist/lively-mascot.min.css",
+    "dist/lively-mascot.core.min.css",
+    "dist/characters",
     "dist/lively-mascot.cjs",
     "dist/lively-mascot.mjs",
     "types/index.d.ts",

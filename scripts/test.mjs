@@ -23,6 +23,11 @@ if (/\.is-emotion-[a-z0-9-]+/i.test(modelCssSource)) {
   throw new Error('Model CSS must use semantic data-mascot-behaviors selectors instead of emotion IDs');
 }
 const browserBundle = await readFile(new URL('../dist/lively-mascot.min.js', import.meta.url), 'utf8');
+const esmBundle = await readFile(new URL('../dist/lively-mascot.mjs', import.meta.url), 'utf8');
+
+if (/from[\s\S]*lively-mascot\.cjs/.test(esmBundle)) {
+  throw new Error('ESM bundle must not wrap the CommonJS bundle');
+}
 
 class FakeClassList {
   constructor() { this.values = new Set(); }
@@ -38,8 +43,9 @@ class FakeClassList {
 }
 
 class FakeStyle {
-  setProperty() {}
-  removeProperty() {}
+  constructor() { this.values = {}; }
+  setProperty(name, value) { this.values[name] = String(value); }
+  removeProperty(name) { delete this.values[name]; }
 }
 
 class FakeElement {
@@ -50,6 +56,7 @@ class FakeElement {
     this.classList = new FakeClassList();
     this.attributes = {};
     this.parentNode = null;
+    this.listeners = {};
   }
   get className() { return this.classList.toString(); }
   set className(value) { this.classList = new FakeClassList(); this.classList.add(...String(value).split(/\s+/).filter(Boolean)); }
@@ -59,6 +66,9 @@ class FakeElement {
   getAttribute(name) { return this.attributes[name] || null; }
   removeAttribute(name) { delete this.attributes[name]; }
   toggleAttribute(name, force) { if (force) this.setAttribute(name, ''); else this.removeAttribute(name); }
+  addEventListener(name, handler) { (this.listeners[name] || (this.listeners[name] = [])).push(handler); }
+  removeEventListener(name, handler) { this.listeners[name] = (this.listeners[name] || []).filter((item) => item !== handler); }
+  dispatch(name, event = {}) { (this.listeners[name] || []).slice().forEach((handler) => handler(event)); }
   querySelector() { return null; }
   querySelectorAll() { return []; }
   getBoundingClientRect() { return { left: 0, top: 0, width: 100, height: 100 }; }
@@ -86,18 +96,23 @@ function testStringEmotionIds() {
     mascot.defineModel({
       id: 'test-string-emotion',
       rig: { hop: false },
-      parts: { body: { actions: [] } },
+      parts: { body: { actions: ['idle'] }, eyes: { actions: ['love'] }, mouth: { actions: ['smile'] } },
       render(runtime, container) {
         const body = document.createElement('div');
         runtime.registerPart('body', body);
+        runtime.registerPart('eyes', document.createElement('div'));
+        runtime.registerPart('mouth', document.createElement('div'));
         container.appendChild(body);
       },
     });
-    mascot.emotions['custom-ready'] = { id: 'custom-ready', name: 'Custom ready', group: 'custom', behaviors: ['custom-ready'] };
+    mascot.defineEmotion({ id: 'custom-ready', name: 'Custom ready', group: 'custom', behaviors: ['custom-ready'], recipe: { parts: { eyes: 'love', mouth: 'smile' } } });
     const instance = mascot.createMascot(host, { type: 'test-string-emotion', animated: false });
     instance.setEmotion('custom-ready');
     if (!instance.el.classList.contains('is-emotion-custom-ready') || instance.el.getAttribute('data-mascot-emotion') !== 'custom-ready' || instance.el.getAttribute('data-mascot-behaviors') !== 'custom-ready') {
       throw new Error('String emotion ID was not applied');
+    }
+    if (instance.el.getAttribute('data-mascot-action-eyes') !== 'love' || instance.el.getAttribute('data-mascot-action-mouth') !== 'smile') {
+      throw new Error('Custom emotion part actions were not exposed on the root');
     }
     if (instance.getCapabilities().rig.hop !== false) throw new Error('Model rig capability was not exposed');
     instance.setEmotion('02');
@@ -116,6 +131,72 @@ function testStringEmotionIds() {
     global.performance = original.performance;
     delete mascot.models['test-string-emotion'];
     delete mascot.emotions['custom-ready'];
+  }
+}
+
+function testRuntimeValidationAndLifecycle() {
+  const original = {
+    document: global.document,
+    window: global.window,
+    requestAnimationFrame: global.requestAnimationFrame,
+    cancelAnimationFrame: global.cancelAnimationFrame,
+    performance: global.performance,
+  };
+  const document = {
+    createElement: (tagName) => new FakeElement(tagName),
+    createElementNS: (_namespace, tagName) => new FakeElement(tagName),
+  };
+  global.document = document;
+  global.window = { addEventListener() {}, removeEventListener() {}, setTimeout, clearTimeout };
+  global.requestAnimationFrame = () => 0;
+  global.cancelAnimationFrame = () => {};
+  global.performance = { now: () => 0 };
+  try {
+    const host = new FakeElement('div');
+    for (const badSize of [NaN, -1, Infinity, '120']) {
+      let rejected = false;
+      try { mascot.createMascot(host, { animated: false, size: badSize }); } catch (error) { rejected = /size must/.test(error.message); }
+      if (!rejected) throw new Error('Invalid size was accepted: ' + String(badSize));
+    }
+    for (const badInterval of [[4, 2], [-1, 2], [0, Infinity], ['0', 2], [1]]) {
+      let rejected = false;
+      try { mascot.createMascot(host, { animated: false, hopInterval: badInterval }); } catch (error) { rejected = /hopInterval/.test(error.message); }
+      if (!rejected) throw new Error('Invalid hopInterval was accepted: ' + JSON.stringify(badInterval));
+    }
+    const passive = mascot.createMascot(host, { animated: false, size: 120 });
+    if (passive.el.style.values.width !== '120px' || passive.el.style.values.height !== '120px' || passive.el.getAttribute('aria-hidden') !== 'true') {
+      throw new Error('Mascot dimensions or passive accessibility state are invalid');
+    }
+    passive.setTheme({ body: '#123456' });
+    if (passive.el.style.values['--lively-body'] !== '#123456') throw new Error('Theme color was not applied');
+    passive.setTheme({ body: null, outline: '' });
+    if ('--lively-body' in passive.el.style.values || '--lively-outline' in passive.el.style.values) throw new Error('Theme clearing did not restore CSS defaults');
+    passive.destroy();
+    passive.destroy();
+
+    let staticClickCount = 0;
+    const staticInteractive = mascot.createMascot(host, { animated: false, onClick: () => { staticClickCount++; } });
+    staticInteractive.el.dispatch('keydown', { key: 'Enter', preventDefault() {} });
+    if (staticClickCount !== 1) throw new Error('Static interactive mascot did not support keyboard activation');
+    staticInteractive.destroy();
+
+    let clickCount = 0;
+    const interactive = mascot.createMascot(host, { onClick: () => { clickCount++; }, ariaLabel: 'Test mascot' });
+    if (interactive.el.getAttribute('role') !== 'button' || interactive.el.getAttribute('tabindex') !== '0' || interactive.el.getAttribute('aria-label') !== 'Test mascot' || interactive.el.getAttribute('aria-hidden')) {
+      throw new Error('Interactive mascot accessibility state is invalid');
+    }
+    interactive.el.dispatch('pointerdown');
+    interactive.el.dispatch('keydown', { key: ' ', preventDefault() {} });
+    if (clickCount !== 2) throw new Error('Pointer and keyboard activation did not invoke onClick');
+    interactive.destroy();
+    interactive.el.dispatch('pointerdown');
+    if (clickCount !== 2) throw new Error('destroy did not remove pointer interaction');
+  } finally {
+    global.document = original.document;
+    global.window = original.window;
+    global.requestAnimationFrame = original.requestAnimationFrame;
+    global.cancelAnimationFrame = original.cancelAnimationFrame;
+    global.performance = original.performance;
   }
 }
 
@@ -157,5 +238,11 @@ if (browserModelIds.join(',') !== modelIds.join(',')) {
 }
 
 testStringEmotionIds();
+testRuntimeValidationAndLifecycle();
+
+const esmMascot = await import(new URL('../dist/lively-mascot.mjs', import.meta.url));
+if (typeof esmMascot.createMascot !== 'function' || Object.keys(esmMascot.models).sort().join(',') !== modelIds.join(',')) {
+  throw new Error('ESM bundle does not expose the complete SDK');
+}
 
 console.log('Smoke tests passed');

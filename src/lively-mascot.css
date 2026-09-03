@@ -354,6 +354,74 @@
   animation: lively-squish 0.6s cubic-bezier(.3, 1.6, .4, 1);
 }
 
+/* Model action contract: each part action is mutually exclusive. A custom
+   recipe can combine actions across parts without stacking old face shapes. */
+.lively-mascot [data-mascot-part="body"][data-mascot-action-body="idle"] { animation: lively-upright-sway 3.6s ease-in-out infinite; filter: none; }
+.lively-mascot [data-mascot-part="body"][data-mascot-action-body="breathe"] { animation: lively-deep-breathe 4s ease-in-out infinite; filter: none; }
+.lively-mascot [data-mascot-part="body"][data-mascot-action-body="bounce"] { animation: lively-happy-bounce .6s ease-in-out 2; filter: none; }
+.lively-mascot [data-mascot-part="body"][data-mascot-action-body="shake"] { animation: lively-angry .15s linear infinite; filter: none; }
+.lively-mascot [data-mascot-part="body"][data-mascot-action-body="pulse"] { animation: lively-love-pulse .8s ease-in-out infinite; filter: none; }
+.lively-mascot [data-mascot-part="body"][data-mascot-action-body="work"] { animation: lively-thinking 2.5s ease-in-out infinite; filter: none; }
+.lively-mascot [data-mascot-part="body"][data-mascot-action-body="dim"] { animation: lively-upright-sway 3.6s ease-in-out infinite; filter: brightness(.7) saturate(.5); }
+
+.lively-mascot [data-mascot-part="eyes"] .lively-face__eye,
+.lively-mascot [data-mascot-part="eyes"] .lively-face__pupil,
+.lively-mascot [data-mascot-part="eyes"] .lively-face__shine,
+.lively-mascot [data-mascot-part="eyes"] .lively-face__happy,
+.lively-mascot [data-mascot-part="eyes"] .lively-face__bored-eye,
+.lively-mascot [data-mascot-part="eyes"] .lively-face__x-eye,
+.lively-mascot [data-mascot-part="eyes"] .lively-face__heart-eye,
+.lively-mascot [data-mascot-part="eyes"] .lively-face__cry-eye,
+.lively-mascot [data-mascot-part="eyes"] .lively-face__sleep-eye,
+.lively-mascot [data-mascot-part="eyes"] .lively-face__angry-brow { visibility: hidden; }
+.lively-mascot [data-mascot-part="eyes"][data-mascot-action-eyes="open"] .lively-face__eye,
+.lively-mascot [data-mascot-part="eyes"][data-mascot-action-eyes="open"] .lively-face__pupil,
+.lively-mascot [data-mascot-part="eyes"][data-mascot-action-eyes="open"] .lively-face__shine,
+.lively-mascot [data-mascot-part="eyes"][data-mascot-action-eyes="happy"] .lively-face__happy,
+.lively-mascot [data-mascot-part="eyes"][data-mascot-action-eyes="wide"] .lively-face__eye,
+.lively-mascot [data-mascot-part="eyes"][data-mascot-action-eyes="sad"] .lively-face__cry-eye,
+.lively-mascot [data-mascot-part="eyes"][data-mascot-action-eyes="angry"] .lively-face__angry-brow,
+.lively-mascot [data-mascot-part="eyes"][data-mascot-action-eyes="love"] .lively-face__heart-eye,
+.lively-mascot [data-mascot-part="eyes"][data-mascot-action-eyes="thinking"] .lively-face__eye,
+.lively-mascot [data-mascot-part="eyes"][data-mascot-action-eyes="bored"] .lively-face__bored-eye,
+.lively-mascot [data-mascot-part="eyes"][data-mascot-action-eyes="cry"] .lively-face__cry-eye { visibility: visible; }
+.lively-mascot [data-mascot-part="eyes"][data-mascot-action-eyes="closed"] .lively-face__sleep-eye,
+.lively-mascot [data-mascot-part="eyes"][data-mascot-action-eyes="closed"] .lively-face__eye { visibility: visible; transform: scaleY(.08); }
+.lively-mascot[data-mascot-action-eyes="love"] .lively-face__eye,
+.lively-mascot[data-mascot-action-eyes="love"] .lively-face__pupil,
+.lively-mascot[data-mascot-action-eyes="love"] .lively-face__shine { visibility: hidden; }
+.lively-mascot[data-mascot-action-eyes="love"] .lively-face__heart-eye { visibility: visible; }
+.lively-mascot[data-mascot-action-eyes="angry"] .lively-face__angry-brow,
+.lively-mascot[data-mascot-action-eyes="sad"] .lively-face__cry-eye,
+.lively-mascot[data-mascot-action-eyes="bored"] .lively-face__bored-eye { visibility: visible; }
+
+.lively-mascot [data-mascot-part="mouth"] .lively-face__mouth,
+.lively-mascot [data-mascot-part="mouth"] .lively-face__happy-mouth,
+.lively-mascot [data-mascot-part="mouth"] .lively-face__open-mouth,
+.lively-mascot [data-mascot-part="mouth"] .lively-face__flat-mouth,
+.lively-mascot [data-mascot-part="mouth"] .lively-face__sad-mouth,
+.lively-mascot [data-mascot-part="mouth"] .lively-face__bored-mouth { visibility: hidden; }
+.lively-mascot [data-mascot-part="mouth"][data-mascot-action-mouth="neutral"] .lively-face__mouth,
+.lively-mascot [data-mascot-part="mouth"][data-mascot-action-mouth="talk"] .lively-face__mouth,
+.lively-mascot [data-mascot-part="mouth"][data-mascot-action-mouth="smile"] .lively-face__happy-mouth,
+.lively-mascot [data-mascot-part="mouth"][data-mascot-action-mouth="open"] .lively-face__open-mouth,
+.lively-mascot [data-mascot-part="mouth"][data-mascot-action-mouth="flat"] .lively-face__flat-mouth,
+.lively-mascot [data-mascot-part="mouth"][data-mascot-action-mouth="frown"] .lively-face__sad-mouth { visibility: visible; }
+
+.lively-mascot [data-mascot-part="top"][data-mascot-action-top="perk"] { animation: lively-leaf-perk 1.5s ease-in-out infinite; }
+.lively-mascot [data-mascot-part="top"][data-mascot-action-top="droop"] { animation: lively-leaf-droop 3s ease-in-out infinite; }
+.lively-mascot [data-mascot-part="top"][data-mascot-action-top="shake"] { animation: lively-leaf-angry .12s linear infinite; }
+.lively-mascot [data-mascot-part="top"][data-mascot-action-top="work"] { animation: lively-leaf-thinking 2s ease-in-out infinite; }
+.lively-mascot [data-mascot-part="feet"][data-mascot-action-feet="step"] .lively__foot--l,
+.lively-mascot [data-mascot-part="feet"][data-mascot-action-feet="step"] .lively__foot--r { animation: lively-foot-pace .8s ease-in-out infinite; }
+.lively-mascot [data-mascot-part="feet"][data-mascot-action-feet="stomp"] .lively__foot--l,
+.lively-mascot [data-mascot-part="feet"][data-mascot-action-feet="stomp"] .lively__foot--r { animation: lively-foot-stomp .18s ease-in-out infinite; }
+.lively-mascot [data-mascot-part="feet"][data-mascot-action-feet="happy"] .lively__foot--l,
+.lively-mascot [data-mascot-part="feet"][data-mascot-action-feet="happy"] .lively__foot--r { animation: lively-foot-happy .35s ease-in-out infinite; }
+.lively-mascot [data-mascot-part="tail"][data-mascot-action-tail="happy"] { animation: lively-cat-tail-wag .3s ease-in-out infinite; }
+.lively-mascot [data-mascot-part="tail"][data-mascot-action-tail="droop"] { animation: lively-cat-tail-droop 3s ease-in-out infinite; }
+.lively-mascot [data-mascot-part="tail"][data-mascot-action-tail="puff"] { animation: lively-cat-tail-puff .5s ease-in-out infinite; }
+
 /* ============================================================
  * Face
  * ============================================================ */

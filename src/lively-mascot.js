@@ -308,6 +308,34 @@
     return models[id];
   }
 
+  function defineEmotion(definition) {
+    definition = definition || {};
+    var id = normalizeEmotionId(definition.id);
+    var behaviors = definition.behaviors;
+    if (!Array.isArray(behaviors) || !behaviors.length) {
+      throw new Error("defineEmotion requires at least one semantic behavior tag");
+    }
+    var normalizedBehaviors = [];
+    for (var i = 0; i < behaviors.length; i++) {
+      var behavior = String(behaviors[i] == null ? "" : behaviors[i]).trim();
+      if (!/^[a-z][a-z0-9-]*$/.test(behavior)) {
+        throw new Error("Emotion behavior tags must use lowercase kebab-case");
+      }
+      if (normalizedBehaviors.indexOf(behavior) === -1) normalizedBehaviors.push(behavior);
+    }
+    var emotion = {};
+    for (var key in definition) {
+      if (Object.prototype.hasOwnProperty.call(definition, key)) emotion[key] = definition[key];
+    }
+    emotion.id = id;
+    emotion.name = definition.name == null ? id : String(definition.name);
+    emotion.group = definition.group == null ? "custom" : String(definition.group);
+    emotion.desc = definition.desc == null ? "" : String(definition.desc);
+    emotion.behaviors = normalizedBehaviors;
+    LivelyEmotions[id] = emotion;
+    return emotion;
+  }
+
   function getModel(type) { return models[type] || models.sprout; }
 
   function createModelRuntime(model, rig, root) {
@@ -334,6 +362,9 @@
       var part = model.parts[name];
       if (!part || !elements[name]) return;
       var attr = actionAttributes[name] || (actionAttributes[name] = "data-mascot-action-" + name);
+      var rootAttr = "data-mascot-action-" + name;
+      if (action && part.actions.indexOf(action) !== -1) root.setAttribute(rootAttr, action);
+      else root.removeAttribute(rootAttr);
       for (var i = 0; i < elements[name].length; i++) {
         if (part.actions.indexOf(action) !== -1) elements[name][i].setAttribute(attr, action);
         else elements[name][i].removeAttribute(attr);
@@ -459,18 +490,51 @@
     return id;
   }
 
+  function normalizeSize(value) {
+    if (value === undefined) return 106;
+    if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
+      throw new Error("size must be a finite number greater than 0");
+    }
+    var size = value;
+    return Math.min(size, 4096);
+  }
+
+  function normalizeHopInterval(value) {
+    if (value === null) return null;
+    if (value === undefined) return [6, 13];
+    if (!Array.isArray(value) || value.length !== 2) throw new Error("hopInterval must be [min, max] or null");
+    var min = value[0];
+    var max = value[1];
+    if (typeof min !== "number" || typeof max !== "number" || !Number.isFinite(min) || !Number.isFinite(max) || min < 0 || max < min) {
+      throw new Error("hopInterval values must be finite, non-negative, and min <= max");
+    }
+    return [min, max];
+  }
+
   // --- Core API ---
   function createMascot(target, options) {
     options = options || {};
+    if (!target || typeof target.appendChild !== "function") throw new Error("createMascot requires a target element");
     var type = options.type || "sprout";
+    if (!models[type] && !models.sprout) throw new Error("No mascot models are registered");
     var model = getModel(type);
+    if (!models[type] && typeof console !== "undefined" && console.warn) console.warn("Unknown mascot type '" + type + "'; falling back to sprout");
     var viewMode = normalizeViewMode(options.viewMode || options.mode);
     var outlineVisible = normalizeOutlineVisible(options.outlineVisible);
-    var root = el("div", {
-      class: "lively-mascot lively-mascot--" + model.id + " lively-mascot--" + viewMode + " lively-mascot--face-default" + (!outlineVisible ? " lively-mascot--outline-hidden" : "") + (options.animated === false ? " lively-mascot--static" : ""),
-      style: "width:" + (options.size || 106) + "px;height:" + (options.size || 106) + "px",
-      "aria-hidden": "true",
-    });
+    var size = normalizeSize(options.size);
+    var hopInterval = normalizeHopInterval(options.hopInterval);
+    var interactive = typeof options.onClick === "function";
+    var rootAttrs = {
+      class: "lively-mascot lively-mascot--" + model.id + " lively-mascot--" + viewMode + " lively-mascot--face-default" + (!outlineVisible ? " lively-mascot--outline-hidden" : "") + (options.animated === false ? " lively-mascot--static" : "")
+    };
+    if (interactive) {
+      rootAttrs.role = "button";
+      rootAttrs.tabindex = "0";
+      rootAttrs["aria-label"] = options.ariaLabel || model.presentation.labels.en || model.name || "Mascot";
+    } else rootAttrs["aria-hidden"] = "true";
+    var root = el("div", rootAttrs);
+    root.style.setProperty("width", size + "px");
+    root.style.setProperty("height", size + "px");
     var rigEl = el("div", { class: "lively-mascot__rig" });
     // gaze wrapper holds all character parts so the whole face turns with the
     // body posture (sway / lean) instead of staying dead-on.
@@ -488,9 +552,13 @@
       root.setAttribute("data-mascot-behaviors", behaviorTags.join(" "));
     }
     function applyTheme() {
-      root.style.setProperty("--lively-body", theme.body || null);
-      root.style.setProperty("--lively-outline", theme.outline || null);
-      root.style.setProperty("--lively-accent", theme.accent || null);
+      var slots = ["body", "outline", "accent"];
+      for (var i = 0; i < slots.length; i++) {
+        var slot = slots[i];
+        var property = "--lively-" + slot;
+        if (theme[slot]) root.style.setProperty(property, theme[slot]);
+        else root.style.removeProperty(property);
+      }
       for (var fixedName in model.skin.fixed) {
         if (Object.prototype.hasOwnProperty.call(model.skin.fixed, fixedName) && model.skin.fixed[fixedName]) {
           root.style.setProperty("--lively-fixed-" + fixedName, model.skin.fixed[fixedName]);
@@ -502,7 +570,7 @@
     var rig = createRig(root, rigEl, {
       followCursor: options.followCursor,
       gazeScope: model.gaze.scope,
-      hopInterval: options.hopInterval,
+      hopInterval: hopInterval,
       animated: options.animated,
       rig: model.rig
     }, {
@@ -520,6 +588,7 @@
     setEmotionClass("02");
     runtime.applyPose((LivelyEmotions["02"] || {}).recipe);
 
+    var destroyed = false;
     return {
       el: root,
       type: model.id,
@@ -558,13 +627,14 @@
       },
       setTheme: function (p) {
         p = p || {};
-        if (p.body && model.skin.slots.indexOf("body") !== -1) theme.body = p.body;
-        if (p.outline && model.skin.slots.indexOf("outline") !== -1) theme.outline = p.outline;
-        if (p.accent && model.skin.slots.indexOf("accent") !== -1) theme.accent = p.accent;
+        if (Object.prototype.hasOwnProperty.call(p, "body") && model.skin.slots.indexOf("body") !== -1) theme.body = p.body == null ? "" : String(p.body);
+        if (Object.prototype.hasOwnProperty.call(p, "outline") && model.skin.slots.indexOf("outline") !== -1) theme.outline = p.outline == null ? "" : String(p.outline);
+        if (Object.prototype.hasOwnProperty.call(p, "accent") && model.skin.slots.indexOf("accent") !== -1) theme.accent = p.accent == null ? "" : String(p.accent);
         applyTheme();
       },
       setEmotion: function (emotionId) {
         var id = normalizeEmotionId(emotionId);
+        if (!LivelyEmotions[id]) throw new Error("Unknown emotion: " + id);
         setEmotionClass(id);
         rig.api.setEmotionState(id);
       },
@@ -572,7 +642,12 @@
         setEmotionClass("02");
         rig.api.setEmotionState("02");
       },
-      destroy: function () { rig.destroy(); root.remove(); }
+      destroy: function () {
+        if (destroyed) return;
+        destroyed = true;
+        rig.destroy();
+        root.remove();
+      }
     };
   }
 
@@ -612,6 +687,7 @@
   return {
     createMascot: createMascot,
     defineModel: defineModel,
+    defineEmotion: defineEmotion,
     defineMascotElement: defineMascotElement,
     buildFaceSvg: buildFaceSvg,
     models: models,

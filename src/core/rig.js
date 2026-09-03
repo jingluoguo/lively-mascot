@@ -274,31 +274,51 @@ function createRig(root, rigEl, config, handlers) {
     scheduleHop();
   }
 
+  var happyTimer = 0;
   function fireClick() {
     if (handlers.onClick) handlers.onClick();
     // Skip happy flash if a non-idle emotion is active (avoid face overlap)
     if (currentEmotionId !== "02") return;
     resetBlinkCycle();
     setHappy(true);
-    setTimeout(function(){ setHappy(false); }, 950);
+    clearTimeout(happyTimer);
+    happyTimer = window.setTimeout(function(){ setHappy(false); }, 950);
+  }
+
+  function onKeyDown(e) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      fireClick();
+    }
   }
 
   if (following) { raf = requestAnimationFrame(tick); window.addEventListener("pointermove", onPointerMove, { passive: true }); }
   if (animated) {
     scheduleBlink();
     syncHop();
+  }
+  if (handlers.onClick) {
     root.addEventListener("pointerdown", fireClick);
+    root.addEventListener("keydown", onKeyDown);
   }
 
+  var destroyed = false;
   return {
     api: api,
     click: fireClick,
     setFollowCursor: function(e){ following=e; },
     destroy: function() {
+      if (destroyed) return;
+      destroyed = true;
       cancelAnimationFrame(raf);
       window.removeEventListener("pointermove", onPointerMove);
       clearTimeout(blinkTimer); clearTimeout(phaseTimer);
       clearTimeout(hopTimer); clearTimeout(hopResetTimer);
+      clearTimeout(happyTimer);
+      if (handlers.onClick) {
+        root.removeEventListener("pointerdown", fireClick);
+        root.removeEventListener("keydown", onKeyDown);
+      }
     }
   };
 }

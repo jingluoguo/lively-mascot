@@ -32,7 +32,8 @@ npm install lively-mascot
 
 ```js
 import { createMascot } from "lively-mascot";
-import "lively-mascot/dist/lively-mascot.min.css";
+import "lively-mascot/styles/core";
+import "lively-mascot/styles/sprout"; // 只引入实际使用的角色
 
 const mascot = createMascot(document.querySelector("#slot"), {
   type: "sprout",
@@ -41,6 +42,8 @@ const mascot = createMascot(document.querySelector("#slot"), {
 
 mascot.setEmotion("10"); // 开心
 ```
+
+完整的 `dist/lively-mascot.min.css` 仍可用于 CDN。使用 npm 构建时，建议引入共享核心样式，再按需引入角色样式（例如 `styles/cat`、`styles/robot`），避免打包未使用角色的 CSS。
 
 也可以通过 jsDelivr 直接加载：
 
@@ -86,6 +89,32 @@ mascot.destroy();
 内置角色：`sprout`、`cat`、`robot`、`ghost`、`jelly`。
 
 情绪行为标签对所有模型统一，并通过 `data-mascot-behaviors` 暴露；模型不需要逐个声明支持哪些情绪。模型定义中的 `rig` 只用于覆盖物理动画能力，例如 `rig: { hop: false }`。
+
+调用 `setEmotion()` 前必须先注册自定义情绪。每个情绪需要唯一 ID 和至少一个语义行为标签，模型样式无需依赖数字 ID：
+
+```js
+import { defineEmotion } from "lively-mascot";
+
+defineEmotion({
+  id: "celebrating",
+  name: "Celebrating",
+  group: "reaction",
+  behaviors: ["celebrating"],
+  recipe: {
+    parts: {
+      body: "bounce",
+      eyes: "happy",
+      mouth: "smile",
+      top: "perk",
+      feet: "happy"
+    }
+  }
+});
+
+mascot.setEmotion("celebrating");
+```
+
+在线演示提供独立的“动作编排”页：它会在运行时读取当前角色声明的 `parts.*.actions`，自动展示可用动作，并将组合结果注册成新的情绪配方后立即应用。新增模型部件或动作也会自动显示，无需维护演示页清单。
 
 ## 项目结构
 

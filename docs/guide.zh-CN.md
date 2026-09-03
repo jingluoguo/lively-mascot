@@ -67,8 +67,11 @@ Vue 中在 `onMounted` 创建实例、`onBeforeUnmount` 销毁实例，并在 `t
 | `viewMode` / `mode` | `"2d" \| "3d"` | `"3d"` | 展示模式 |
 | `outlineVisible` | `boolean` | `true` | 是否显示外轮廓线 |
 | `animated` | `boolean` | `true` | 是否启用动画 |
-| `hopInterval` | `[number, number] \| null` | `[6, 13]` | 随机跳跃间隔，单位秒 |
-| `onClick` | `() => void` | - | 点击回调 |
+| `hopInterval` | `[number, number] \| null` | `[6, 13]` | 随机跳跃间隔，单位秒；两项必须为有限非负数且 `min <= max` |
+| `onClick` | `() => void` | - | 点击回调；提供后吉祥物会成为支持键盘操作的按钮 |
+| `ariaLabel` | `string` | 模型名称 | 设置 `onClick` 时使用的无障碍名称 |
+
+`size` 必须是有限正数，最大值为 `4096`。非法的 `size` 或 `hopInterval` 会抛出错误。重复调用 `destroy()` 是安全的。
 
 返回实例提供：
 
@@ -81,6 +84,7 @@ instance.setViewMode("2d");
 instance.setOutlineVisible(false);
 instance.setFaceVariant("default"); // "default" | "simple" | "dot"
 instance.setTheme({ body: "#67d9ff", outline: "#17202a", accent: "#ffd6a5" });
+instance.setTheme({ body: null, accent: "" }); // 清除槽位，恢复模型 CSS 默认值
 instance.setEmotion("10");
 instance.clearEmotion();
 instance.destroy();
@@ -88,7 +92,27 @@ instance.destroy();
 
 ### 表情注册表
 
-通过 `LivelyMascot.emotions` 和 `LivelyMascot.emotionGroups` 获取当前可用的 ID、名称、分组和配方。界面或业务代码应以它们为准，这样新增表情后无需同步维护固定范围或清单。
+通过 `LivelyMascot.emotions` 和 `LivelyMascot.emotionGroups` 获取当前可用的 ID、名称、分组和配方。`setEmotion()` 会拒绝未注册 ID；自定义情绪应通过明确的注册 API 提供至少一个语义行为标签：
+
+```js
+LivelyMascot.defineEmotion({
+  id: "celebrating",
+  name: "Celebrating",
+  group: "reaction",
+  behaviors: ["celebrating", "happy"]
+});
+```
+
+模型 CSS 应使用 `[data-mascot-behaviors~="celebrating"]` 匹配这些标签，而不是匹配数字情绪 class。
+
+## CSS 引入
+
+`dist/lively-mascot.min.css` 仍是面向 CDN 的全量样式表。包使用方可以按角色引入共享核心样式和所需角色样式：
+
+```js
+import "lively-mascot/styles/core";
+import "lively-mascot/styles/cat";
+```
 
 ## 自定义模型
 
