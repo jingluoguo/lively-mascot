@@ -44,7 +44,7 @@
     var rigApi = runtime ? runtime.rig : api;
     function registerPart(name, element, options) {
       if (runtime) runtime.registerPart(name, element, options);
-      else if (name === "eyes") rigApi.registerEye(element);
+      else if (name === "eyes") rigApi.registerEye(element, options && options.gaze);
       else if (name === "pupils") rigApi.registerPupil(element, options && options.gaze);
       else if (name === "face") rigApi.registerFace(element);
     }
@@ -53,7 +53,17 @@
     function buildEye(cx, cy, side) {
       var wrapper = svg("g", { transform: "translate(" + cx + " " + cy + ")" });
       var eye = svg("g", { class: "lively-face__eye lively-face__eye--" + side });
-      registerPart("eyes", eye);
+      registerPart("eyes", eye, {
+        gaze: {
+          maxX: 3.6,
+          maxY: 2.4,
+          scale: 0.035,
+          depth: 0.1,
+          verticalScale: 0.075,
+          side: side === "l" ? "left" : "right",
+          sideScale: 0.075
+        }
+      });
       eye.appendChild(svg("ellipse", { rx: 10, ry: 11.5 }));
       // Half-lidded bored eye: a flat upper lid with a softly curved lower edge.
       eye.appendChild(svg("path", { class: "lively-face__bored-eye", d: "M-9 -3 L9 -3 C8 4.5 4 8 0 8 C-4 8 -8 4.5 -9 -3 Z" }));

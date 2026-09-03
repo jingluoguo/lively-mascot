@@ -169,6 +169,7 @@ function createRig(root, rigEl, config, handlers) {
       var turnCurve = curX * Math.abs(curX);
       eye.el.style.setProperty("--lively-gaze-rotate", (turnCurve * (Number(eye.spec.rotate) || 0)).toFixed(2) + "deg");
       eye.el.style.setProperty("--lively-gaze-depth", (1 - Math.abs(curX) * (Number(eye.spec.depth) || 0)).toFixed(3));
+      eye.el.style.setProperty("--lively-gaze-height", (1 + curY * (Number(eye.spec.verticalScale) || 0)).toFixed(3));
       var baseScale = 1 + Math.max(Math.abs(curX), Math.abs(curY)) * (Number(eye.spec.scale) || 0);
       var sideScale = Number(eye.spec.sideScale) || 0;
       if (eye.spec.side === "left" || eye.spec.side === "right") {

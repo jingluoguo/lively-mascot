@@ -495,26 +495,36 @@
     /* ---- Custom emotion composer ---- */
     .emotion-composer {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      align-items: end;
-      gap: 12px 16px;
+      gap: 16px;
       margin: 0 0 20px;
-      padding: 0 0 18px;
+      padding: 2px 0 20px;
       border-bottom: 2px dashed rgba(8, 8, 8, .15);
     }
 
     .emotion-composer__title {
-      grid-column: 1 / -1;
       margin: 0;
-      font-size: 12px;
+      font-size: 15px;
       font-weight: 900;
       color: #1d1d1f;
     }
 
-    .emotion-composer__field { min-width: 0; }
+    .emotion-composer__field--actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+    }
+
+    .emotion-composer__field {
+      min-width: 0;
+      padding: 10px;
+      border: 2px solid rgba(8, 8, 8, .12);
+      border-radius: 8px;
+      background: #fafafa;
+    }
+
     .emotion-composer__label {
       display: block;
-      margin: 0 0 7px;
+      margin: 0 0 8px;
       font-size: 11px;
       font-weight: 800;
       color: #777;
@@ -522,30 +532,15 @@
       letter-spacing: .08em;
     }
 
-    .emotion-composer__select {
-      width: 100%;
-      min-height: 36px;
-      padding: 0 9px;
-      border: 2px solid #080808;
-      border-radius: 6px;
-      background: #fff;
-      color: #1d1d1f;
-      font: inherit;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .emotion-composer__chips {
+    .emotion-composer__options {
       display: flex;
-      min-height: 36px;
       gap: 6px;
       flex-wrap: wrap;
     }
 
-    .emotion-composer__chip {
-      min-width: 34px;
-      height: 34px;
-      padding: 0 9px;
+    .emotion-composer__option {
+      min-height: 30px;
+      padding: 4px 9px;
       border: 2px solid rgba(8, 8, 8, .2);
       border-radius: 6px;
       background: #fafafa;
@@ -556,9 +551,13 @@
       font-weight: 800;
     }
 
-    .emotion-composer__chip:hover,
-    .emotion-composer__chip:focus-visible { border-color: #080808; outline: none; }
-    .emotion-composer__chip.is-active {
+    .emotion-composer__option:hover,
+    .emotion-composer__option:focus-visible {
+      border-color: #080808;
+      outline: none;
+    }
+
+    .emotion-composer__option.is-active {
       border-color: #080808;
       background: #48ff42;
       color: #080808;
@@ -567,9 +566,8 @@
     }
 
     .emotion-composer__apply {
-      grid-column: 1 / -1;
-      justify-self: end;
-      height: 36px;
+      justify-self: start;
+      height: 40px;
       padding: 0 14px;
       border: 2px solid #080808;
       border-radius: 6px;
@@ -587,6 +585,19 @@
       box-shadow: 3px 3px 0 #48ff42;
       outline: none;
       transform: translate(-1px, -1px);
+    }
+
+    .emotion-composer__field--blink {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-block: 8px;
+    }
+
+    .emotion-composer__field--blink .emotion-composer__label {
+      display: inline;
+      margin: 0;
+      cursor: pointer;
     }
 
     /* ---- Footer: GitHub repo link (theme-matched) ---- */
@@ -729,9 +740,9 @@
         grid-template-columns: repeat(3, 1fr);
       }
 
-      .emotion-composer { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .emotion-composer__title,
-      .emotion-composer__apply { grid-column: 1 / -1; }
+      .emotion-composer__field--actions {
+        grid-template-columns: 1fr;
+      }
 
       .lang-switch {
         top: 14px;
@@ -1174,6 +1185,18 @@
     actionFields.className = 'emotion-composer__field emotion-composer__field--actions';
     var selectedActions = {};
     var actionFieldsByPart = {};
+    function getPartLabel(part) {
+      var labels = {
+        body: { zh: '身体动作', en: 'Body motion' },
+        eyes: { zh: '眼睛状态', en: 'Eye state' },
+        mouth: { zh: '嘴巴状态', en: 'Mouth state' },
+        top: { zh: '顶部装饰', en: 'Top detail' },
+        feet: { zh: '脚步动作', en: 'Feet motion' },
+        tail: { zh: '尾巴动作', en: 'Tail motion' },
+        accessory: { zh: '配件状态', en: 'Accessory' }
+      };
+      return (labels[part] && labels[part][currentLang]) || part;
+    }
     function renderActionFields() {
       actionFields.textContent = '';
       selectedActions = {};
@@ -1186,30 +1209,36 @@
         field.className = 'emotion-composer__field';
         var label = document.createElement('div');
         label.className = 'emotion-composer__label';
-        label.textContent = part;
-        var select = document.createElement('select');
-        select.className = 'emotion-composer__select';
-        var empty = document.createElement('option');
-        empty.value = '';
-        empty.textContent = '-';
-        select.appendChild(empty);
+        label.textContent = getPartLabel(part);
+        var options = document.createElement('div');
+        options.className = 'emotion-composer__options';
+        options.setAttribute('role', 'group');
+        options.setAttribute('aria-label', getPartLabel(part));
         actions.forEach(function (action) {
-          var option = document.createElement('option');
-          option.value = action;
+          var option = document.createElement('button');
+          option.type = 'button';
+          option.className = 'emotion-composer__option';
           option.textContent = action;
-          select.appendChild(option);
-        });
-        select.addEventListener('change', function () {
-          if (select.value) selectedActions[part] = select.value;
-          else delete selectedActions[part];
+          option.setAttribute('aria-pressed', 'false');
+          option.addEventListener('click', function () {
+            var isSelected = selectedActions[part] === action;
+            if (isSelected) delete selectedActions[part];
+            else selectedActions[part] = action;
+            Array.prototype.forEach.call(options.children, function (button) {
+              var active = !isSelected && button === option;
+              button.classList.toggle('is-active', active);
+              button.setAttribute('aria-pressed', String(active));
+            });
+          });
+          options.appendChild(option);
         });
         field.appendChild(label);
-        field.appendChild(select);
+        field.appendChild(options);
         actionFields.appendChild(field);
-        actionFieldsByPart[part] = select;
+        actionFieldsByPart[part] = options;
       });
       var blinkField = document.createElement('label');
-      blinkField.className = 'emotion-composer__field';
+      blinkField.className = 'emotion-composer__field emotion-composer__field--blink';
       var blinkLabel = document.createElement('span');
       blinkLabel.className = 'emotion-composer__label';
       var blink = document.createElement('input');

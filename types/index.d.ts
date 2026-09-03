@@ -113,7 +113,7 @@ export interface ModelAccessoryConfig {
 
 export interface RigApi {
   registerPupil(element: Element, options?: { maxX?: number; maxY?: number }): void;
-  registerEye(element: Element, options?: { maxX?: number; maxY?: number; scale?: number; rotate?: number; depth?: number; side?: "left" | "right"; sideScale?: number }): void;
+  registerEye(element: Element, options?: { maxX?: number; maxY?: number; scale?: number; rotate?: number; depth?: number; verticalScale?: number; side?: "left" | "right"; sideScale?: number }): void;
   registerFace(element: Element): void;
   registerBody(element: Element): void;
   registerLeaf(element: Element, options?: { useLeafAnim?: boolean }): void;
@@ -124,7 +124,7 @@ export interface RigApi {
 
 export interface ModelRuntime {
   rig: RigApi;
-  registerPart(name: string, element: Element, options?: { gaze?: { maxX?: number; maxY?: number; scale?: number; rotate?: number; depth?: number; side?: "left" | "right"; sideScale?: number }; useEmotionAnimation?: boolean }): void;
+  registerPart(name: string, element: Element, options?: { gaze?: { maxX?: number; maxY?: number; scale?: number; rotate?: number; depth?: number; verticalScale?: number; side?: "left" | "right"; sideScale?: number }; useEmotionAnimation?: boolean }): void;
   registerAccessory(id: string, element: Element): void;
   setAccessory(id: string, enabled: boolean): boolean;
   applyPose(recipe?: EmotionRecipe): void;

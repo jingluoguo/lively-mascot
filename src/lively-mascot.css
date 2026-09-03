@@ -452,6 +452,12 @@
 .lively-face__eye {
   transform-box: fill-box;
   transform-origin: center;
+  transform:
+    translate(var(--lively-gaze-x, 0px), var(--lively-gaze-y, 0px))
+    rotate(var(--lively-gaze-rotate, 0deg))
+    scaleX(var(--lively-gaze-depth, 1))
+    scaleY(var(--lively-gaze-height, 1))
+    scale(var(--lively-gaze-scale, 1));
   transition: transform 90ms ease-out;
 }
 
@@ -1287,7 +1293,12 @@
   visibility: visible;
   transform: translate(var(--lively-minimal-eye-x), var(--lively-minimal-eye-y))
     rotate(var(--lively-minimal-eye-turn, 0deg))
-    scale(var(--lively-minimal-eye-scale-x), var(--lively-minimal-eye-scale-y));
+    scale(var(--lively-minimal-eye-scale-x), var(--lively-minimal-eye-scale-y))
+    translate(var(--lively-gaze-x, 0px), var(--lively-gaze-y, 0px))
+    rotate(var(--lively-gaze-rotate, 0deg))
+    scaleX(var(--lively-gaze-depth, 1))
+    scaleY(var(--lively-gaze-height, 1))
+    scale(var(--lively-gaze-scale, 1));
 }
 
 .lively-mascot.lively-mascot--face-simple .lively-face__eye--l,
