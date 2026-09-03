@@ -2,6 +2,8 @@
 
 Every mascot is registered through `LivelyMascot.defineModel(definition)`. The definition is the only integration contract; SVG/HTML string import and DOM marker scanning are not supported.
 
+The contract is sourced from the standalone repository at `https://github.com/jingluoguo/lively-mascot.git`. A skill installation is not a project checkout. Fetch that repository into a task-scoped directory before reading source files, checking the demo, or running `npm` commands, and keep generated outputs outside both the skill installation and the fetched checkout unless the user explicitly requests an integrated patch.
+
 Generated model files are complete regeneration artifacts. Change reusable behavior in the skill contract first, then regenerate all of the model's `model.js`, `model.css`, and `model.json`; do not maintain one-off patches in generated output.
 
 ## Definition
@@ -20,6 +22,7 @@ LivelyMascot.defineModel({
     accessory: { actions: LivelyMascot.partActions.accessory }
   },
   gaze: { scope: "eyes" },
+  rig: { hop: false },
   skin: {
     slots: ["body", "outline", "accent"],
     fixed: { pupil: "#18222a", "identity-mark": "#f4e7d0" }
@@ -48,6 +51,18 @@ Use `parts.accessory` and `model.registerPart("accessory", element)` for permane
 Optional hats, glasses, and similar visual layers belong in `accessories`. Declare their default state and supported actions, then call `model.registerAccessory(id, element)`. Instances toggle them with `setAccessory(id, enabled)`; enabled accessories receive the shared `accessory` action from an emotion recipe. Do not place permanent identity details in `accessories`.
 
 The engine evaluates each emotion recipe against `parts`. An action is applied only when the model declares both that part and the requested action. This is how a floating model can omit feet while a feline model uses ears and tail without requiring model-specific emotion code.
+
+## Semantic Behaviors And Rig Capabilities
+
+Emotion definitions own semantic `behaviors` such as `happy`, `angry`, `loading`, or `eureka`. The runtime exposes the active tags uniformly through `data-mascot-behaviors` for every model. A model does not whitelist individual emotion tags; model CSS may react to any relevant tag or ignore it when no model-specific treatment is needed.
+
+The model definition uses `rig` only for physical capabilities of the shared animation rig:
+
+```js
+rig: { hop: false }
+```
+
+The available capabilities are `blink`, `gaze`, `hop`, and `spin`, all enabled by default. Set a capability to `false` only when the model cannot physically support that shared motion. Do not encode these capabilities in `behaviors`, and do not use numeric emotion IDs to decide whether a model supports an expression.
 
 ## Skin And Effects
 

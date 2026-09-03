@@ -1,11 +1,23 @@
 ---
 name: lively-mascot-image-model
-description: Extract a supplied character image into a Lively Mascot model definition with explicit parts, skin slots, effect anchors, and scoped CSS. Use for 2D SVG/HTML mascot extraction, not GLB/GLTF/FBX.
+description: Extract a supplied character image into a Lively Mascot model definition using the standalone GitHub project contract, with explicit parts, skin slots, effect anchors, and scoped CSS. Use for 2D SVG/HTML mascot extraction, not GLB/GLTF/FBX.
 ---
 
 # Lively Mascot Image Model
 
 Turn one supplied image into a compact, rigged 2D model. Inspect the image directly; do not generate an intermediate image or require an API key. If there is no usable image, ask for one before writing files.
+
+## Obtain The Project
+
+This skill is installed independently from the Lively Mascot repository. Never assume that the skill directory, the current working directory, or another already-open project contains the SDK source. Before inspecting the implementation or running project commands, obtain the canonical project from GitHub:
+
+```text
+https://github.com/jingluoguo/lively-mascot.git
+```
+
+Clone the repository into a task-scoped temporary directory (or use an existing checkout only when the user explicitly provides that checkout and confirms it is the target). Use the repository root as the project root for all source inspection, `npm` commands, model registration, demo integration, and visual verification. Do not modify the installed skill directory. Do not silently substitute a fork, the current workspace, or a stale local copy; ask when the requested repository revision cannot be obtained. Keep the checkout and generated project changes separate from the skill's own output.
+
+When the user asks only for generated model files, write them to the independent output directory described below. When the user asks to inspect the model in the demo or integrate it, apply the changes to the fetched checkout and report the checkout/output locations explicitly.
 
 ## Model Architecture
 
@@ -58,12 +70,14 @@ For 3D-capable models, preserve the native layered body, face, and upper/lower f
 
 ## Deliverables And QA
 
-Write these files under `outputs/lively-mascot-model/<slug>/` unless another path is requested:
+Write these files under an independent task output directory such as `outputs/lively-mascot-model/<slug>/` unless another path is requested. Resolve this path from the task workspace, never from the installed skill directory or the fetched repository unless the user explicitly requests repository-local output:
 
 - `model.js` defining the model with `defineModel()`.
 - `model.css` for reference-specific artwork only.
-- `model.json` with the declared parts, skin slots, effect anchors, the supported emotion IDs, and actual limitations.
+- `model.json` with the declared parts, skin slots, effect anchors, the semantic behavior tags used by the model, Rig capability overrides, and actual limitations. Do not treat numeric emotion IDs as model capabilities.
 
 Generated outputs are regeneration artifacts, not hand-tuned overrides. When a reusable behavior changes, update this skill (and any project workflow documentation) first, then regenerate the complete `model.js`, `model.css`, and `model.json` from the revised contract. Do not patch only one generated selector or numeric value to solve a single model review comment.
 
-Add the generated CSS and renderer script to the project demo when the user asks to inspect the model. Run `node --check model.js`, build the project, and compare a neutral 2D screenshot at the reference's effective thumbnail scale before checking 3D frames with `followCursor:false`. In that comparison, explicitly verify silhouette proportions, facial feature scale and placement, and the color/light distribution; correct a reference-defining mismatch before treating the model as complete. Verify every registered emotion, face variants, outline visibility, independent theme slots, and the applicable shared particles. For cursor gaze, verify left, right, up, down, left-down, and right-down extremes separately. Confirm the mounted DOM and `parts` definition both omit unconfirmed anatomy and include any user-confirmed additions. Inspect the neutral `02` transforms for body, primary artwork layer, rig, and gaze: they must not contain a planar rotation, skew, or directional horizontal shift. Inspect non-neutral states separately to confirm any such motion is intentional and returns to neutral.
+When the user asks to inspect the model in the demo, copy or integrate the generated CSS and renderer script into the fetched project's matching model entry files, then run `node --check` against the generated renderer, build from the fetched repository root, and compare a neutral 2D screenshot at the reference's effective thumbnail scale before checking 3D frames with `followCursor:false`. In that comparison, explicitly verify silhouette proportions, facial feature scale and placement, and the color/light distribution; correct a reference-defining mismatch before treating the model as complete. Verify every registered emotion, face variants, outline visibility, independent theme slots, and the applicable shared particles. For cursor gaze, verify left, right, up, down, left-down, and right-down extremes separately. Confirm the mounted DOM and `parts` definition both omit unconfirmed anatomy and include any user-confirmed additions. Inspect the neutral `02` transforms for body, primary artwork layer, rig, and gaze: they must not contain a planar rotation, skew, or directional horizontal shift. Inspect non-neutral states separately to confirm any such motion is intentional and returns to neutral.
+
+The fetched project may be discarded after verification unless the user asks for a patch or integrated project output. Preserve the generated model files independently so they remain usable after the temporary checkout is removed.
