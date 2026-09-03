@@ -52,7 +52,7 @@ Vue 中在 `onMounted` 创建实例、`onBeforeUnmount` 销毁实例，并在 `t
 <script src="dist/lively-mascot.min.js"></script>
 ```
 
-自行托管源码时，依次加载 `src/core/emotions.js`、`src/core/dom.js`、`src/core/rig.js` 和 `src/lively-mascot.js`，然后按需加载各模型对应的 CSS 与 JavaScript 文件。
+自行托管源码时，依次加载 `src/core/emotions.js`、`src/core/dom.js`、`src/core/rig.js` 和 `src/lively-mascot.js`，然后按需加载每个模型成对的 `src/characters/<id>.model.css` 与 `src/characters/<id>.model.js`。构建只会包含成对的 `*.model.js` 和 `*.model.css` 入口，因此同目录的辅助文件不会被误打包。
 
 ## API 参考
 

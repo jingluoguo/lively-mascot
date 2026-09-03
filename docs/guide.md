@@ -52,7 +52,7 @@ Use the distribution files for a self-contained browser build:
 <script src="dist/lively-mascot.min.js"></script>
 ```
 
-For source loading, load `src/core/emotions.js`, `src/core/dom.js`, `src/core/rig.js`, and `src/lively-mascot.js` in that order, then load the CSS and JavaScript file for each model you want to register.
+For source loading, load `src/core/emotions.js`, `src/core/dom.js`, `src/core/rig.js`, and `src/lively-mascot.js` in that order, then load matching `src/characters/<id>.model.css` and `src/characters/<id>.model.js` files for each model you want to register. The build only includes paired `*.model.js` and `*.model.css` entries, so helpers can live in the same directory safely.
 
 ## API Reference
 

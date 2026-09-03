@@ -435,6 +435,14 @@
     return value !== false && String(value).toLowerCase() !== "false";
   }
 
+  function normalizeEmotionId(value) {
+    var id = String(value == null ? "" : value).trim();
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(id)) {
+      throw new Error("Emotion ids must use letters, numbers, and single hyphens");
+    }
+    return id;
+  }
+
   // --- Core API ---
   function createMascot(target, options) {
     options = options || {};
@@ -453,6 +461,13 @@
     var gazeEl = el("div", { class: "lively-mascot__gaze" });
     rigEl.appendChild(gazeEl);
     var theme = { body: options.color || "", outline: options.outline || "", accent: options.accent || "" };
+    var currentEmotionClass = "";
+    function setEmotionClass(id) {
+      if (currentEmotionClass) root.classList.remove(currentEmotionClass);
+      currentEmotionClass = "is-emotion-" + id;
+      root.classList.add(currentEmotionClass);
+      root.setAttribute("data-mascot-emotion", id);
+    }
     function applyTheme() {
       root.style.setProperty("--lively-body", theme.body || null);
       root.style.setProperty("--lively-outline", theme.outline || null);
@@ -528,13 +543,12 @@
         applyTheme();
       },
       setEmotion: function (emotionId) {
-        root.className = root.className.replace(/is-emotion-\d+/g, "").trim();
-        root.classList.add("is-emotion-" + emotionId);
-        rig.api.setEmotionState(String(emotionId));
+        var id = normalizeEmotionId(emotionId);
+        setEmotionClass(id);
+        rig.api.setEmotionState(id);
       },
       clearEmotion: function () {
-        root.className = root.className.replace(/is-emotion-\d+/g, "").trim();
-        root.classList.add("is-emotion-02");
+        setEmotionClass("02");
         rig.api.setEmotionState("02");
       },
       destroy: function () { rig.destroy(); root.remove(); }

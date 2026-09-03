@@ -10,13 +10,26 @@ const esbuild = require('esbuild');
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-async function discoverCharacterFiles(extension) {
+async function discoverModelFiles() {
   const directory = join(root, 'src/characters');
   const entries = await readdir(directory, { withFileTypes: true });
-  return entries
-    .filter((entry) => entry.isFile() && entry.name.endsWith(extension))
-    .map((entry) => join('src/characters', entry.name))
-    .sort();
+  const files = entries.filter((entry) => entry.isFile()).map((entry) => entry.name);
+  const scripts = files.filter((name) => name.endsWith('.model.js')).sort();
+  const styles = files.filter((name) => name.endsWith('.model.css')).sort();
+  const scriptIds = new Set(scripts.map((name) => name.slice(0, -'.model.js'.length)));
+  const styleIds = new Set(styles.map((name) => name.slice(0, -'.model.css'.length)));
+  const missingStyles = [...scriptIds].filter((id) => !styleIds.has(id));
+  const missingScripts = [...styleIds].filter((id) => !scriptIds.has(id));
+  if (missingStyles.length || missingScripts.length) {
+    throw new Error('Each model needs matching .model.js and .model.css files' +
+      (missingStyles.length ? '; missing CSS: ' + missingStyles.join(', ') : '') +
+      (missingScripts.length ? '; missing JS: ' + missingScripts.join(', ') : ''));
+  }
+  if (!scripts.length) throw new Error('No model entry files found in src/characters');
+  return {
+    scripts: scripts.map((name) => join('src/characters', name)),
+    styles: styles.map((name) => join('src/characters', name)),
+  };
 }
 
 function createBundleEntry(characterFiles) {
@@ -43,17 +56,14 @@ function validateEmotionAnimations(emotionSource, css) {
 }
 
 async function main() {
-  const [characterJsFiles, characterCssFiles] = await Promise.all([
-    discoverCharacterFiles('.js'),
-    discoverCharacterFiles('.css'),
-  ]);
-  const cssFiles = ['src/lively-mascot.css', ...characterCssFiles];
+  const modelFiles = await discoverModelFiles();
+  const cssFiles = ['src/lively-mascot.css', ...modelFiles.styles];
   const emotionSource = await readFile(join(root, 'src/core/emotions.js'), 'utf8');
   let css = '';
   for (const f of cssFiles) css += (await readFile(join(root, f), 'utf8')).trim() + '\n';
   validateEmotionAnimations(emotionSource, css);
 
-  const entry = createBundleEntry(characterJsFiles);
+  const entry = createBundleEntry(modelFiles.scripts);
   const sharedBuildOptions = {
     stdin: { contents: entry, resolveDir: root, sourcefile: 'lively-mascot-entry.js' },
     bundle: true,
