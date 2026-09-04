@@ -232,16 +232,18 @@ function testFaceVariantLifecycle() {
   global.cancelAnimationFrame = () => {};
   global.performance = { now: () => 0 };
   try {
-    const instance = mascot.createMascot(new FakeElement('div'), { animated: false });
-    for (const variant of ['simple', 'dot', 'default']) {
-      if (instance.setFaceVariant(variant) !== variant) throw new Error(`Face variant was not returned: ${variant}`);
-      const active = ['default', 'simple', 'dot'].filter((name) => instance.el.classList.contains(`lively-mascot--face-${name}`));
-      if (active.length !== 1 || active[0] !== variant) throw new Error(`Face variant classes are not exclusive: ${variant}`);
+    for (const type of ['sprout']) {
+      const instance = mascot.createMascot(new FakeElement('div'), { type, animated: false });
+      for (const variant of ['simple', 'dot', 'default']) {
+        if (instance.setFaceVariant(variant) !== variant) throw new Error(`Face variant was not returned: ${type}/${variant}`);
+        const active = ['default', 'simple', 'dot'].filter((name) => instance.el.classList.contains(`lively-mascot--face-${name}`));
+        if (active.length !== 1 || active[0] !== variant) throw new Error(`Face variant classes are not exclusive: ${type}/${variant}`);
+      }
+      if (instance.setFaceVariant('unknown') !== 'default' || !instance.el.classList.contains('lively-mascot--face-default')) {
+        throw new Error(`Invalid face variant did not fall back to default: ${type}`);
+      }
+      instance.destroy();
     }
-    if (instance.setFaceVariant('unknown') !== 'default' || !instance.el.classList.contains('lively-mascot--face-default')) {
-      throw new Error('Invalid face variant did not fall back to default');
-    }
-    instance.destroy();
   } finally {
     global.document = original.document;
     global.window = original.window;
