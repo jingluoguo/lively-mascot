@@ -18,6 +18,9 @@ const cssSources = await Promise.all([
   readFile(new URL('../src/lively-mascot.css', import.meta.url), 'utf8'),
   ...modelCssIds.map((id) => readFile(new URL('../src/characters/' + id + '.model.css', import.meta.url), 'utf8')),
 ]);
+if (!cssSources[0].includes('.lively-mascot.is-happy [data-mascot-part="eyes"] .lively-face__pupil')) {
+  throw new Error('Happy state must hide the default pupil after eye action rules');
+}
 const modelCssSource = cssSources.slice(1).join('\n');
 if (/\.is-emotion-[a-z0-9-]+/i.test(modelCssSource)) {
   throw new Error('Model CSS must use semantic data-mascot-behaviors selectors instead of emotion IDs');
@@ -61,6 +64,12 @@ class FakeElement {
   get className() { return this.classList.toString(); }
   set className(value) { this.classList = new FakeClassList(); this.classList.add(...String(value).split(/\s+/).filter(Boolean)); }
   appendChild(child) { child.parentNode = this; this.children.push(child); return child; }
+  insertBefore(child, reference) {
+    child.parentNode = this;
+    const index = this.children.indexOf(reference);
+    if (index === -1) this.children.push(child); else this.children.splice(index, 0, child);
+    return child;
+  }
   remove() { if (this.parentNode) this.parentNode.children = this.parentNode.children.filter((child) => child !== this); }
   setAttribute(name, value) { this.attributes[name] = String(value); }
   getAttribute(name) { return this.attributes[name] || null; }
@@ -167,10 +176,15 @@ function testRuntimeValidationAndLifecycle() {
     if (passive.el.style.values.width !== '120px' || passive.el.style.values.height !== '120px' || passive.el.getAttribute('aria-hidden') !== 'true') {
       throw new Error('Mascot dimensions or passive accessibility state are invalid');
     }
+    const cat = mascot.createMascot(host, { type: 'cat', animated: false });
+    if (cat.el.style.values['--lively-body'] !== '#3d4852' || cat.el.style.values['--lively-outline'] !== '#131a20') {
+      throw new Error('Model presentation theme was not applied by default');
+    }
+    cat.destroy();
     passive.setTheme({ body: '#123456' });
     if (passive.el.style.values['--lively-body'] !== '#123456') throw new Error('Theme color was not applied');
     passive.setTheme({ body: null, outline: '' });
-    if ('--lively-body' in passive.el.style.values || '--lively-outline' in passive.el.style.values) throw new Error('Theme clearing did not restore CSS defaults');
+    if (passive.el.style.values['--lively-body'] !== '#48ff42' || passive.el.style.values['--lively-outline'] !== '#080808') throw new Error('Theme clearing did not restore model defaults');
     passive.destroy();
     passive.destroy();
 

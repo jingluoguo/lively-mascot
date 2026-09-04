@@ -9,11 +9,18 @@
   "unpkg": "./dist/lively-mascot.min.js",
   "jsdelivr": "./dist/lively-mascot.min.js",
   "types": "./types/index.d.ts",
+  "type": "commonjs",
+  "engines": { "node": ">=18" },
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
-      "require": "./dist/lively-mascot.cjs",
-      "import": "./dist/lively-mascot.mjs",
+      "require": {
+        "types": "./types/index.d.cts",
+        "default": "./dist/lively-mascot.cjs"
+      },
+      "import": {
+        "types": "./types/index.d.mts",
+        "default": "./dist/lively-mascot.mjs"
+      },
       "default": "./dist/lively-mascot.mjs"
     },
     "./dist/lively-mascot.min.js": "./dist/lively-mascot.min.js",
@@ -49,6 +56,8 @@
     "dist/lively-mascot.cjs",
     "dist/lively-mascot.mjs",
     "types/index.d.ts",
+    "types/index.d.mts",
+    "types/index.d.cts",
     "CHANGELOG.md",
     "CHANGELOG.zh-CN.md",
     "src/lively-mascot.js",
@@ -59,8 +68,9 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/jingluoguo/lively-mascot"
+    "url": "git+https://github.com/jingluoguo/lively-mascot.git"
   },
+  "sideEffects": ["**/*.css", "src/characters/*.model.js"],
   "devDependencies": {
     "esbuild": "^0.28.2"
   }

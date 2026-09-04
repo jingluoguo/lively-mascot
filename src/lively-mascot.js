@@ -550,7 +550,15 @@
     // body posture (sway / lean) instead of staying dead-on.
     var gazeEl = el("div", { class: "lively-mascot__gaze" });
     rigEl.appendChild(gazeEl);
-    var theme = { body: options.color || "", outline: options.outline || "", accent: options.accent || "" };
+    // Start from the model contract's theme, then let instance options win.
+    // This keeps each built-in model self-contained while preserving explicit
+    // per-instance overrides.
+    var defaultTheme = model.presentation && model.presentation.theme || {};
+    var theme = {
+      body: options.color || defaultTheme.body || "",
+      outline: options.outline || defaultTheme.outline || "",
+      accent: options.accent || defaultTheme.accent || ""
+    };
     var currentEmotionClass = "";
     function setEmotionClass(id) {
       if (currentEmotionClass) root.classList.remove(currentEmotionClass);
@@ -567,6 +575,7 @@
         var slot = slots[i];
         var property = "--lively-" + slot;
         if (theme[slot]) root.style.setProperty(property, theme[slot]);
+        else if (defaultTheme[slot]) root.style.setProperty(property, defaultTheme[slot]);
         else root.style.removeProperty(property);
       }
       for (var fixedName in model.skin.fixed) {
@@ -637,9 +646,9 @@
       },
       setTheme: function (p) {
         p = p || {};
-        if (Object.prototype.hasOwnProperty.call(p, "body") && model.skin.slots.indexOf("body") !== -1) theme.body = p.body == null ? "" : String(p.body);
-        if (Object.prototype.hasOwnProperty.call(p, "outline") && model.skin.slots.indexOf("outline") !== -1) theme.outline = p.outline == null ? "" : String(p.outline);
-        if (Object.prototype.hasOwnProperty.call(p, "accent") && model.skin.slots.indexOf("accent") !== -1) theme.accent = p.accent == null ? "" : String(p.accent);
+        if (Object.prototype.hasOwnProperty.call(p, "body") && model.skin.slots.indexOf("body") !== -1) theme.body = p.body == null ? (defaultTheme.body || "") : String(p.body);
+        if (Object.prototype.hasOwnProperty.call(p, "outline") && model.skin.slots.indexOf("outline") !== -1) theme.outline = p.outline == null ? (defaultTheme.outline || "") : String(p.outline);
+        if (Object.prototype.hasOwnProperty.call(p, "accent") && model.skin.slots.indexOf("accent") !== -1) theme.accent = p.accent == null ? (defaultTheme.accent || "") : String(p.accent);
         applyTheme();
       },
       setEmotion: function (emotionId) {

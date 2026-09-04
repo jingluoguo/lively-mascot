@@ -426,6 +426,72 @@
       font-weight: 900;
     }
 
+    .theme-controls {
+      display: grid;
+      grid-template-columns: minmax(190px, .85fr) minmax(0, 1.15fr);
+      gap: 14px;
+      margin: 0 0 20px;
+      padding-bottom: 18px;
+      border-bottom: 2px dashed rgba(8, 8, 8, .15);
+    }
+
+    .model-default-theme {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin: 0;
+      padding: 10px 12px;
+      border: 2px solid #080808;
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 3px 3px 0 #080808;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .model-default-theme:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0 #080808;
+    }
+
+    .model-default-theme:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0 #080808;
+    }
+
+    .model-default-theme__copy {
+      min-width: 0;
+    }
+
+    .model-default-theme__title {
+      display: block;
+      font-size: 12px;
+      font-weight: 900;
+      color: #1d1d1f;
+    }
+
+    .model-default-theme__hint {
+      display: block;
+      margin-top: 3px;
+      font-size: 11px;
+      color: #777;
+    }
+
+    .model-default-theme__swatches {
+      display: flex;
+      flex: 0 0 auto;
+      gap: 5px;
+    }
+
+    .model-default-theme__swatch {
+      width: 24px;
+      height: 24px;
+      border: 2px solid #080808;
+      border-radius: 50%;
+      box-shadow: 1px 1px 0 rgba(0, 0, 0, .15);
+    }
+
     /* ---- Emotion Grid (model on top, title below) ---- */
     .emotion-grid {
       display: grid;
@@ -646,9 +712,7 @@
       align-items: center;
       gap: 18px;
       flex-wrap: wrap;
-      margin-bottom: 20px;
-      padding-bottom: 18px;
-      border-bottom: 2px dashed rgba(8, 8, 8, .15);
+      align-content: center;
     }
 
     .color-field {
@@ -734,6 +798,10 @@
 
       .palette {
         grid-template-columns: repeat(3, 1fr);
+      }
+
+      .theme-controls {
+        grid-template-columns: 1fr;
       }
 
       .emotion-grid {
@@ -1085,11 +1153,53 @@
     var paletteCaptions = [];
     var activeSwatch = null;
     var colorInputs = {};
+    var themeControls = document.createElement('div');
+    themeControls.className = 'theme-controls';
+
+    var defaultThemeButton = document.createElement('button');
+    defaultThemeButton.type = 'button';
+    defaultThemeButton.className = 'model-default-theme';
+    defaultThemeButton.setAttribute('aria-label', 'Restore model default colors');
+    var defaultThemeCopy = document.createElement('span');
+    defaultThemeCopy.className = 'model-default-theme__copy';
+    var defaultThemeTitle = document.createElement('span');
+    defaultThemeTitle.className = 'model-default-theme__title';
+    var defaultThemeHint = document.createElement('span');
+    defaultThemeHint.className = 'model-default-theme__hint';
+    defaultThemeCopy.appendChild(defaultThemeTitle);
+    defaultThemeCopy.appendChild(defaultThemeHint);
+    var defaultThemeSwatches = document.createElement('span');
+    defaultThemeSwatches.className = 'model-default-theme__swatches';
+    var defaultThemeSwatchEls = {};
+    ['body', 'outline', 'accent'].forEach(function (key) {
+      var swatch = document.createElement('span');
+      swatch.className = 'model-default-theme__swatch';
+      swatch.dataset.themeKey = key;
+      swatch.title = key;
+      defaultThemeSwatches.appendChild(swatch);
+      defaultThemeSwatchEls[key] = swatch;
+    });
+    defaultThemeButton.appendChild(defaultThemeCopy);
+    defaultThemeButton.appendChild(defaultThemeSwatches);
+    defaultThemeButton.addEventListener('click', function () {
+      currentTheme = getDefaultTheme(currentCharType);
+      applyThemeToAll();
+      syncColorInputs();
+      if (activeSwatch) { activeSwatch.classList.remove('is-active'); activeSwatch = null; }
+    });
+    function syncDefaultThemeCard() {
+      var theme = getDefaultTheme(currentCharType);
+      var label = getModelLabel(currentCharType);
+      defaultThemeTitle.textContent = currentLang === 'zh' ? label + '默认色' : label + ' default';
+      defaultThemeHint.textContent = currentLang === 'zh' ? '点击恢复该模型配色' : 'Click to restore model colors';
+      ['body', 'outline', 'accent'].forEach(function (key) {
+        defaultThemeSwatchEls[key].style.background = theme[key] || '#fff';
+      });
+    }
 
     // ---- Custom color pickers (native <input type=color>) ----
     var presetTitle = document.createElement('span');
     presetTitle.className = 'panel-subtitle';
-    palettePanel.appendChild(presetTitle);
 
     var colorCustom = document.createElement('div');
     colorCustom.className = 'color-custom';
@@ -1117,7 +1227,10 @@
       colorCustom.appendChild(field);
       colorInputs[key] = input;
     });
-    palettePanel.appendChild(colorCustom);
+    themeControls.appendChild(defaultThemeButton);
+    themeControls.appendChild(colorCustom);
+    palettePanel.appendChild(themeControls);
+    palettePanel.appendChild(presetTitle);
 
     // keep the three pickers in sync with whatever theme is currently applied
     function syncColorInputs() {
@@ -1125,6 +1238,7 @@
       if (/^#[0-9a-f]{6}$/i.test(t.body)) colorInputs.body.value = t.body;
       if (/^#[0-9a-f]{6}$/i.test(t.outline)) colorInputs.outline.value = t.outline;
       if (/^#[0-9a-f]{6}$/i.test(t.accent)) colorInputs.accent.value = t.accent;
+      syncDefaultThemeCard();
     }
 
     function applyThemeToAll() {
@@ -1390,6 +1504,8 @@
 
       // Custom picker labels + preset subtitle
       if (presetTitle) presetTitle.textContent = t.presetTitle;
+      syncDefaultThemeCard();
+      defaultThemeButton.setAttribute('aria-label', currentLang === 'zh' ? '恢复模型默认配色' : 'Restore model default colors');
       document.querySelectorAll('.color-field__label').forEach(function (lab) {
         lab.textContent = t.colorFields[lab.dataset.colorKey];
       });

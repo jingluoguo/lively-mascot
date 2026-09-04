@@ -30,8 +30,17 @@
   width: 106px;
   height: 106px;
   container-type: inline-size;
-  cursor: pointer;
+  cursor: default;
   user-select: none;
+}
+
+.lively-mascot[role="button"] {
+  cursor: pointer;
+}
+
+.lively-mascot[role="button"]:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 4px;
 }
 
 /* 2D view keeps the original flat, sticker-like rendering. */
@@ -572,10 +581,10 @@
   visibility: hidden;
 }
 
-.lively-mascot.is-happy .lively-face__eye>ellipse,
-.lively-mascot.is-happy .lively-face__pupil,
-.lively-mascot.is-happy .lively-face__shine,
-.lively-mascot.is-happy .lively-face__mouth {
+.lively-mascot.is-happy [data-mascot-part="eyes"] .lively-face__eye>ellipse,
+.lively-mascot.is-happy [data-mascot-part="eyes"] .lively-face__pupil,
+.lively-mascot.is-happy [data-mascot-part="eyes"] .lively-face__shine,
+.lively-mascot.is-happy [data-mascot-part="eyes"] .lively-face__mouth {
   visibility: hidden;
 }
 

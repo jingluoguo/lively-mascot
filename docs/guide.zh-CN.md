@@ -73,6 +73,8 @@ Vue 中在 `onMounted` 创建实例、`onBeforeUnmount` 销毁实例，并在 `t
 
 `size` 必须是有限正数，最大值为 `4096`。非法的 `size` 或 `hopInterval` 会抛出错误。重复调用 `destroy()` 是安全的。
 
+每个模型的 `presentation.theme` 会作为默认配色，`color`、`outline`、`accent` 可按实例覆盖。页面隐藏或系统开启“减少动态效果”时，视线、眨眼、跳跃和定时器会自动暂停，恢复后继续运行。
+
 返回实例提供：
 
 ```js

@@ -34,6 +34,13 @@ function createRig(root, rigEl, config, handlers) {
   var leafUseLeafAnim = true;
   var feetEl = null;
   var gazeEl = null;
+  var motionReduced = false;
+  var motionQuery = null;
+  var pointerListening = false;
+
+  function isMotionPaused() {
+    return motionReduced || (typeof document !== "undefined" && document.hidden === true);
+  }
 
   var api = {
     registerPupil: function (elm, spec) {
@@ -155,6 +162,7 @@ function createRig(root, rigEl, config, handlers) {
   }
 
   function tick() {
+    if (isMotionPaused()) { raf = 0; return; }
     if (!shouldGaze()) { targetX = 0; targetY = 0; }
     curX += (targetX - curX) * 0.2;
     curY += (targetY - curY) * 0.2;
@@ -209,7 +217,7 @@ function createRig(root, rigEl, config, handlers) {
   // --- Blink ---
   var blinkTimer = 0, phaseTimer = 0;
   function scheduleBlink() {
-    if (rigCapabilities.blink === false) return;
+    if (!animated || isMotionPaused() || rigCapabilities.blink === false) return;
     var def = getEmotionDef(currentEmotionId);
     // No blink if disabled
     if (def && def.blink === false) {
@@ -259,7 +267,7 @@ function createRig(root, rigEl, config, handlers) {
   }
 
   function scheduleHop() {
-    if (!canHop()) return;
+    if (isMotionPaused() || !canHop()) return;
     hopTimer = window.setTimeout(function () {
       if (!canHop()) return;
       setHopping(true);
@@ -293,7 +301,44 @@ function createRig(root, rigEl, config, handlers) {
     }
   }
 
-  if (following) { raf = requestAnimationFrame(tick); window.addEventListener("pointermove", onPointerMove, { passive: true }); }
+  function resumeMotion() {
+    if (!animated || isMotionPaused()) return;
+    if (following && !raf) raf = requestAnimationFrame(tick);
+    scheduleBlink();
+    syncHop();
+  }
+
+  function pauseMotion() {
+    cancelAnimationFrame(raf); raf = 0;
+    clearTimeout(blinkTimer); clearTimeout(phaseTimer);
+    clearTimeout(hopTimer); clearTimeout(hopResetTimer);
+    blinkTimer = phaseTimer = hopTimer = hopResetTimer = 0;
+    setHopping(false);
+  }
+
+  function onVisibilityChange() { if (isMotionPaused()) pauseMotion(); else resumeMotion(); }
+  function onMotionPreferenceChange(event) {
+    motionReduced = event && event.matches === true;
+    onVisibilityChange();
+  }
+  function addPointerListener() {
+    if (pointerListening || typeof window === "undefined") return;
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    pointerListening = true;
+  }
+  function removePointerListener() {
+    if (!pointerListening || typeof window === "undefined") return;
+    window.removeEventListener("pointermove", onPointerMove);
+    pointerListening = false;
+  }
+  if (typeof window !== "undefined" && typeof window.matchMedia === "function") {
+    motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    motionReduced = motionQuery.matches === true;
+    if (typeof motionQuery.addEventListener === "function") motionQuery.addEventListener("change", onMotionPreferenceChange);
+    else if (typeof motionQuery.addListener === "function") motionQuery.addListener(onMotionPreferenceChange);
+  }
+  if (typeof document !== "undefined" && typeof document.addEventListener === "function") document.addEventListener("visibilitychange", onVisibilityChange);
+  if (following) { if (!isMotionPaused()) raf = requestAnimationFrame(tick); addPointerListener(); }
   if (animated) {
     scheduleBlink();
     syncHop();
@@ -307,12 +352,22 @@ function createRig(root, rigEl, config, handlers) {
   return {
     api: api,
     click: fireClick,
-    setFollowCursor: function(e){ following=e; },
+    setFollowCursor: function(e){
+      following = e !== false;
+      if (following && animated) addPointerListener(); else removePointerListener();
+      if (following && animated && !isMotionPaused() && !raf) raf = requestAnimationFrame(tick);
+      if (!following) { cancelAnimationFrame(raf); raf = 0; }
+    },
     destroy: function() {
       if (destroyed) return;
       destroyed = true;
       cancelAnimationFrame(raf);
-      window.removeEventListener("pointermove", onPointerMove);
+      removePointerListener();
+      if (typeof document !== "undefined" && typeof document.removeEventListener === "function") document.removeEventListener("visibilitychange", onVisibilityChange);
+      if (motionQuery) {
+        if (typeof motionQuery.removeEventListener === "function") motionQuery.removeEventListener("change", onMotionPreferenceChange);
+        else if (typeof motionQuery.removeListener === "function") motionQuery.removeListener(onMotionPreferenceChange);
+      }
       clearTimeout(blinkTimer); clearTimeout(phaseTimer);
       clearTimeout(hopTimer); clearTimeout(hopResetTimer);
       clearTimeout(happyTimer);

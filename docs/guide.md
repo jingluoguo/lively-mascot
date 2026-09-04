@@ -73,6 +73,8 @@ For source loading, load `src/core/emotions.js`, `src/core/dom.js`, `src/core/ri
 
 `size` must be a finite positive number and is capped at `4096`. Invalid `size` or `hopInterval` values throw an error. Calling `destroy()` more than once is safe.
 
+Each model's `presentation.theme` is used as the default palette; `color`, `outline`, and `accent` override those values per instance. Runtime gaze, blinking, hopping, and timers pause while the document is hidden or when the system requests reduced motion, then resume automatically.
+
 The returned instance exposes:
 
 ```js
