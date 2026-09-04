@@ -1,5 +1,5 @@
 /**
- * lively-mascot · core SDK (v0.2.0)
+ * lively-mascot · core SDK (v0.3.0)
  *
  * Requires: src/core/emotions.js, src/core/dom.js, src/core/rig.js
  * (loaded before this script)
@@ -713,6 +713,6 @@
     partActions: STANDARD_ACTIONS,
     emotions: LivelyEmotions,
     emotionGroups: LivelyEmotionGroups,
-    version: "0.2.0"
+    version: "0.3.0"
   };
 });

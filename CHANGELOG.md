@@ -4,6 +4,36 @@
 
 All notable changes to this project are documented here.
 
+## [0.3.0] - 2026-09-04
+
+### Added
+
+- Added a declarative `defineModel()` contract for custom models, including parts, actions, skin slots, accessories, effects, presentation metadata, and rig capabilities.
+- Added semantic emotion behavior tags and string emotion IDs, allowing model styles to react without depending on numeric IDs.
+- Added model-specific action recipes with accessory toggles and anchored effects such as hearts, sparkles, sleep, and loading indicators.
+- Added scoped gaze registration for eye-only or whole-model tracking, plus configurable blink, gaze, hop, and spin capabilities.
+- Added modular model discovery and paired per-character CSS distribution files for smaller package imports.
+- Added an interactive action composer and expanded the image-to-model skill contract documentation.
+
+### Changed
+
+- Reworked built-in character registration around the unified model runtime and shared SVG face builder.
+- Improved gaze and 3D posture behavior with per-eye scaling, depth, rotation, vertical response, and model-aware gaze wrappers.
+- Updated the demo with native color pickers, model default color cards, face variants, custom action composition, and bilingual model presentation metadata.
+- Applied each model's presentation theme by default, while preserving per-instance theme overrides.
+- Paused runtime gaze, blinking, hopping, and timers while the document is hidden or `prefers-reduced-motion` is enabled, with automatic resume.
+- Improved package exports with ESM/CJS-specific TypeScript declarations, Node.js engine metadata, and more precise side-effect declarations.
+
+### Fixed
+
+- Fixed happy click eyes so the default pupils do not remain visible over the smiling-eye expression.
+- Fixed model theme reset behavior so clearing a custom color restores the active model's defaults.
+
+### Packaging
+
+- Added `types/index.d.mts` and `types/index.d.cts` for reliable TypeScript resolution across ESM and CommonJS consumers.
+- Regenerated browser, ESM, CommonJS, core CSS, and per-character CSS distribution files.
+
 ## [0.2.0] - 2026-08-26
 
 ### Added

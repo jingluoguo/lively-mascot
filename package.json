@@ -1,6 +1,6 @@
 {
   "name": "lively-mascot",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Universal animated mascot engine with pure SVG, zero dependencies, and a data-driven model registry.",
   "license": "MIT",
   "main": "./dist/lively-mascot.cjs",
