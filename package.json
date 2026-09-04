@@ -1,6 +1,6 @@
 {
   "name": "lively-mascot",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Universal animated mascot engine with pure SVG, zero dependencies, and a data-driven model registry.",
   "license": "MIT",
   "main": "./dist/lively-mascot.cjs",
@@ -10,7 +10,9 @@
   "jsdelivr": "./dist/lively-mascot.min.js",
   "types": "./types/index.d.ts",
   "type": "commonjs",
-  "engines": { "node": ">=18" },
+  "engines": {
+    "node": ">=18"
+  },
   "exports": {
     ".": {
       "require": {
@@ -70,7 +72,10 @@
     "type": "git",
     "url": "git+https://github.com/jingluoguo/lively-mascot.git"
   },
-  "sideEffects": ["**/*.css", "src/characters/*.model.js"],
+  "sideEffects": [
+    "**/*.css",
+    "src/characters/*.model.js"
+  ],
   "devDependencies": {
     "esbuild": "^0.28.2"
   }
