@@ -61,7 +61,7 @@ Or load the browser bundle from jsDelivr:
 </script>
 ```
 
-Pin a release tag such as `@v0.3.0` in production rather than using `@master`.
+Pin a release tag such as `@v0.3.1` in production rather than using `@master`.
 
 ## Documentation
 

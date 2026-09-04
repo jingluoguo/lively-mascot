@@ -48,6 +48,14 @@ The body artwork must match the reference silhouette, including distinctive roun
 
 For regenerated custom-eye models, the rigged eye node uses the complete gaze composition: `translate(var(--lively-gaze-x), var(--lively-gaze-y)) rotate(var(--lively-gaze-rotate)) scaleX(var(--lively-gaze-depth)) scaleY(var(--lively-gaze-height)) scale(var(--lively-gaze-scale))`. Its gaze spec includes `maxX`, `maxY`, `depth`, `verticalScale`, `side`, and `sideScale`. This preserves cursor position movement while adding horizontal compression, vertical opening, and the near/far asymmetry; no model may replace it with a scale-only declaration. For sparse high-contrast eyes with sufficient space, tune `maxX` to 55-70% of visible eye width and `maxY` to 25-35% of visible eye height. Use the smaller 35-55% horizontal range only when the face silhouette makes larger travel unsafe. Test left, right, up, down, and both lower diagonals at demo size, confirming a visibly obvious position change and all three deformation cues before acceptance.
 
+## Face Variants
+
+`setFaceVariant()` applies one root class at a time: `.lively-mascot--face-default`, `.lively-mascot--face-simple`, or `.lively-mascot--face-dot`. Models that use `buildFaceSvg(model)` receive this behavior from the shared stylesheet. A custom-eye model must provide it in its model CSS.
+
+Each registered custom eye contains three mutually exclusive primitives: `<slug>__eye-default` preserves the measured reference eye, `<slug>__eye-simple` is a reduced capsule or line, and `<slug>__eye-dot` is a circle. Hide all primitives by default, then reveal only the corresponding primitive under each root class. Any action rule that could show old artwork must be overridden with `display: none` for the inactive primitives; `visibility: hidden` alone is insufficient when the action selector has higher specificity.
+
+Eye actions and blinking pose the registered eye wrapper while keeping its selected primitive visible. They do not swap in heart, sleep, pupil, or default-eye artwork over simple and dot faces. The generated manifest records `faceVariants: ["default", "simple", "dot"]`, and QA checks one visible eye primitive per eye group for neutral, closed, happy, wide, thinking, and love actions across all three variants.
+
 Use `parts.accessory` and `model.registerPart("accessory", element)` for permanent non-structural details such as whiskers, a fixed badge, or an always-worn item. These remain visible and receive shared `accessory` actions from emotion recipes.
 
 Optional hats, glasses, and similar visual layers belong in `accessories`. Declare their default state and supported actions, then call `model.registerAccessory(id, element)`. Instances toggle them with `setAccessory(id, enabled)`; enabled accessories receive the shared `accessory` action from an emotion recipe. Do not place permanent identity details in `accessories`.

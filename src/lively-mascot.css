@@ -1370,6 +1370,16 @@
   visibility: hidden;
 }
 
+/* The open-eye action has a more specific selector than the generic minimal
+   face rule above. Remove the default pupil artwork entirely so it cannot
+   reappear over a capsule or dot eye after a face-variant switch. */
+.lively-mascot.lively-mascot--face-simple .lively-face__pupil,
+.lively-mascot.lively-mascot--face-simple .lively-face__shine,
+.lively-mascot.lively-mascot--face-dot .lively-face__pupil,
+.lively-mascot.lively-mascot--face-dot .lively-face__shine {
+  display: none;
+}
+
 /* Closed and smiling eyes are the selected shape compressed in place. */
 .lively-mascot--face-simple.is-emotion-00,
 .lively-mascot--face-dot.is-emotion-00 {

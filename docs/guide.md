@@ -169,7 +169,7 @@ $lively-mascot-image-model
 Turn this image into a lively-mascot character named "Fox".
 ```
 
-The skill selects the closest native archetype when possible, preserving the project's built-in face, 2D/3D layers, and local feature motion. It writes output under `outputs/lively-mascot-model/<slug>/` and requires neither an API key nor an intermediate image.
+The skill selects the closest native archetype when possible, preserving the project's built-in face, 2D/3D layers, local feature motion, and all default, simple, and dot face variants. It writes output under `outputs/lively-mascot-model/<slug>/` and requires neither an API key nor an intermediate image.
 
 Read the complete [model skill instructions](../skills/lively-mascot-image-model/SKILL.md) for the output contract.
 

@@ -179,7 +179,7 @@ $lively-mascot-image-model
 请把这张图生成 lively-mascot 角色，名称为“小狐狸”。
 ```
 
-Skill 会优先选择相近的原生 archetype，保留项目既有的面部、2D/3D 层和局部部件运动，结果写入 `outputs/lively-mascot-model/<slug>/`。它直接使用提供的参考图，不需要 API key 或中间生成图片。
+Skill 会优先选择相近的原生 archetype，保留项目既有的面部、2D/3D 层、局部部件运动，以及默认、简约、圆点三种五官样式，结果写入 `outputs/lively-mascot-model/<slug>/`。它直接使用提供的参考图，不需要 API key 或中间生成图片。
 
 完整规范见 [Skill 指令](../skills/lively-mascot-image-model/SKILL.md)。
 

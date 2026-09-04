@@ -4,6 +4,21 @@
 
 All notable changes to this project are documented here.
 
+## [0.3.1] - 2026-09-04
+
+### Added
+
+- Added default, simple, and dot face variants to generated custom-face models.
+
+### Fixed
+
+- Fixed minimal face variants so the default pupil and shine do not reappear over simple or dot eyes.
+
+### Packaging and Documentation
+
+- Added the image-model face-variant generation contract and QA guidance.
+- Added the release preparation skill and documented face-variant support for generated models.
+
 ## [0.3.0] - 2026-09-04
 
 Compared with `v0.2.0`, this release changes the extension and runtime contracts while retaining the existing characters, emotion set, and 2D/3D modes.

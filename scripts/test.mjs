@@ -214,6 +214,45 @@ function testRuntimeValidationAndLifecycle() {
   }
 }
 
+function testFaceVariantLifecycle() {
+  const original = {
+    document: global.document,
+    window: global.window,
+    requestAnimationFrame: global.requestAnimationFrame,
+    cancelAnimationFrame: global.cancelAnimationFrame,
+    performance: global.performance,
+  };
+  const document = {
+    createElement: (tagName) => new FakeElement(tagName),
+    createElementNS: (_namespace, tagName) => new FakeElement(tagName),
+  };
+  global.document = document;
+  global.window = { addEventListener() {}, removeEventListener() {}, setTimeout, clearTimeout };
+  global.requestAnimationFrame = () => 0;
+  global.cancelAnimationFrame = () => {};
+  global.performance = { now: () => 0 };
+  try {
+    for (const type of ['sprout']) {
+      const instance = mascot.createMascot(new FakeElement('div'), { type, animated: false });
+      for (const variant of ['simple', 'dot', 'default']) {
+        if (instance.setFaceVariant(variant) !== variant) throw new Error(`Face variant was not returned: ${type}/${variant}`);
+        const active = ['default', 'simple', 'dot'].filter((name) => instance.el.classList.contains(`lively-mascot--face-${name}`));
+        if (active.length !== 1 || active[0] !== variant) throw new Error(`Face variant classes are not exclusive: ${type}/${variant}`);
+      }
+      if (instance.setFaceVariant('unknown') !== 'default' || !instance.el.classList.contains('lively-mascot--face-default')) {
+        throw new Error(`Invalid face variant did not fall back to default: ${type}`);
+      }
+      instance.destroy();
+    }
+  } finally {
+    global.document = original.document;
+    global.window = original.window;
+    global.requestAnimationFrame = original.requestAnimationFrame;
+    global.cancelAnimationFrame = original.cancelAnimationFrame;
+    global.performance = original.performance;
+  }
+}
+
 const emotionIds = Object.keys(mascot.emotions);
 if (!emotionIds.length) throw new Error('No emotions were registered');
 emotionIds.forEach((id) => {
@@ -253,6 +292,7 @@ if (browserModelIds.join(',') !== modelIds.join(',')) {
 
 testStringEmotionIds();
 testRuntimeValidationAndLifecycle();
+testFaceVariantLifecycle();
 
 const esmMascot = await import(new URL('../dist/lively-mascot.mjs', import.meta.url));
 if (typeof esmMascot.createMascot !== 'function' || Object.keys(esmMascot.models).sort().join(',') !== modelIds.join(',')) {
