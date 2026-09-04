@@ -40,6 +40,10 @@ Use objective release-note language in Chinese; do not use first-person wording 
    - `git diff --check`
    - optionally `npm exec --yes publint -- --strict .` for package metadata.
    - search for stale version references with `rg` and ensure generated `dist` files match the target version.
+7. Include a release title in the completion summary:
+   - Provide one concise GitHub Release title in Markdown link form for every prepared version.
+   - Derive the title from the user-visible changes in the version-to-version diff; prefer the main fix or capability over internal implementation details.
+   - Use the target version and the repository's actual GitHub URL. State that the title is a suggestion and does not mean a release was published.
 
 ## Release-note style
 
@@ -50,6 +54,8 @@ Use a concise GitHub Release title such as:
 ```
 
 The title must use the actual target version and repository URL. Do not claim that a GitHub Release was published; this skill only prepares project files and release text unless the user separately asks for publishing.
+
+Always include the title in the final release-preparation response, even when the user did not explicitly ask for release copy.
 
 ## Safety and scope
 
