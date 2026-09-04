@@ -7,6 +7,7 @@
  * - Work States (20-31): What the bot/agent is doing (thinking, searching, etc.).
  *
  * Each emotion can define:
+ * - behaviors: semantic behavior tags for model-specific presentation
  * - bodyAnim:   CSS animation override for .lively-body
  * - bodyFilter: CSS filter override for .lively-body
  * - blink:      false = force eyes closed/locked (default true)
@@ -41,6 +42,7 @@ var LivelyEmotions = {
           leafAnim: "lively-leaf-pause 6s ease-in-out infinite",
           footAnim: "lively-foot-rest 4s ease-in-out infinite" },
   "06": { id: "06", name: "Refresh",    group: "lifecycle", desc: "正在刷新",
+          motionTarget: "rig",
           bodyAnim: "lively-refresh 0.8s ease-in-out infinite",
           leafAnim: "lively-leaf-refresh 0.6s ease-in-out infinite" },
   "07": { id: "07", name: "LowBattery", group: "lifecycle", desc: "电量不足",
@@ -63,12 +65,11 @@ var LivelyEmotions = {
           bodyAnim: "lively-happy-bounce 0.6s ease-in-out 2",
           leafAnim: "lively-leaf-happy 0.4s ease-in-out 4",
           footAnim: "lively-foot-happy 0.35s ease-in-out 4" },
-  "11": { id: "11", name: "Excited",   group: "reaction", desc: "兴奋",
+  "11": { id: "11", name: "Curious",   group: "reaction", desc: "好奇",
           gaze: false,
-          bodyAnim: "lively-excited 0.5s ease-in-out 3",
-          leafAnim: "lively-leaf-excited 0.3s ease-in-out 5",
-          footAnim: "lively-foot-excited 0.25s ease-in-out 6" },
-  "12": { id: "12", name: "Sad",       group: "reaction", desc: "难过",
+          bodyAnim: "lively-confused 2.4s ease-in-out infinite",
+          leafAnim: "lively-leaf-confused 1.8s ease-in-out infinite" },
+  "12": { id: "12", name: "Aggrieved", group: "reaction", desc: "委屈",
           gaze: false,
           bodyAnim: "lively-sad 3s ease-in-out infinite",
           bodyFilter: "brightness(0.85) saturate(0.7)",
@@ -133,6 +134,7 @@ var LivelyEmotions = {
           leafAnim: "lively-leaf-designing 2.5s ease-in-out infinite" },
   "28": { id: "28", name: "Loading",    group: "work", desc: "加载中",
           gaze: false,
+          motionTarget: "rig",
           // Loading state is communicated by the rotated ring (CSS).
           // Disable the base body sway so the ring stays concentric; the
           // whole rig bounces instead to make the live mascot feel alive.
@@ -194,6 +196,79 @@ var LivelyEmotionGroups = {
   "reaction":  { name: "情绪反应", order: 1 },
   "work":      { name: "工作状态", order: 2 }
 };
+
+// The recipe is the model-independent intent behind each visual state. The
+// rig still owns its proven motion values above; a model only receives actions
+// for parts it explicitly declared, and unsupported effects are skipped.
+var LivelyEmotionRecipes = {
+  "00": { parts: { body: "rest", eyes: "closed", mouth: "flat", top: "droop", feet: "rest" }, effects: [{ type: "sleep", anchor: "head", count: 2 }] },
+  "01": { parts: { body: "wake", eyes: "wide", mouth: "open", top: "perk", feet: "rest" } },
+  "02": { parts: { body: "idle", eyes: "open", mouth: "neutral", top: "idle", feet: "rest", tail: "idle" } },
+  "03": { parts: { body: "breathe", eyes: "open", mouth: "neutral", top: "idle", feet: "rest" } },
+  "04": { parts: { body: "breathe", eyes: "open", mouth: "neutral", top: "perk", feet: "rest" } },
+  "05": { parts: { body: "rest", eyes: "sad", mouth: "flat", top: "droop", feet: "rest" } },
+  "06": { parts: { body: "refresh", eyes: "open", mouth: "neutral", top: "work", feet: "rest" } },
+  "07": { parts: { body: "dim", eyes: "sad", mouth: "frown", top: "droop", feet: "rest" } },
+  "08": { parts: { body: "dim", eyes: "closed", mouth: "flat", top: "droop", feet: "rest" } },
+  "09": { parts: { body: "wake", eyes: "wide", mouth: "open", top: "perk", feet: "step" } },
+  "10": { parts: { body: "bounce", eyes: "happy", mouth: "smile", top: "perk", feet: "happy", tail: "happy", accessory: "happy" }, effects: [{ type: "sparkles", anchor: "head" }] },
+  "11": { parts: { body: "work", eyes: "wide", mouth: "open", top: "perk", tail: "idle" } },
+  "12": { parts: { body: "dim", eyes: "sad", mouth: "frown", top: "droop", feet: "rest", tail: "droop" } },
+  "13": { parts: { body: "shake", eyes: "angry", mouth: "frown", top: "shake", feet: "stomp", tail: "puff" } },
+  "14": { parts: { body: "wake", eyes: "wide", mouth: "open", top: "perk", accessory: "alert" } },
+  "15": { parts: { body: "work", eyes: "sad", mouth: "smile", top: "droop" } },
+  "16": { parts: { body: "pulse", eyes: "love", mouth: "smile", top: "perk", tail: "happy" }, effects: [{ type: "hearts", anchor: "head", count: 3 }] },
+  "17": { parts: { body: "work", eyes: "sad", mouth: "frown", top: "work" } },
+  "18": { parts: { body: "idle", eyes: "open", mouth: "smile", top: "perk" } },
+  "19": { parts: { body: "work", eyes: "open", mouth: "smile", top: "perk" } },
+  "20": { parts: { body: "work", eyes: "thinking", mouth: "flat", top: "work" } },
+  "21": { parts: { body: "work", eyes: "open", mouth: "neutral", top: "listen", accessory: "alert" } },
+  "22": { parts: { body: "work", eyes: "open", mouth: "talk", top: "work" } },
+  "23": { parts: { body: "work", eyes: "open", mouth: "neutral", top: "work", feet: "step" } },
+  "24": { parts: { body: "work", eyes: "thinking", mouth: "smile", top: "work" } },
+  "25": { parts: { body: "work", eyes: "thinking", mouth: "neutral", top: "work", feet: "step" } },
+  "26": { parts: { body: "work", eyes: "thinking", mouth: "flat", top: "work" } },
+  "27": { parts: { body: "work", eyes: "happy", mouth: "smile", top: "work" } },
+  "28": { parts: { body: "bounce", eyes: "thinking", mouth: "flat", feet: "rest" }, effects: [{ type: "loading", anchor: "body", count: 1 }] },
+  "29": { parts: { body: "work", eyes: "thinking", mouth: "flat", top: "work" } },
+  "30": { parts: { body: "bounce", eyes: "happy", mouth: "smile", top: "perk", feet: "happy" }, effects: [{ type: "sparkles", anchor: "head" }] },
+  "31": { parts: { body: "shake", eyes: "closed", mouth: "frown", top: "shake", feet: "stomp" } },
+  "32": { parts: { body: "pulse", eyes: "happy", mouth: "smile", top: "perk" }, effects: [{ type: "hearts", anchor: "head", count: 2 }] },
+  "33": { parts: { body: "work", eyes: "thinking", mouth: "neutral", top: "work", feet: "step" } },
+  "34": { parts: { body: "rest", eyes: "sad", mouth: "frown", top: "droop", feet: "rest" } },
+  "35": { parts: { body: "dim", eyes: "cry", mouth: "frown", top: "droop", feet: "rest", tail: "droop" } },
+  "36": { parts: { body: "rest", eyes: "bored", mouth: "flat", top: "droop", feet: "rest" } },
+  "37": { parts: { body: "shake", eyes: "sad", mouth: "neutral", top: "shake", feet: "step", tail: "tuck" } },
+  "38": { parts: { body: "bounce", eyes: "wide", mouth: "smile", top: "perk", feet: "happy", accessory: "alert" }, effects: [{ type: "sparkles", anchor: "head", count: 4 }] },
+  "39": { parts: { body: "work", eyes: "open", mouth: "flat", top: "idle", feet: "step" } }
+};
+
+// Semantic behavior tags are intentionally separate from numeric IDs. Models
+// can react to "angry" or "loading" without knowing which registry ID maps
+// to that intent, and custom emotions can provide their own tags.
+var LivelyEmotionBehaviors = {
+  "00": ["sleep"], "01": ["wake"], "02": ["idle"], "03": ["breathe"],
+  "04": ["ready"], "05": ["pause"], "06": ["refresh", "spin"], "07": ["low-battery"],
+  "08": ["offline"], "09": ["boot"], "10": ["happy"], "11": ["curious"],
+  "12": ["sad"], "13": ["angry"], "14": ["surprised"], "15": ["shy"],
+  "16": ["love"], "17": ["confused"], "18": ["cool"], "19": ["smug"],
+  "20": ["thinking"], "21": ["listening"], "22": ["talking"], "23": ["searching"],
+  "24": ["reading"], "25": ["writing"], "26": ["coding"], "27": ["designing"],
+  "28": ["loading", "spin"], "29": ["processing"], "30": ["success"], "31": ["error"],
+  "32": ["grateful"], "33": ["retrying"], "34": ["cancelled"], "35": ["crying"],
+  "36": ["bored"], "37": ["nervous"], "38": ["eureka"], "39": ["waiting"]
+};
+
+for (var emotionId in LivelyEmotionRecipes) {
+  if (Object.prototype.hasOwnProperty.call(LivelyEmotionRecipes, emotionId) && LivelyEmotions[emotionId]) {
+    LivelyEmotions[emotionId].recipe = LivelyEmotionRecipes[emotionId];
+  }
+}
+for (var behaviorId in LivelyEmotionBehaviors) {
+  if (Object.prototype.hasOwnProperty.call(LivelyEmotionBehaviors, behaviorId) && LivelyEmotions[behaviorId]) {
+    LivelyEmotions[behaviorId].behaviors = LivelyEmotionBehaviors[behaviorId].slice();
+  }
+}
 
 // Keep the no-build browser global while making the data consumable from
 // Node/CommonJS when the source SDK is used as an npm entry point.

@@ -1,7 +1,7 @@
 {
   "name": "lively-mascot",
-  "version": "0.2.0",
-  "description": "Universal Animated Mascot Engine: 40 Emotions · 5 Characters · Pure SVG · Zero Dependencies · Data-Driven · Drop-in.",
+  "version": "0.3.0",
+  "description": "Universal animated mascot engine with pure SVG, zero dependencies, and a data-driven model registry.",
   "license": "MIT",
   "main": "./dist/lively-mascot.cjs",
   "module": "./dist/lively-mascot.mjs",
@@ -9,15 +9,24 @@
   "unpkg": "./dist/lively-mascot.min.js",
   "jsdelivr": "./dist/lively-mascot.min.js",
   "types": "./types/index.d.ts",
+  "type": "commonjs",
+  "engines": { "node": ">=18" },
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
-      "require": "./dist/lively-mascot.cjs",
-      "import": "./dist/lively-mascot.mjs",
+      "require": {
+        "types": "./types/index.d.cts",
+        "default": "./dist/lively-mascot.cjs"
+      },
+      "import": {
+        "types": "./types/index.d.mts",
+        "default": "./dist/lively-mascot.mjs"
+      },
       "default": "./dist/lively-mascot.mjs"
     },
     "./dist/lively-mascot.min.js": "./dist/lively-mascot.min.js",
     "./dist/lively-mascot.min.css": "./dist/lively-mascot.min.css",
+    "./styles/core": "./dist/lively-mascot.core.min.css",
+    "./styles/*": "./dist/characters/*.min.css",
     "./package.json": "./package.json"
   },
   "keywords": [
@@ -36,36 +45,32 @@
     "robot"
   ],
   "scripts": {
-    "build": "node scripts/build-dist.mjs"
+    "build": "node scripts/build-dist.mjs",
+    "test": "npm run build && node scripts/test.mjs"
   },
   "files": [
     "dist/lively-mascot.min.js",
     "dist/lively-mascot.min.css",
+    "dist/lively-mascot.core.min.css",
+    "dist/characters",
     "dist/lively-mascot.cjs",
     "dist/lively-mascot.mjs",
     "types/index.d.ts",
+    "types/index.d.mts",
+    "types/index.d.cts",
     "CHANGELOG.md",
     "CHANGELOG.zh-CN.md",
     "src/lively-mascot.js",
     "src/lively-mascot.css",
-    "src/core/emotions.js",
-    "src/core/rig.js",
-    "src/characters/sprout.js",
-    "src/characters/sprout.css",
-    "src/characters/cat.js",
-    "src/characters/cat.css",
-    "src/characters/robot.js",
-    "src/characters/robot.css",
-    "src/characters/ghost.js",
-    "src/characters/ghost.css",
-    "src/characters/jelly.js",
-    "src/characters/jelly.css",
+    "src/core",
+    "src/characters",
     "README.zh-CN.md"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/jingluoguo/lively-mascot"
+    "url": "git+https://github.com/jingluoguo/lively-mascot.git"
   },
+  "sideEffects": ["**/*.css", "src/characters/*.model.js"],
   "devDependencies": {
     "esbuild": "^0.28.2"
   }

@@ -37,9 +37,6 @@
   50% { transform: translateY(-7px) rotate(-2deg); }
 }
 
-/* no hard hop for a ghost */
-.lively-mascot--ghost.is-hopping .lively-mascot__rig { animation: none; }
-
 /* The SVG only supplies the optional bottom ink. The body itself owns the
    filled wavy silhouette, so there is never a second colour layer to join. */
 .lively__ghost-hem {

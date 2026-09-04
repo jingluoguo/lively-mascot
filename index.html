@@ -5,12 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>lively-mascot · demo</title>
-  <link rel="stylesheet" href="src/lively-mascot.css" />
-  <link rel="stylesheet" href="src/characters/sprout.css" />
-  <link rel="stylesheet" href="src/characters/cat.css" />
-  <link rel="stylesheet" href="src/characters/robot.css" />
-  <link rel="stylesheet" href="src/characters/ghost.css" />
-  <link rel="stylesheet" href="src/characters/jelly.css" />
+  <link rel="stylesheet" href="dist/lively-mascot.min.css" />
   <style>
     * {
       box-sizing: border-box;
@@ -213,6 +208,71 @@
       color: #fff;
     }
 
+    /* ---- Face variant picker (preview cards) ---- */
+    .face-variants {
+      flex-basis: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 2px;
+    }
+
+    .face-variants__label {
+      font-size: 12px;
+      font-weight: 800;
+      color: #777;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      white-space: nowrap;
+    }
+
+    .face-variants__grid {
+      display: flex;
+      gap: 10px;
+    }
+
+    .face-variant {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      width: 72px;
+      padding: 8px 6px 6px;
+      border: 2px solid rgba(8, 8, 8, .12);
+      border-radius: 10px;
+      background: #fafafa;
+      cursor: pointer;
+      transition: border-color .15s, box-shadow .15s, background .15s, transform .15s;
+    }
+
+    .face-variant:hover {
+      border-color: rgba(8, 8, 8, .35);
+    }
+
+    .face-variant.is-active {
+      border-color: #080808;
+      background: #fff;
+      box-shadow: 3px 3px 0 #080808;
+      transform: translate(-1px, -1px);
+    }
+
+    .face-variant__preview {
+      width: 44px;
+      height: 44px;
+      display: block;
+      pointer-events: none;
+    }
+
+    .face-variant__name {
+      font-size: 12px;
+      font-weight: 800;
+      color: #666;
+    }
+
+    .face-variant.is-active .face-variant__name {
+      color: #080808;
+    }
+
     /* ---- Main Tabs (below character switcher) ---- */
     .tabs {
       margin: 36px auto 0;
@@ -272,6 +332,8 @@
     .tabs__panel.parameter-panel.is-active {
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
       min-height: 52px;
     }
 
@@ -364,6 +426,72 @@
       font-weight: 900;
     }
 
+    .theme-controls {
+      display: grid;
+      grid-template-columns: minmax(190px, .85fr) minmax(0, 1.15fr);
+      gap: 14px;
+      margin: 0 0 20px;
+      padding-bottom: 18px;
+      border-bottom: 2px dashed rgba(8, 8, 8, .15);
+    }
+
+    .model-default-theme {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin: 0;
+      padding: 10px 12px;
+      border: 2px solid #080808;
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 3px 3px 0 #080808;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .model-default-theme:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0 #080808;
+    }
+
+    .model-default-theme:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0 #080808;
+    }
+
+    .model-default-theme__copy {
+      min-width: 0;
+    }
+
+    .model-default-theme__title {
+      display: block;
+      font-size: 12px;
+      font-weight: 900;
+      color: #1d1d1f;
+    }
+
+    .model-default-theme__hint {
+      display: block;
+      margin-top: 3px;
+      font-size: 11px;
+      color: #777;
+    }
+
+    .model-default-theme__swatches {
+      display: flex;
+      flex: 0 0 auto;
+      gap: 5px;
+    }
+
+    .model-default-theme__swatch {
+      width: 24px;
+      height: 24px;
+      border: 2px solid #080808;
+      border-radius: 50%;
+      box-shadow: 1px 1px 0 rgba(0, 0, 0, .15);
+    }
+
     /* ---- Emotion Grid (model on top, title below) ---- */
     .emotion-grid {
       display: grid;
@@ -430,6 +558,114 @@
       margin-top: 1px;
     }
 
+    /* ---- Custom emotion composer ---- */
+    .emotion-composer {
+      display: grid;
+      gap: 16px;
+      margin: 0 0 20px;
+      padding: 2px 0 20px;
+      border-bottom: 2px dashed rgba(8, 8, 8, .15);
+    }
+
+    .emotion-composer__title {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 900;
+      color: #1d1d1f;
+    }
+
+    .emotion-composer__field--actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+    }
+
+    .emotion-composer__field {
+      min-width: 0;
+      padding: 10px;
+      border: 2px solid rgba(8, 8, 8, .12);
+      border-radius: 8px;
+      background: #fafafa;
+    }
+
+    .emotion-composer__label {
+      display: block;
+      margin: 0 0 8px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #777;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .emotion-composer__options {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .emotion-composer__option {
+      min-height: 30px;
+      padding: 4px 9px;
+      border: 2px solid rgba(8, 8, 8, .2);
+      border-radius: 6px;
+      background: #fafafa;
+      color: #444;
+      cursor: pointer;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .emotion-composer__option:hover,
+    .emotion-composer__option:focus-visible {
+      border-color: #080808;
+      outline: none;
+    }
+
+    .emotion-composer__option.is-active {
+      border-color: #080808;
+      background: #48ff42;
+      color: #080808;
+      box-shadow: 2px 2px 0 #080808;
+      transform: translate(-1px, -1px);
+    }
+
+    .emotion-composer__apply {
+      justify-self: start;
+      height: 40px;
+      padding: 0 14px;
+      border: 2px solid #080808;
+      border-radius: 6px;
+      background: #080808;
+      color: #fff;
+      cursor: pointer;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .emotion-composer__apply:hover,
+    .emotion-composer__apply:focus-visible {
+      box-shadow: 3px 3px 0 #48ff42;
+      outline: none;
+      transform: translate(-1px, -1px);
+    }
+
+    .emotion-composer__field--blink {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-block: 8px;
+    }
+
+    .emotion-composer__field--blink .emotion-composer__label {
+      display: inline;
+      margin: 0;
+      cursor: pointer;
+    }
+
     /* ---- Footer: GitHub repo link (theme-matched) ---- */
     .footer {
       text-align: center;
@@ -470,6 +706,90 @@
       font-size: 16px;
     }
 
+    /* ---- Custom color pickers (native <input type=color>) ---- */
+    .color-custom {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-content: center;
+    }
+
+    .color-field {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .color-field__label {
+      font-size: 12px;
+      font-weight: 800;
+      color: #777;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      white-space: nowrap;
+    }
+
+    .color-field__picker {
+      position: relative;
+      display: inline-block;
+      padding: 0;
+      width: 46px;
+      height: 34px;
+      border: 2px solid #080808;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 3px 3px 0 #080808;
+      cursor: pointer;
+      overflow: hidden;
+      transition: transform .15s, box-shadow .15s;
+    }
+
+    .color-field__picker:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0 #080808;
+    }
+
+    .color-field__picker:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0 #080808;
+    }
+
+    .color-field__picker input[type="color"] {
+      -webkit-appearance: none;
+      appearance: none;
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      width: calc(100% + 8px);
+      height: calc(100% + 8px);
+      border: none;
+      padding: 0;
+      background: none;
+      cursor: pointer;
+    }
+
+    .color-field__picker input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    .color-field__picker input[type="color"]::-webkit-color-swatch {
+      border: none;
+      border-radius: 0;
+    }
+
+    /* ---- Preset palette grid heading ---- */
+    .panel-subtitle {
+      display: block;
+      margin: 4px 0 14px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #777;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
     @media (max-width: 720px) {
       .view-mode {
         justify-content: center;
@@ -480,8 +800,16 @@
         grid-template-columns: repeat(3, 1fr);
       }
 
+      .theme-controls {
+        grid-template-columns: 1fr;
+      }
+
       .emotion-grid {
         grid-template-columns: repeat(3, 1fr);
+      }
+
+      .emotion-composer__field--actions {
+        grid-template-columns: 1fr;
       }
 
       .lang-switch {
@@ -516,21 +844,60 @@
             <div class="view-mode__control">
               <span class="view-mode__label" id="view-mode-label"></span>
               <div class="view-mode__group" role="group" aria-labelledby="view-mode-label">
-                <button type="button" class="view-mode__btn view-mode__mode-btn" data-mode="2d" aria-pressed="false">2D</button>
-                <button type="button" class="view-mode__btn view-mode__mode-btn is-active" data-mode="3d" aria-pressed="true">3D</button>
+                <button type="button" class="view-mode__btn view-mode__mode-btn" data-mode="2d"
+                  aria-pressed="false">2D</button>
+                <button type="button" class="view-mode__btn view-mode__mode-btn is-active" data-mode="3d"
+                  aria-pressed="true">3D</button>
               </div>
             </div>
             <div class="view-mode__control">
               <span class="view-mode__label" id="outline-label"></span>
               <div class="view-mode__group" role="group" aria-labelledby="outline-label">
-                <button type="button" class="view-mode__btn view-mode__outline-btn is-active" data-outline="visible" aria-pressed="true"></button>
-                <button type="button" class="view-mode__btn view-mode__outline-btn" data-outline="hidden" aria-pressed="false"></button>
+                <button type="button" class="view-mode__btn view-mode__outline-btn is-active" data-outline="visible"
+                  aria-pressed="true"></button>
+                <button type="button" class="view-mode__btn view-mode__outline-btn" data-outline="hidden"
+                  aria-pressed="false"></button>
               </div>
+            </div>
+          </div>
+          <div class="face-variants" id="face-variants">
+            <span class="face-variants__label" id="face-label">五官</span>
+            <div class="face-variants__grid" role="group" aria-labelledby="face-label">
+              <button type="button" class="face-variant is-active" data-face="default" aria-pressed="true">
+                <svg class="face-variant__preview" viewBox="0 0 64 64" aria-hidden="true">
+                  <ellipse cx="16" cy="41" rx="5" ry="3" fill="#ff9fb6" />
+                  <ellipse cx="48" cy="41" rx="5" ry="3" fill="#ff9fb6" />
+                  <ellipse cx="22" cy="28" rx="7" ry="8" fill="#fff" stroke="#080808" stroke-width="2.5" />
+                  <circle cx="22" cy="29" r="4" fill="#080808" />
+                  <circle cx="23.6" cy="27" r="1.4" fill="#fff" />
+                  <ellipse cx="42" cy="28" rx="7" ry="8" fill="#fff" stroke="#080808" stroke-width="2.5" />
+                  <circle cx="42" cy="29" r="4" fill="#080808" />
+                  <circle cx="43.6" cy="27" r="1.4" fill="#fff" />
+                  <path d="M26 40 Q32 46 38 40" fill="none" stroke="#080808" stroke-width="2.5"
+                    stroke-linecap="round" />
+                </svg>
+                <span class="face-variant__name" data-face-name="default">默认</span>
+              </button>
+              <button type="button" class="face-variant" data-face="simple" aria-pressed="false">
+                <svg class="face-variant__preview" viewBox="0 0 64 64" aria-hidden="true">
+                  <rect x="18.5" y="17" width="7" height="22" rx="3.5" fill="#080808" />
+                  <rect x="38.5" y="17" width="7" height="22" rx="3.5" fill="#080808" />
+                </svg>
+                <span class="face-variant__name" data-face-name="simple">简约</span>
+              </button>
+              <button type="button" class="face-variant" data-face="dot" aria-pressed="false">
+                <svg class="face-variant__preview" viewBox="0 0 64 64" aria-hidden="true">
+                  <circle cx="22" cy="28" r="5.5" fill="#080808" />
+                  <circle cx="42" cy="28" r="5.5" fill="#080808" />
+                </svg>
+                <span class="face-variant__name" data-face-name="dot">圆点</span>
+              </button>
             </div>
           </div>
         </div>
         <div class="tabs__panel" id="panel-color"></div>
         <div class="tabs__panel" id="panel-emotion"></div>
+        <div class="tabs__panel" id="panel-composer"></div>
       </div>
     </div>
 
@@ -542,41 +909,27 @@
     </footer>
   </main>
 
-  <script src="src/core/emotions.js"></script>
-  <script src="src/core/rig.js"></script>
-  <script src="src/lively-mascot.js"></script>
-  <script src="src/characters/sprout.js"></script>
-  <script src="src/characters/cat.js"></script>
-  <script src="src/characters/robot.js"></script>
-  <script src="src/characters/ghost.js"></script>
-  <script src="src/characters/jelly.js"></script>
+  <script src="dist/lively-mascot.min.js"></script>
   <script>
     // ============================================================
     // i18n dictionary
     // ============================================================
     var I18N = {
       zh: {
-        tagline: '通用电子宠物引擎：40 种状态表情 · 多角色 · 纯 SVG 驱动 · 零依赖 · 即插即用。',
+        tagline: '通用电子宠物引擎：多角色 · 纯 SVG 驱动 · 零依赖 · 即插即用。',
         hint: '把光标移到吉祥物上 · 点击让它开心',
         repoLabel: '在 GitHub 上查看源码',
         viewMode: '视图', outline: '边框', outlineOn: '显示', outlineOff: '隐藏',
-        charNames: {
-          sprout: '🌱 嫩芽', cat: '🐱 小猫', robot: '🤖 机器人',
-          ghost: '👻 幽灵', jelly: '🟢 果冻'
-        },
-        tabs: ['参数', '颜色', '表情'],
+        face: '五官', faceDefault: '默认', faceSimple: '简约', faceDot: '圆点',
+        tabs: ['参数', '颜色', '表情', '动作编排'],
+        colorFields: { body: '身体', outline: '描边', accent: '点缀' },
+        presetTitle: '预设配色',
         palette: ['薄荷绿', '天空蓝', '蜜桃橙', '薰衣草紫', '玫瑰粉', '柠檬黄'],
         groupNames: {
           lifecycle: '生命周期', reaction: '情绪反应', work: '工作状态'
         },
-        clickName: function (type) {
-          return {
-            sprout: '嫩芽',
-            cat: '喵！',
-            robot: '哔哔！',
-            ghost: '呜～',
-            jelly: '啵！'
-          }[type] || '嫩芽';
+        emotionComposer: {
+          title: '动作编排', apply: '应用编排', customName: '自定义动作', blink: '快速眨眼'
         },
         sayGreeting: function (name, time) {
           return name + ' 说：你好！（点击于 ' + (time || new Date()).toLocaleTimeString() + '）';
@@ -586,27 +939,20 @@
         }
       },
       en: {
-        tagline: 'Universal e-pet engine: 40 status emotions · multi-character · pure SVG · zero deps · drop-in.',
+        tagline: 'Universal e-pet engine: multi-character · pure SVG · zero deps · drop-in.',
         hint: 'Hover the mascot · click to make it happy',
         repoLabel: 'View source on GitHub',
         viewMode: 'View', outline: 'Outline', outlineOn: 'On', outlineOff: 'Off',
-        charNames: {
-          sprout: '🌱 Sprout', cat: '🐱 Cat', robot: '🤖 Robot',
-          ghost: '👻 Ghost', jelly: '🟢 Jelly'
-        },
-        tabs: ['Parameters', 'Color', 'Emotion'],
+        face: 'Face', faceDefault: 'Default', faceSimple: 'Simple', faceDot: 'Dot',
+        tabs: ['Parameters', 'Color', 'Emotion', 'Actions'],
+        colorFields: { body: 'Body', outline: 'Outline', accent: 'Accent' },
+        presetTitle: 'Presets',
         palette: ['Mint', 'Sky Blue', 'Peach', 'Lavender', 'Rose', 'Lemon'],
         groupNames: {
           lifecycle: 'Lifecycle', reaction: 'Reactions', work: 'Work states'
         },
-        clickName: function (type) {
-          return {
-            sprout: 'Sprout',
-            cat: 'Meow!',
-            robot: 'Beep!',
-            ghost: 'Boo!',
-            jelly: 'Plop!'
-          }[type] || 'Sprout';
+        emotionComposer: {
+          title: 'Action composer', apply: 'Apply actions', customName: 'Custom action', blink: 'Fast blink'
         },
         sayGreeting: function (name, time) {
           return name + ' says: hello! (clicked at ' + (time || new Date()).toLocaleTimeString() + ')';
@@ -627,18 +973,38 @@
 
     // ---- Current mascot instance ----
     var hero = null;
-    var currentCharType = 'sprout';
+    var currentCharType;
     var currentViewMode = '3d';
     var outlineVisible = true;
+    var currentFaceVariant = 'default';
     var currentTheme = null;
-    var CHAR_DEFAULT_THEMES = {
-      sprout: { body: '#48ff42', outline: '#080808', accent: '#ff9fb6' },
-      cat: { body: '#3d4852', outline: '#131a20', accent: '#eeb3c1' },
-      robot: { body: '#6f879b', outline: '#162332', accent: '#74e5ff' },
-      ghost: { body: '#bdeef2', outline: '#23434d', accent: '#a9d9ff' },
-      jelly: { body: '#f29cc2', outline: '#5a243e', accent: '#ffe0a8' }
-    };
+    var currentEmotionId = '02';
     var previewInstances = []; // static thumbnails in the emotion gallery
+
+    function getPresentation(type) {
+      var model = LivelyMascot.models[type] || {};
+      return model.presentation || { labels: {}, greeting: {}, theme: {}, order: 1000, icon: '' };
+    }
+
+    function getModelLabel(type) {
+      var model = LivelyMascot.models[type] || {};
+      var presentation = getPresentation(type);
+      return (presentation.labels && presentation.labels[currentLang]) || model.name || type;
+    }
+
+    function getModelGreeting(type) {
+      var presentation = getPresentation(type);
+      return (presentation.greeting && presentation.greeting[currentLang]) || getModelLabel(type);
+    }
+
+    function getDefaultTheme(type) {
+      return Object.assign({}, getPresentation(type).theme || {});
+    }
+
+    function applyModelTheme(instance, type) {
+      var theme = currentTheme || getDefaultTheme(type);
+      if (theme.body || theme.outline || theme.accent) instance.setTheme(theme);
+    }
 
     function createHero(type) {
       if (hero) hero.destroy();
@@ -650,29 +1016,35 @@
         viewMode: currentViewMode,
         outlineVisible: outlineVisible,
         hopInterval: [3, 6],
-        onClick: function () { say(function () { return T().sayGreeting(T().clickName(type), new Date()); }); },
+        onClick: function () { say(function () { return T().sayGreeting(getModelGreeting(type), new Date()); }); },
       });
+      hero.setFaceVariant(currentFaceVariant);
       currentCharType = type;
-      hero.setTheme(currentTheme || CHAR_DEFAULT_THEMES[type]);
-      var activeEmotion = document.querySelector('.emotion-item.is-active');
-      if (activeEmotion) {
-        hero.setEmotion(activeEmotion.dataset.emotionId);
-      }
+      applyModelTheme(hero, type);
+      if (typeof syncColorInputs === 'function') syncColorInputs();
+      if (LivelyMascot.emotions[currentEmotionId]) hero.setEmotion(currentEmotionId);
     }
 
     // ---- Character Bar ----
     var charBar = document.getElementById('char-bar');
-    var charTypes = ['sprout', 'cat', 'robot', 'ghost', 'jelly'];
+    var charTypes = Object.keys(LivelyMascot.models).sort(function (a, b) {
+      var orderA = getPresentation(a).order;
+      var orderB = getPresentation(b).order;
+      return orderA - orderB || a.localeCompare(b);
+    });
+    currentCharType = LivelyMascot.models.sprout ? 'sprout' : charTypes[0];
     var charBtns = [];
 
     charTypes.forEach(function (type) {
       var btn = document.createElement('button');
-      btn.className = 'char-btn' + (type === 'sprout' ? ' is-active' : '');
+      btn.className = 'char-btn' + (type === currentCharType ? ' is-active' : '');
       btn.dataset.type = type;
       btn.addEventListener('click', function () {
         charBtns.forEach(function (b) { b.classList.remove('is-active'); });
         btn.classList.add('is-active');
+        currentEmotionId = '02';
         createHero(type);
+        renderActionFields();
         renderEmotionPreviews();
       });
       charBar.appendChild(btn);
@@ -710,6 +1082,31 @@
         syncOutlineToggle();
         if (hero) hero.setOutlineVisible(outlineVisible);
         previewInstances.forEach(function (pInst) { pInst.setOutlineVisible(outlineVisible); });
+      });
+    });
+
+    // ---- Face variant toggle ----
+    var faceBtns = Array.prototype.slice.call(document.querySelectorAll('.face-variant'));
+    function syncFaceVariant() {
+      faceBtns.forEach(function (btn) {
+        var active = btn.dataset.face === currentFaceVariant;
+        btn.classList.toggle('is-active', active);
+        btn.setAttribute('aria-pressed', String(active));
+        var t = T();
+        var nameEl = btn.querySelector('.face-variant__name');
+        if (nameEl) {
+          if (btn.dataset.face === 'default') nameEl.textContent = t.faceDefault;
+          else if (btn.dataset.face === 'simple') nameEl.textContent = t.faceSimple;
+          else if (btn.dataset.face === 'dot') nameEl.textContent = t.faceDot;
+        }
+      });
+    }
+    faceBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        currentFaceVariant = btn.dataset.face;
+        syncFaceVariant();
+        if (hero) hero.setFaceVariant(currentFaceVariant);
+        previewInstances.forEach(function (pInst) { pInst.setFaceVariant(currentFaceVariant); });
       });
     });
 
@@ -755,6 +1152,99 @@
     paletteGrid.className = 'palette';
     var paletteCaptions = [];
     var activeSwatch = null;
+    var colorInputs = {};
+    var themeControls = document.createElement('div');
+    themeControls.className = 'theme-controls';
+
+    var defaultThemeButton = document.createElement('button');
+    defaultThemeButton.type = 'button';
+    defaultThemeButton.className = 'model-default-theme';
+    defaultThemeButton.setAttribute('aria-label', 'Restore model default colors');
+    var defaultThemeCopy = document.createElement('span');
+    defaultThemeCopy.className = 'model-default-theme__copy';
+    var defaultThemeTitle = document.createElement('span');
+    defaultThemeTitle.className = 'model-default-theme__title';
+    var defaultThemeHint = document.createElement('span');
+    defaultThemeHint.className = 'model-default-theme__hint';
+    defaultThemeCopy.appendChild(defaultThemeTitle);
+    defaultThemeCopy.appendChild(defaultThemeHint);
+    var defaultThemeSwatches = document.createElement('span');
+    defaultThemeSwatches.className = 'model-default-theme__swatches';
+    var defaultThemeSwatchEls = {};
+    ['body', 'outline', 'accent'].forEach(function (key) {
+      var swatch = document.createElement('span');
+      swatch.className = 'model-default-theme__swatch';
+      swatch.dataset.themeKey = key;
+      swatch.title = key;
+      defaultThemeSwatches.appendChild(swatch);
+      defaultThemeSwatchEls[key] = swatch;
+    });
+    defaultThemeButton.appendChild(defaultThemeCopy);
+    defaultThemeButton.appendChild(defaultThemeSwatches);
+    defaultThemeButton.addEventListener('click', function () {
+      currentTheme = getDefaultTheme(currentCharType);
+      applyThemeToAll();
+      syncColorInputs();
+      if (activeSwatch) { activeSwatch.classList.remove('is-active'); activeSwatch = null; }
+    });
+    function syncDefaultThemeCard() {
+      var theme = getDefaultTheme(currentCharType);
+      var label = getModelLabel(currentCharType);
+      defaultThemeTitle.textContent = currentLang === 'zh' ? label + '默认色' : label + ' default';
+      defaultThemeHint.textContent = currentLang === 'zh' ? '点击恢复该模型配色' : 'Click to restore model colors';
+      ['body', 'outline', 'accent'].forEach(function (key) {
+        defaultThemeSwatchEls[key].style.background = theme[key] || '#fff';
+      });
+    }
+
+    // ---- Custom color pickers (native <input type=color>) ----
+    var presetTitle = document.createElement('span');
+    presetTitle.className = 'panel-subtitle';
+
+    var colorCustom = document.createElement('div');
+    colorCustom.className = 'color-custom';
+    var colorKeys = ['body', 'outline', 'accent'];
+    colorKeys.forEach(function (key) {
+      var field = document.createElement('label');
+      field.className = 'color-field';
+      var label = document.createElement('span');
+      label.className = 'color-field__label';
+      label.dataset.colorKey = key;
+      var picker = document.createElement('span');
+      picker.className = 'color-field__picker';
+      var input = document.createElement('input');
+      input.type = 'color';
+      input.dataset.key = key;
+      input.addEventListener('input', function () {
+        if (!currentTheme) currentTheme = getDefaultTheme(currentCharType);
+        currentTheme[key] = input.value;
+        applyThemeToAll();
+        if (activeSwatch) { activeSwatch.classList.remove('is-active'); activeSwatch = null; }
+      });
+      picker.appendChild(input);
+      field.appendChild(label);
+      field.appendChild(picker);
+      colorCustom.appendChild(field);
+      colorInputs[key] = input;
+    });
+    themeControls.appendChild(defaultThemeButton);
+    themeControls.appendChild(colorCustom);
+    palettePanel.appendChild(themeControls);
+    palettePanel.appendChild(presetTitle);
+
+    // keep the three pickers in sync with whatever theme is currently applied
+    function syncColorInputs() {
+      var t = currentTheme || getDefaultTheme(currentCharType);
+      if (/^#[0-9a-f]{6}$/i.test(t.body)) colorInputs.body.value = t.body;
+      if (/^#[0-9a-f]{6}$/i.test(t.outline)) colorInputs.outline.value = t.outline;
+      if (/^#[0-9a-f]{6}$/i.test(t.accent)) colorInputs.accent.value = t.accent;
+      syncDefaultThemeCard();
+    }
+
+    function applyThemeToAll() {
+      hero.setTheme(currentTheme);
+      previewInstances.forEach(function (pInst) { pInst.setTheme(currentTheme); });
+    }
 
     palettes.forEach(function (p) {
       var fig = document.createElement('figure');
@@ -767,9 +1257,13 @@
       fig.appendChild(swatch);
       fig.appendChild(caption);
       fig.addEventListener('click', function () {
-        currentTheme = { body: p.color, outline: p.outline, accent: p.accent };
-        hero.setTheme(currentTheme);
-        previewInstances.forEach(function (pInst) { pInst.setTheme(currentTheme); });
+        currentTheme = {
+          body: p.color,
+          outline: p.outline,
+          accent: p.accent || (currentTheme && currentTheme.accent) || getDefaultTheme(currentCharType).accent
+        };
+        applyThemeToAll();
+        syncColorInputs();
         if (activeSwatch) activeSwatch.classList.remove('is-active');
         fig.classList.add('is-active');
         activeSwatch = fig;
@@ -781,6 +1275,7 @@
 
     // ---- Emotion Panel (Sub Tabs) ----
     var emotionPanel = document.getElementById('panel-emotion');
+    var composerPanel = document.getElementById('panel-composer');
     var groups = LivelyMascot.emotionGroups;
     var emotions = LivelyMascot.emotions;
     var groupKeys = Object.keys(groups);
@@ -793,6 +1288,108 @@
     var subBtns = [];
     var subPanels = [];
     var subCaptions = [];
+
+    var composer = document.createElement('section');
+    composer.className = 'emotion-composer';
+    var composerTitle = document.createElement('h2');
+    composerTitle.className = 'emotion-composer__title';
+    composer.appendChild(composerTitle);
+
+    var actionFields = document.createElement('div');
+    actionFields.className = 'emotion-composer__field emotion-composer__field--actions';
+    var selectedActions = {};
+    var actionFieldsByPart = {};
+    function getPartLabel(part) {
+      var labels = {
+        body: { zh: '身体动作', en: 'Body motion' },
+        eyes: { zh: '眼睛状态', en: 'Eye state' },
+        mouth: { zh: '嘴巴状态', en: 'Mouth state' },
+        top: { zh: '顶部装饰', en: 'Top detail' },
+        feet: { zh: '脚步动作', en: 'Feet motion' },
+        tail: { zh: '尾巴动作', en: 'Tail motion' },
+        accessory: { zh: '配件状态', en: 'Accessory' }
+      };
+      return (labels[part] && labels[part][currentLang]) || part;
+    }
+    function renderActionFields() {
+      actionFields.textContent = '';
+      selectedActions = {};
+      actionFieldsByPart = {};
+      var model = LivelyMascot.models[currentCharType];
+      Object.keys(model.parts || {}).forEach(function (part) {
+        var actions = model.parts[part].actions || [];
+        if (!actions.length || part === 'pupils' || part === 'face') return;
+        var field = document.createElement('div');
+        field.className = 'emotion-composer__field';
+        var label = document.createElement('div');
+        label.className = 'emotion-composer__label';
+        label.textContent = getPartLabel(part);
+        var options = document.createElement('div');
+        options.className = 'emotion-composer__options';
+        options.setAttribute('role', 'group');
+        options.setAttribute('aria-label', getPartLabel(part));
+        actions.forEach(function (action) {
+          var option = document.createElement('button');
+          option.type = 'button';
+          option.className = 'emotion-composer__option';
+          option.textContent = action;
+          option.setAttribute('aria-pressed', 'false');
+          option.addEventListener('click', function () {
+            var isSelected = selectedActions[part] === action;
+            if (isSelected) delete selectedActions[part];
+            else selectedActions[part] = action;
+            Array.prototype.forEach.call(options.children, function (button) {
+              var active = !isSelected && button === option;
+              button.classList.toggle('is-active', active);
+              button.setAttribute('aria-pressed', String(active));
+            });
+          });
+          options.appendChild(option);
+        });
+        field.appendChild(label);
+        field.appendChild(options);
+        actionFields.appendChild(field);
+        actionFieldsByPart[part] = options;
+      });
+      var blinkField = document.createElement('label');
+      blinkField.className = 'emotion-composer__field emotion-composer__field--blink';
+      var blinkLabel = document.createElement('span');
+      blinkLabel.className = 'emotion-composer__label';
+      var blink = document.createElement('input');
+      blink.type = 'checkbox';
+      blink.className = 'emotion-composer__blink';
+      blinkLabel.appendChild(blink);
+      blinkLabel.appendChild(document.createTextNode(' ' + T().emotionComposer.blink));
+      blinkField.appendChild(blinkLabel);
+      actionFields.appendChild(blinkField);
+      actionFieldsByPart.__blink = blink;
+    }
+    renderActionFields();
+    composer.appendChild(actionFields);
+
+    var applyCustomEmotion = document.createElement('button');
+    applyCustomEmotion.type = 'button';
+    applyCustomEmotion.className = 'emotion-composer__apply';
+    applyCustomEmotion.addEventListener('click', function () {
+      var behaviors = Object.keys(selectedActions).filter(function (key) { return key !== '__blink'; }).map(function (part) { return part + '-' + selectedActions[part]; });
+      if (!behaviors.length) behaviors = ['idle'];
+      var custom = {
+        recipe: { parts: Object.assign({}, selectedActions) },
+        blink: actionFieldsByPart.__blink.checked ? 'fast' : true
+      };
+      delete custom.recipe.parts.__blink;
+      custom.id = 'demo-custom-mix';
+      custom.name = T().emotionComposer.customName;
+      custom.group = 'custom';
+      custom.desc = behaviors.join(' + ');
+      custom.behaviors = behaviors;
+      LivelyMascot.defineEmotion(custom);
+      currentEmotionId = custom.id;
+      hero.setEmotion(custom.id);
+      emotionPanel.querySelectorAll('.emotion-item.is-active').forEach(function (item) { item.classList.remove('is-active'); });
+      say(function () { return T().sayEmotion(T().emotionComposer.customName + ' · ' + behaviors.join(' + ')); });
+    });
+    composer.appendChild(applyCustomEmotion);
 
     groupOrder.forEach(function (key, i) {
       var btn = document.createElement('button');
@@ -826,10 +1423,11 @@
         item.appendChild(nameEl);
         item.appendChild(descEl);
         item.addEventListener('click', function () {
+          currentEmotionId = e.id;
           hero.setEmotion(e.id);
           emotionPanel.querySelectorAll('.emotion-item.is-active').forEach(function (a) { a.classList.remove('is-active'); });
           item.classList.add('is-active');
-          say(function () { return T().sayEmotion(currentLang === 'zh' ? ZH_NAME[e.id] : e.name); });
+          say(function () { return T().sayEmotion(getEmotionLabel(e)); });
         });
         grid.appendChild(item);
       });
@@ -838,6 +1436,7 @@
       subPanels.push(panel);
     });
 
+    composerPanel.appendChild(composer);
     emotionPanel.appendChild(subBar);
     subPanels.forEach(function (p) { emotionPanel.appendChild(p); });
 
@@ -858,8 +1457,9 @@
           viewMode: currentViewMode,
           outlineVisible: outlineVisible
         });
+        inst.setFaceVariant(currentFaceVariant);
         inst.setEmotion(item.dataset.emotionId);
-        inst.setTheme(currentTheme || CHAR_DEFAULT_THEMES[currentCharType]);
+        applyModelTheme(inst, currentCharType);
         previewInstances.push(inst);
       });
     }
@@ -873,7 +1473,9 @@
       document.getElementById('repo-label').textContent = t.repoLabel;
       document.getElementById('view-mode-label').textContent = t.viewMode;
       document.getElementById('outline-label').textContent = t.outline;
+      document.getElementById('face-label').textContent = t.face;
       syncOutlineToggle();
+      syncFaceVariant();
       toggleButtons.forEach(function (b) {
         b.classList.toggle('is-active', b.dataset.lang === currentLang);
       });
@@ -888,7 +1490,8 @@
 
       // Character bar
       charBtns.forEach(function (btn) {
-        btn.textContent = t.charNames[btn.dataset.type];
+        var presentation = getPresentation(btn.dataset.type);
+        btn.textContent = (presentation.icon ? presentation.icon + ' ' : '') + getModelLabel(btn.dataset.type);
       });
 
       // Main tabs
@@ -899,47 +1502,41 @@
         cap.textContent = currentLang === 'zh' ? palettes[i].name : palettes[i].en;
       });
 
+      // Custom picker labels + preset subtitle
+      if (presetTitle) presetTitle.textContent = t.presetTitle;
+      syncDefaultThemeCard();
+      defaultThemeButton.setAttribute('aria-label', currentLang === 'zh' ? '恢复模型默认配色' : 'Restore model default colors');
+      document.querySelectorAll('.color-field__label').forEach(function (lab) {
+        lab.textContent = t.colorFields[lab.dataset.colorKey];
+      });
+
       // Emotion sub-tab captions
       subCaptions.forEach(function (cap, i) {
         var key = groupOrder[i];
-        cap.textContent = t.groupNames[key] + ' (' + subCounts[i] + ')';
+        cap.textContent = (t.groupNames[key] || groups[key].name || key) + ' (' + subCounts[i] + ')';
       });
+
+      composerTitle.textContent = t.emotionComposer.title;
+      applyCustomEmotion.textContent = t.emotionComposer.apply;
+      if (actionFieldsByPart.__blink) actionFieldsByPart.__blink.nextSibling.textContent = ' ' + t.emotionComposer.blink;
 
       // Emotion item names + descriptions
       document.querySelectorAll('.emotion-item').forEach(function (item) {
         var e = emotions[item.dataset.emotionId];
-        item.querySelector('.emotion-item__name').textContent = currentLang === 'zh' ? ZH_NAME[e.id] : e.name;
-        var enDesc = EN_DESC[e.id];
-        var desc = currentLang === 'zh' ? e.desc : enDesc;
+        var desc = getEmotionDescription(e);
+        item.querySelector('.emotion-item__name').textContent = getEmotionLabel(e);
         item.querySelector('.emotion-item__desc').textContent = desc;
-        item.title = e.id + ' - ' + (currentLang === 'zh' ? ZH_NAME[e.id] : e.name) + ': ' + desc;
+        item.title = e.id + ' - ' + getEmotionLabel(e) + ': ' + desc;
       });
     }
 
-    // English descriptions for emotions (zh desc already lives in emotions.js)
-    var EN_DESC = {
-      "00": "Deep sleep", "01": "Just woke", "02": "Idle", "03": "Calm breathing",
-      "04": "Standing by", "05": "Paused", "06": "Refreshing", "07": "Low battery",
-      "08": "Offline", "09": "Booting",
-      "10": "Happy", "11": "Excited", "12": "Sad", "13": "Angry", "14": "Surprised",
-      "15": "Shy", "16": "In love", "17": "Confused", "18": "Cool", "19": "Smug",
-      "20": "Thinking", "21": "Listening", "22": "Talking", "23": "Searching",
-      "24": "Reading", "25": "Writing", "26": "Coding", "27": "Designing",
-      "28": "Loading", "29": "Processing", "30": "Success", "31": "Error",
-      "32": "Grateful", "33": "Retrying", "34": "Cancelled", "35": "Crying",
-      "36": "Bored", "37": "Nervous", "38": "Eureka", "39": "Waiting"
-    };
-    // Chinese names for emotions (zh desc already lives in emotions.js)
-    var ZH_NAME = {
-      "00": "睡眠", "01": "醒来", "02": "待机", "03": "呼吸", "04": "待命",
-      "05": "暂停", "06": "刷新", "07": "低电量", "08": "离线", "09": "启动",
-      "10": "开心", "11": "兴奋", "12": "难过", "13": "生气", "14": "惊讶",
-      "15": "害羞", "16": "心动", "17": "困惑", "18": "耍酷", "19": "得意",
-      "20": "思考", "21": "倾听", "22": "说话", "23": "搜索", "24": "阅读",
-      "25": "写作", "26": "编程", "27": "设计", "28": "加载", "29": "处理",
-      "30": "成功", "31": "错误", "32": "感谢", "33": "重试", "34": "取消",
-      "35": "哭泣", "36": "无聊", "37": "紧张", "38": "顿悟", "39": "等待"
-    };
+    function getEmotionLabel(emotion) {
+      return currentLang === 'zh' ? (emotion.desc || emotion.name || emotion.id) : (emotion.name || emotion.id);
+    }
+
+    function getEmotionDescription(emotion) {
+      return currentLang === 'zh' ? (emotion.desc || emotion.name || '') : (emotion.name || emotion.desc || '');
+    }
 
     // Cache sub-tab counts (stable across languages)
     var subCounts = groupOrder.map(function (key) {
@@ -960,7 +1557,7 @@
     });
 
     // ---- Init ----
-    createHero('sprout');
+    createHero(currentCharType);
     applyLanguage();
   </script>
 </body>

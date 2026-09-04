@@ -1,0 +1,4 @@
+interface:
+  display_name: "Image to Lively Mascot Model"
+  short_description: "Extract an image into a rigged SVG/HTML mascot"
+  default_prompt: "Use $lively-mascot-image-model to fetch the standalone Lively Mascot project from https://github.com/jingluoguo/lively-mascot.git and extract the supplied image into a rigged SVG model. Keep the body upright, use stable pupil clip wrappers, transform whole eye groups for expressions, use semantic emotion behavior tags with rig capability overrides only for physical limitations, animate emotion accessories such as tears and sweat locally, and make 3D visibly layered through independent nested SVG artwork planes without overriding the SDK camera layer."

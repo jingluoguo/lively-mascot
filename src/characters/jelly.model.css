@@ -29,17 +29,14 @@
   75% { transform: scale(1.03, 0.97); border-radius: 44% 44% 50% 50% / 50% 50% 52% 52%; }
 }
 
-/* jelly never hops (no feet) */
-.lively-mascot--jelly.is-hopping .lively-mascot__rig { animation: none; }
-
-/* a couple of emotion-driven jelly reactions on top of face changes */
-.lively-mascot--jelly.is-emotion-10 .lively-body,
-.lively-mascot--jelly.is-emotion-30 .lively-body,
-.lively-mascot--jelly.is-emotion-38 .lively-body {
+/* Local behavior tags let Jelly react to semantic states, not emotion IDs. */
+.lively-mascot--jelly[data-mascot-behaviors~="happy"] .lively-body,
+.lively-mascot--jelly[data-mascot-behaviors~="success"] .lively-body,
+.lively-mascot--jelly[data-mascot-behaviors~="eureka"] .lively-body {
   animation: lively-jelly-bounce 0.7s cubic-bezier(.3,1.5,.5,1);
 }
-.lively-mascot--jelly.is-emotion-12 .lively-body,
-.lively-mascot--jelly.is-emotion-35 .lively-body {
+.lively-mascot--jelly[data-mascot-behaviors~="sad"] .lively-body,
+.lively-mascot--jelly[data-mascot-behaviors~="crying"] .lively-body {
   animation: lively-jelly-sad 3s ease-in-out infinite;
 }
 @keyframes lively-jelly-bounce {

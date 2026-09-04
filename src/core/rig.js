@@ -17,6 +17,8 @@ function createRig(root, rigEl, config, handlers) {
   handlers = handlers || {};
   var animated = config.animated !== false;
   var followCursor = config.followCursor !== false;
+  var gazeScope = config.gazeScope === "eyes" ? "eyes" : "model";
+  var rigCapabilities = config.rig || { blink: true, gaze: true, hop: true, spin: true };
   var gazeRadiusX = config.gazeRadiusX || 200;
   var gazeRadiusY = config.gazeRadiusY || 160;
   var currentHopInterval = config.hopInterval === undefined ? [6, 13] : config.hopInterval;
@@ -32,15 +34,25 @@ function createRig(root, rigEl, config, handlers) {
   var leafUseLeafAnim = true;
   var feetEl = null;
   var gazeEl = null;
-  var faceAccessories = {};
-  var activeFaceAccessory = null;
+  var motionReduced = false;
+  var motionQuery = null;
+  var pointerListening = false;
+
+  function isMotionPaused() {
+    return motionReduced || (typeof document !== "undefined" && document.hidden === true);
+  }
 
   var api = {
     registerPupil: function (elm, spec) {
       for (var i = 0; i < pupils.length; i++) { if (pupils[i].el === elm) { pupils[i].spec = spec; return; } }
       pupils.push({ el: elm, spec: spec || { maxX: 8, maxY: 6 } });
     },
-    registerEye: function (elm) { if (eyes.indexOf(elm) === -1) eyes.push(elm); },
+    registerEye: function (elm, spec) {
+      for (var i = 0; i < eyes.length; i++) {
+        if (eyes[i].el === elm) { eyes[i].spec = spec || eyes[i].spec; return; }
+      }
+      eyes.push({ el: elm, spec: spec || { maxX: 0, maxY: 0, scale: 0 } });
+    },
     registerFace: function (elm) { face = elm; },
     registerBody: function (elm) { bodyEl = elm; },
     registerLeaf: function (elm, opts) {
@@ -50,25 +62,11 @@ function createRig(root, rigEl, config, handlers) {
     },
     registerFeet: function (elm) { feetEl = elm; },
     registerGazeWrap: function (elm) { gazeEl = elm; },
-    registerFaceAccessory: function (name, elm) {
-      if (!name || !elm) return;
-      faceAccessories[String(name)] = elm;
-      elm.classList.add("lively-face-accessory");
-      if (activeFaceAccessory === null) activeFaceAccessory = String(name);
-      elm.classList.toggle("is-active", activeFaceAccessory === String(name));
-    },
-    setFaceAccessory: function (name) {
-      var key = name == null ? null : String(name);
-      activeFaceAccessory = key;
-      for (var accessoryName in faceAccessories) {
-        if (Object.prototype.hasOwnProperty.call(faceAccessories, accessoryName)) {
-          faceAccessories[accessoryName].classList.toggle("is-active", accessoryName === key);
-        }
-      }
-    },
     setEmotionState: function (id) {
       currentEmotionId = String(id);
+      resetBlinkCycle();
       applyEmotionBehavior(currentEmotionId);
+      if (handlers.onEmotionChange) handlers.onEmotionChange(currentEmotionId);
       syncHop();
     }
   };
@@ -78,6 +76,13 @@ function createRig(root, rigEl, config, handlers) {
 
   // --- Emotion Behavior ---
   function getEmotionDef(id) { return LivelyEmotions[String(id)]; }
+
+  function emotionSeed(id) {
+    id = String(id || "");
+    var seed = 0;
+    for (var i = 0; i < id.length; i++) seed = (seed * 31 + id.charCodeAt(i)) % 1009;
+    return seed;
+  }
 
   function clearEmotionBehavior() {
     if (bodyEl) { bodyEl.style.animation = ""; bodyEl.style.filter = ""; }
@@ -123,9 +128,9 @@ function createRig(root, rigEl, config, handlers) {
     }
     // Refresh (06) + Loading (28): drive the entire rig (whole mascot
     // bounces / rotates with feet attached) instead of just the body.
-    if (id === "06" || id === "28") {
+    if (def.motionTarget === "rig") {
       if (bodyEl) bodyEl.style.animation = "";
-      rigEl.style.animation = def.bodyAnim || "";
+      rigEl.style.animation = rigCapabilities.spin !== false ? (def.bodyAnim || "") : "";
     } else {
       // Everything else: keep the rig stationary so overlays line up.
       rigEl.style.animation = "";
@@ -137,6 +142,7 @@ function createRig(root, rigEl, config, handlers) {
   var targetX = 0, targetY = 0, curX = 0, curY = 0;
 
   function shouldGaze() {
+    if (rigCapabilities.gaze === false) return false;
     // Explicit gaze:false emotions
     var def = getEmotionDef(currentEmotionId);
     if (def && def.gaze === false) return false;
@@ -156,6 +162,7 @@ function createRig(root, rigEl, config, handlers) {
   }
 
   function tick() {
+    if (isMotionPaused()) { raf = 0; return; }
     if (!shouldGaze()) { targetX = 0; targetY = 0; }
     curX += (targetX - curX) * 0.2;
     curY += (targetY - curY) * 0.2;
@@ -163,13 +170,33 @@ function createRig(root, rigEl, config, handlers) {
       var p = pupils[i];
       p.el.setAttribute("transform", "translate(" + (curX * p.spec.maxX).toFixed(2) + " " + (curY * p.spec.maxY).toFixed(2) + ")");
     }
+    for (var j = 0; j < eyes.length; j++) {
+      var eye = eyes[j];
+      eye.el.style.setProperty("--lively-gaze-x", (curX * (Number(eye.spec.maxX) || 0)).toFixed(2) + "px");
+      eye.el.style.setProperty("--lively-gaze-y", (curY * (Number(eye.spec.maxY) || 0)).toFixed(2) + "px");
+      var turnCurve = curX * Math.abs(curX);
+      eye.el.style.setProperty("--lively-gaze-rotate", (turnCurve * (Number(eye.spec.rotate) || 0)).toFixed(2) + "deg");
+      eye.el.style.setProperty("--lively-gaze-depth", (1 - Math.abs(curX) * (Number(eye.spec.depth) || 0)).toFixed(3));
+      eye.el.style.setProperty("--lively-gaze-height", (1 + curY * (Number(eye.spec.verticalScale) || 0)).toFixed(3));
+      var baseScale = 1 + Math.max(Math.abs(curX), Math.abs(curY)) * (Number(eye.spec.scale) || 0);
+      var sideScale = Number(eye.spec.sideScale) || 0;
+      if (eye.spec.side === "left" || eye.spec.side === "right") {
+        // The eye nearer the gaze direction narrows slightly; the far eye
+        // opens by the same cue, preserving a lively asymmetric read.
+        var toward = eye.spec.side === "left" ? -curX : curX;
+        baseScale -= toward * sideScale;
+      }
+      eye.el.style.setProperty("--lively-gaze-scale", baseScale.toFixed(3));
+    }
     if (face) face.setAttribute("transform", "rotate(" + (curX * 3).toFixed(2) + " 50 52)");
     var postureEl = gazeEl || rigEl;
-    if (root.classList.contains("lively-mascot--3d")) {
+    if (gazeScope === "eyes") {
+      postureEl.style.transform = "";
+    } else if (root.classList.contains("lively-mascot--3d")) {
       // Keep the character's parts in one shared 3D posture layer. Pointer
       // position steers the turn, while active expressions retain a subtle
       // living tilt after gaze tracking has intentionally paused.
-      var emotionPhase = performance.now() / 720 + Number(currentEmotionId || 0) * 0.67;
+      var emotionPhase = performance.now() / 720 + emotionSeed(currentEmotionId) * 0.67;
       var emotionPitch = currentEmotionId === "02" ? 0 : Math.sin(emotionPhase) * 1.2;
       var emotionYaw = currentEmotionId === "02" ? 0 : Math.cos(emotionPhase * 0.82) * 1.7;
       var pitch = 3.2 - curY * 7.2 + emotionPitch;
@@ -190,6 +217,7 @@ function createRig(root, rigEl, config, handlers) {
   // --- Blink ---
   var blinkTimer = 0, phaseTimer = 0;
   function scheduleBlink() {
+    if (!animated || isMotionPaused() || rigCapabilities.blink === false) return;
     var def = getEmotionDef(currentEmotionId);
     // No blink if disabled
     if (def && def.blink === false) {
@@ -198,14 +226,14 @@ function createRig(root, rigEl, config, handlers) {
     }
     var blinkDelay = def && def.blink === "fast" ? 800 + Math.random() * 1200 : 2200 + Math.random() * 2600;
     blinkTimer = window.setTimeout(function () {
-      for (var i = 0; i < eyes.length; i++) eyes[i].classList.add("is-blinking");
+      for (var i = 0; i < eyes.length; i++) eyes[i].el.classList.add("is-blinking");
       phaseTimer = window.setTimeout(function () {
-        for (var i = 0; i < eyes.length; i++) eyes[i].classList.remove("is-blinking");
+        for (var i = 0; i < eyes.length; i++) eyes[i].el.classList.remove("is-blinking");
         if (Math.random() < 0.18) {
           phaseTimer = window.setTimeout(function () {
-            for (var i = 0; i < eyes.length; i++) eyes[i].classList.add("is-blinking");
+            for (var i = 0; i < eyes.length; i++) eyes[i].el.classList.add("is-blinking");
             phaseTimer = window.setTimeout(function () {
-              for (var i = 0; i < eyes.length; i++) eyes[i].classList.remove("is-blinking");
+              for (var i = 0; i < eyes.length; i++) eyes[i].el.classList.remove("is-blinking");
               scheduleBlink();
             }, 90);
           }, 160);
@@ -214,13 +242,20 @@ function createRig(root, rigEl, config, handlers) {
     }, blinkDelay);
   }
 
+  function resetBlinkCycle() {
+    clearTimeout(blinkTimer);
+    clearTimeout(phaseTimer);
+    for (var i = 0; i < eyes.length; i++) eyes[i].el.classList.remove("is-blinking");
+    if (animated) scheduleBlink();
+  }
+
   // --- Hop ---
   var hopTimer = 0, hopResetTimer = 0;
 
   // A hop is an expression-specific action, never a background interruption.
   function canHop() {
     var def = getEmotionDef(currentEmotionId);
-    return animated && !!currentHopInterval && !!(def && def.hop);
+    return animated && rigCapabilities.hop !== false && !!currentHopInterval && !!(def && def.hop);
   }
 
   function stopHop() {
@@ -232,7 +267,7 @@ function createRig(root, rigEl, config, handlers) {
   }
 
   function scheduleHop() {
-    if (!canHop()) return;
+    if (isMotionPaused() || !canHop()) return;
     hopTimer = window.setTimeout(function () {
       if (!canHop()) return;
       setHopping(true);
@@ -248,30 +283,98 @@ function createRig(root, rigEl, config, handlers) {
     scheduleHop();
   }
 
+  var happyTimer = 0;
   function fireClick() {
     if (handlers.onClick) handlers.onClick();
     // Skip happy flash if a non-idle emotion is active (avoid face overlap)
     if (currentEmotionId !== "02") return;
+    resetBlinkCycle();
     setHappy(true);
-    setTimeout(function(){ setHappy(false); }, 950);
+    clearTimeout(happyTimer);
+    happyTimer = window.setTimeout(function(){ setHappy(false); }, 950);
   }
 
-  if (following) { raf = requestAnimationFrame(tick); window.addEventListener("pointermove", onPointerMove, { passive: true }); }
+  function onKeyDown(e) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      fireClick();
+    }
+  }
+
+  function resumeMotion() {
+    if (!animated || isMotionPaused()) return;
+    if (following && !raf) raf = requestAnimationFrame(tick);
+    scheduleBlink();
+    syncHop();
+  }
+
+  function pauseMotion() {
+    cancelAnimationFrame(raf); raf = 0;
+    clearTimeout(blinkTimer); clearTimeout(phaseTimer);
+    clearTimeout(hopTimer); clearTimeout(hopResetTimer);
+    blinkTimer = phaseTimer = hopTimer = hopResetTimer = 0;
+    setHopping(false);
+  }
+
+  function onVisibilityChange() { if (isMotionPaused()) pauseMotion(); else resumeMotion(); }
+  function onMotionPreferenceChange(event) {
+    motionReduced = event && event.matches === true;
+    onVisibilityChange();
+  }
+  function addPointerListener() {
+    if (pointerListening || typeof window === "undefined") return;
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    pointerListening = true;
+  }
+  function removePointerListener() {
+    if (!pointerListening || typeof window === "undefined") return;
+    window.removeEventListener("pointermove", onPointerMove);
+    pointerListening = false;
+  }
+  if (typeof window !== "undefined" && typeof window.matchMedia === "function") {
+    motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    motionReduced = motionQuery.matches === true;
+    if (typeof motionQuery.addEventListener === "function") motionQuery.addEventListener("change", onMotionPreferenceChange);
+    else if (typeof motionQuery.addListener === "function") motionQuery.addListener(onMotionPreferenceChange);
+  }
+  if (typeof document !== "undefined" && typeof document.addEventListener === "function") document.addEventListener("visibilitychange", onVisibilityChange);
+  if (following) { if (!isMotionPaused()) raf = requestAnimationFrame(tick); addPointerListener(); }
   if (animated) {
     scheduleBlink();
     syncHop();
+  }
+  if (handlers.onClick) {
     root.addEventListener("pointerdown", fireClick);
+    root.addEventListener("keydown", onKeyDown);
   }
 
+  var destroyed = false;
   return {
     api: api,
     click: fireClick,
-    setFollowCursor: function(e){ following=e; },
+    setFollowCursor: function(e){
+      following = e !== false;
+      if (following && animated) addPointerListener(); else removePointerListener();
+      if (following && animated && !isMotionPaused() && !raf) raf = requestAnimationFrame(tick);
+      if (!following) { cancelAnimationFrame(raf); raf = 0; }
+    },
     destroy: function() {
+      if (destroyed) return;
+      destroyed = true;
       cancelAnimationFrame(raf);
-      window.removeEventListener("pointermove", onPointerMove);
+      removePointerListener();
+      if (typeof document !== "undefined" && typeof document.removeEventListener === "function") document.removeEventListener("visibilitychange", onVisibilityChange);
+      if (motionQuery) {
+        if (typeof motionQuery.removeEventListener === "function") motionQuery.removeEventListener("change", onMotionPreferenceChange);
+        else if (typeof motionQuery.removeListener === "function") motionQuery.removeListener(onMotionPreferenceChange);
+      }
       clearTimeout(blinkTimer); clearTimeout(phaseTimer);
       clearTimeout(hopTimer); clearTimeout(hopResetTimer);
+      clearTimeout(happyTimer);
+      if (handlers.onClick) {
+        root.removeEventListener("pointerdown", fireClick);
+        root.removeEventListener("keydown", onKeyDown);
+      }
     }
   };
 }

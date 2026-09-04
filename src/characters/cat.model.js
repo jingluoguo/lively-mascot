@@ -4,35 +4,16 @@
  * A round cat with triangular ears, a curved tail, and whiskers.
  * Registers itself with the global LivelyMascot SDK.
  *
- * Requires: lively-mascot.js (loaded before this script)
+ * Requires: core/dom.js and lively-mascot.js (loaded before this script)
  */
 (function () {
   "use strict";
 
-  var SVG_NS = "http://www.w3.org/2000/svg";
+  var dom = typeof LivelyDom !== "undefined" ? LivelyDom : {};
+  var svg = dom.svg;
+  var hEl = dom.hEl;
 
-  function svg(tag, attrs, children) {
-    var el = document.createElementNS(SVG_NS, tag);
-    if (attrs) for (var k in attrs) if (Object.prototype.hasOwnProperty.call(attrs, k)) el.setAttribute(k, String(attrs[k]));
-    if (children) for (var i = 0; i < children.length; i++) el.appendChild(children[i]);
-    return el;
-  }
-  function hEl(tag, attrs, children) {
-    var node = document.createElement(tag);
-    if (attrs) for (var k in attrs) {
-      if (Object.prototype.hasOwnProperty.call(attrs, k)) {
-        var v = attrs[k];
-        if (v === undefined || v === null || v === "") continue;
-        if (k === "class") node.className = String(v);
-        else if (k === "text") node.textContent = String(v);
-        else node.setAttribute(k, String(v));
-      }
-    }
-    if (children) for (var i = 0; i < children.length; i++) node.appendChild(children[i]);
-    return node;
-  }
-
-  function renderCat(rig, rigEl) {
+  function renderCat(model, rigEl) {
     // --- Ears: tall, pointed cat ears ---
     var ears = hEl("span", { class: "lively__ears", "aria-hidden": "true" });
     var earLeft = svg("g", { class: "lively__ear-left" }, [
@@ -44,14 +25,15 @@
       svg("path", { class: "lively__ear--inner", d: "M54 28 C54 19 52 10 50 6 Q49 5 48 7 C45 15 44 23 44 28 C48 29 51 29 54 28 Z" })
     ]);
     ears.appendChild(svg("svg", { viewBox: "0 0 60 32" }, [earLeft, earRight]));
-    rig.registerLeaf(ears, { useLeafAnim: false }); // cat drives ears via its own CSS
+    model.registerPart("top", ears, { useEmotionAnimation: false }); // cat drives ears via its own CSS
 
     // --- Body ---
     var body = hEl("div", { class: "lively-body lively-body--cat" });
-    rig.registerBody(body);
+    model.registerPart("body", body);
 
     // --- Tail ---
     var tail = hEl("span", { class: "lively__tail", "aria-hidden": "true" });
+    model.registerPart("tail", tail);
     // The tail begins well inside the body silhouette. Its visible curve can
     // therefore emerge from behind the flank instead of ending at the edge.
     tail.appendChild(svg("svg", { viewBox: "0 0 52 58" }, [
@@ -63,7 +45,7 @@
     ]));
 
     // --- Face (shared) ---
-    var faceObj = LivelyMascot.buildFaceSvg(rig);
+    var faceObj = LivelyMascot.buildFaceSvg(model);
     var face = faceObj.face;
 
     // A small warm muzzle keeps the dark cat readable without making the
@@ -87,8 +69,7 @@
       svg("path", { class: "lively-cat__whisker lively-cat__whisker--r2", d: "M67 61 C78 60 85 60 93 62" }),
       svg("path", { class: "lively-cat__whisker lively-cat__whisker--r3", d: "M66 65 C76 67 82 70 89 74" })
     ]));
-    rig.registerFaceAccessory("whiskers", whiskers);
-    rig.setFaceAccessory("whiskers");
+    model.registerPart("accessory", whiskers);
 
     body.appendChild(ears);
     body.appendChild(faceObj.wrap);
@@ -98,7 +79,7 @@
 
     // --- Feet ---
     var feet = hEl("div", { class: "lively__feet" });
-    rig.registerFeet(feet);
+    model.registerPart("feet", feet);
     var footL = hEl("span", { class: "lively__foot lively__foot--l" });
     footL.appendChild(svg("svg", { viewBox: "0 0 22 16" }, [
       svg("ellipse", { class: "lively-foot__body", cx: 11, cy: 10, rx: 10, ry: 6 }),
@@ -116,15 +97,17 @@
     rigEl.appendChild(feet);
   }
 
-  // Register cat character when SDK is available
-  if (typeof LivelyMascot !== "undefined") {
-    LivelyMascot.registerCharacter("cat", renderCat, "Cat", "0 0 100 100");
-  } else {
-    // SDK not yet loaded; defer registration
-    document.addEventListener("DOMContentLoaded", function () {
-      if (typeof LivelyMascot !== "undefined") {
-        LivelyMascot.registerCharacter("cat", renderCat, "Cat", "0 0 100 100");
-      }
+  function register() {
+    if (typeof LivelyMascot === "undefined") return;
+    var actions = LivelyMascot.partActions;
+    LivelyMascot.defineModel({
+      id: "cat", name: "Cat", viewBox: "0 0 100 100", render: renderCat,
+      presentation: { icon: "\u{1F431}", labels: { zh: "小猫", en: "Cat" }, greeting: { zh: "喵！", en: "Meow!" }, order: 1, theme: { body: "#3d4852", outline: "#131a20", accent: "#eeb3c1" } },
+      parts: { body: { actions: actions.body }, eyes: { actions: actions.eyes }, pupils: { actions: [] }, face: { actions: [] }, mouth: { actions: actions.mouth }, top: { actions: actions.top }, feet: { actions: actions.feet }, tail: { actions: actions.tail }, accessory: { actions: actions.accessory } },
+      skin: { slots: ["body", "outline", "accent"], fixed: { pupil: "#17212a", muzzle: "#eee5d9" } },
+      effects: { supported: ["hearts", "sparkles", "sleep", "loading"], anchors: { head: { x: 50, y: 9 }, face: { x: 50, y: 47 }, body: { x: 50, y: 58 }, feet: { x: 50, y: 88 } } }
     });
   }
+  register();
+  if (typeof LivelyMascot === "undefined") document.addEventListener("DOMContentLoaded", register);
 })();
