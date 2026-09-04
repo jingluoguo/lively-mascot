@@ -1,0 +1,4 @@
+interface:
+  display_name: "Lively Mascot Release"
+  short_description: "Compare versions and prepare a Lively Mascot release"
+  default_prompt: "Use $lively-mascot-release to compare the previous tag with the target version, update release metadata and bilingual changelogs, rebuild, and verify the package."
